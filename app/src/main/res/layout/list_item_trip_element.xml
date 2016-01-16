@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content" >
+
+<!-- Album id / Hidden by default -->
+<TextView
+    android:id="@+id/trip_id"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone" />
+
+<!-- Song id / Hidden by default -->
+<TextView
+    android:id="@+id/element_id"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone" />
+
+
+<ImageView
+    android:id="@+id/element_icon"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:paddingTop="5sp"
+    android:paddingBottom="5sp"
+    android:paddingEnd="5sp"/>
+
+<!-- Element Title -->
+<TextView
+    android:id="@+id/element_title"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="15dip"
+    android:paddingLeft="5dip"
+    android:paddingTop="15dip"
+    android:textColor="#000000"
+    android:textSize="16dip"
+    android:layout_toRightOf="@+id/element_icon"/>
+
+<!-- Element Info -->
+<TextView
+    android:id="@+id/element_info"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentRight="true"
+    android:layout_centerVertical="true"
+    android:layout_toRightOf="@+id/element_icon"
+    android:layout_below="@+id/element_title"
+    android:paddingLeft="3dip"
+    android:paddingRight="6dip"
+    android:textColor="#202020" />
+
+    <!-- Element Details -->
+    <TextView
+        android:id="@+id/element_details"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/element_icon"
+        android:layout_below="@+id/element_info"
+        android:paddingLeft="3dip"
+        android:paddingRight="6dip"
+        android:textColor="#202020" />
+
+</RelativeLayout>

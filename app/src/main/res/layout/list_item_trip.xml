@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical">
+
+<!-- Trip id / Hidden by default -->
+<TextView
+    android:id="@+id/trip_id"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone" />
+
+<ImageView
+    android:id="@+id/trip_icon"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:paddingTop="5sp"
+    android:paddingBottom="5sp"
+    android:paddingEnd="5sp"/>
+
+<!-- Trip Name -->
+<TextView
+    android:id="@+id/trip_name"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_toRightOf="@id/trip_icon"
+    android:textSize="16sp"
+    android:textColor="#000000"
+    android:paddingTop="15dip"
+    android:paddingBottom="15dip"
+    android:paddingStart="10dip"
+    android:textStyle="bold"/>
+
+<!-- Trip description -->
+<TextView android:id="@+id/trip_description"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/trip_name"
+    android:layout_toRightOf="@id/trip_icon"
+    android:textColor="#202020"
+    android:paddingRight="3dip"
+    android:paddingLeft="3dip"/>
+
+</RelativeLayout>

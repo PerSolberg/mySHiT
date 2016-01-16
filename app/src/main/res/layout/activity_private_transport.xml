@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:text="Company"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/company"
+            android:layout_column="2"/>
+    </TableRow>
+
+    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:text="Departure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/departure"
+            android:layout_column="2"/>
+    </TableRow>
+
+    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:text="Arrival"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/arrival"
+            android:layout_column="2"/>
+    </TableRow>
+
+    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:text="Phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/phone"
+            android:layout_column="2"/>
+    </TableRow>
+
+    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:text="Reference"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/reference"
+            android:layout_column="2"/>
+    </TableRow>
+
+
+</TableLayout>
