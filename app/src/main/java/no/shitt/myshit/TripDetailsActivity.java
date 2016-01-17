@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import no.shitt.myshit.adapters.TripElementListAdapter;
+import no.shitt.myshit.beans.TripElementItem;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
 import no.shitt.myshit.helper.JSONParser;
@@ -41,7 +43,8 @@ public class TripDetailsActivity extends ListActivity {
     // Creating JSON Parser object
     JSONParser jsonParser = new JSONParser();
 
-    ArrayList<HashMap<String, String>> elementsList;
+    //ArrayList<HashMap<String, String>> elementsList;
+    List<TripElementItem> elementsList;
 
     // tracks JSONArray
     //JSONArray albums = null;
@@ -53,7 +56,7 @@ public class TripDetailsActivity extends ListActivity {
     // tracks JSON url
     // id - should be posted as GET params to get track list (ex: id = 5)
     //private static final String URL_ALBUMS = "http://api.androidhive.info/songs/album_tracks.php";
-    private static final String URL_TRIP_DETAILS = "https://www.shitt.no/mySHiT/trip/code/MICA2016?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
+    private static final String URL_TRIP_DETAILS = "http://www.shitt.no/mySHiT/trip/code/MICA2016?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
 
     // ALL JSON node names
     private static final String JSON_QUERY_RESULTS          = "results";
@@ -61,8 +64,8 @@ public class TripDetailsActivity extends ListActivity {
     private static final String JSON_TRIP_NAME              = "name";
     private static final String JSON_TRIP_ELEMENTS          = "elements";
 
-    //private static final String JSON_ELEM_TYPE              = "type";
-    //private static final String JSON_ELEM_SUBTYPE           = "subType";
+    private static final String JSON_ELEM_TYPE              = "type";
+    private static final String JSON_ELEM_SUBTYPE           = "subType";
     private static final String JSON_ELEM_ID                = "id";
     //private static final String JSON_ELEM_REF               = "references";
     //private static final String JSON_ELEM_LEG_NO            = "legNo";
@@ -113,10 +116,11 @@ public class TripDetailsActivity extends ListActivity {
         trip_id = i.getStringExtra("trip_id");
 
         // Hashmap for ListView
-        elementsList = new ArrayList<HashMap<String, String>>();
+        //elementsList = new ArrayList<HashMap<String, String>>();
+        elementsList = new ArrayList<>();
 
         // Loading tracks in Background Thread
-        new LoadTracks().execute();
+        new LoadTripElements().execute();
 
         // get listview
         ListView lv = getListView();
@@ -151,7 +155,7 @@ public class TripDetailsActivity extends ListActivity {
     /**
      * Background Async Task to Load all tracks under one album
      * */
-    class LoadTracks extends AsyncTask<String, String, String> {
+    class LoadTripElements extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -160,7 +164,7 @@ public class TripDetailsActivity extends ListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(TripDetailsActivity.this);
-            pDialog.setMessage("Loading songs ...");
+            pDialog.setMessage("Loading trip details ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -190,9 +194,9 @@ public class TripDetailsActivity extends ListActivity {
                     if (tripListData != null) {
                         JSONObject tripDetailsData = tripListData.getJSONObject(0);
                         if (tripDetailsData != null) {
-                            String trip_id = jObj.getString(JSON_TRIP_ID);
-                            trip_name = jObj.getString(JSON_TRIP_NAME);
-                            elements = jObj.getJSONArray(JSON_TRIP_ELEMENTS);
+                            String trip_id = tripDetailsData.getString(JSON_TRIP_ID);
+                            trip_name = tripDetailsData.getString(JSON_TRIP_NAME);
+                            elements = tripDetailsData.getJSONArray(JSON_TRIP_ELEMENTS);
 
                             if (elements != null) {
                                 // looping through All songs
@@ -201,6 +205,8 @@ public class TripDetailsActivity extends ListActivity {
 
                                     // Storing each json item in variable
                                     String element_id = e.getString(JSON_ELEM_ID);
+                                    String type       = e.getString(JSON_ELEM_TYPE);
+                                    String subtype    = e.getString(JSON_ELEM_SUBTYPE);
                                     String start_loc  = e.getString(JSON_ELEM_DEP_LOCATION);
                                     String start_stop = e.getString(JSON_ELEM_DEP_STOP);
                                     String start_time = e.getString(JSON_ELEM_DEP_TIME);
@@ -209,9 +215,12 @@ public class TripDetailsActivity extends ListActivity {
                                     String end_time   = e.getString(JSON_ELEM_ARR_TIME);
 
                                     String element_title = start_loc + " - " + end_loc;
-                                    String element_info  = start_time + ": " + start_stop + "\n" + end_time + ": " + end_stop;
+                                    //String element_info  = start_time + ": " + start_stop + "\n" + end_time + ": " + end_stop;
+                                    String element_start = start_time + ": " + start_stop;
+                                    String element_end   = end_time + ": " + end_stop;
                                     String element_details = "references go here";
 
+                                    /*
                                     // creating new HashMap
                                     HashMap<String, String> map = new HashMap<String, String>();
 
@@ -224,6 +233,13 @@ public class TripDetailsActivity extends ListActivity {
 
                                     // adding HashList to ArrayList
                                     elementsList.add(map);
+                                    */
+
+                                    String icon_name = "icon_tripelement_" + type + "_" + subtype + "_default";
+                                    int icon_id = getResources().getIdentifier(icon_name.toLowerCase(), "mipmap", getPackageName());
+                                    Log.d("Element Icon:", icon_name + " (" + Integer.toString(icon_id) + ")");
+                                    TripElementItem element = new TripElementItem(Integer.valueOf(trip_id), Integer.valueOf(element_id), icon_id, element_title, element_start, element_end, element_details );
+                                    elementsList.add(element);
                                 }
                             } else {
                                 Log.d("Trip Details: ", "null");
@@ -251,12 +267,15 @@ public class TripDetailsActivity extends ListActivity {
                     /**
                      * Updating parsed JSON data into ListView
                      * */
+                    ListAdapter adapter = new TripElementListAdapter( TripDetailsActivity.this, elementsList );
+                    /*
                     ListAdapter adapter = new SimpleAdapter( TripDetailsActivity.this
                             , elementsList
                             , R.layout.list_item_trip_element
                             , new String[] { JSON_TRIP_ID, JSON_ELEM_ID, null, "title", "info", "details" }
                             , new int[] { R.id.trip_id, R.id.element_id, R.id.element_icon, R.id.element_title, R.id.element_info, R.id.element_details }
                             );
+                    */
                     // updating listview
                     setListAdapter(adapter);
 

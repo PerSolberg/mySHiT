@@ -22,9 +22,12 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import no.shitt.myshit.adapters.TripListAdapter;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
 import no.shitt.myshit.helper.JSONParser;
+
+import no.shitt.myshit.beans.TripItem;
 
 public class TripsActivity extends ListActivity {
     // Connection detector
@@ -39,7 +42,8 @@ public class TripsActivity extends ListActivity {
     // Creating JSON Parser object
     JSONParser jsonParser = new JSONParser();
 
-    ArrayList<HashMap<String, String>> tripList;
+    //ArrayList<HashMap<String, String>> tripList;
+    List<TripItem> tripList;
 
     // albums JSONArray
     //JSONArray albums = null;
@@ -47,7 +51,7 @@ public class TripsActivity extends ListActivity {
 
     // albums JSON url
     //private static final String URL_ALBUMS = "http://api.androidhive.info/songs/albums.php";
-    private static final String URL_TRIPS = "https://www.shitt.no/mySHiT/trip?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
+    private static final String URL_TRIPS = "http://www.shitt.no/mySHiT/trip?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
 
     // ALL JSON node names
     private static final String JSON_QUERY_RESULTS = "results";
@@ -58,7 +62,7 @@ public class TripsActivity extends ListActivity {
     //private static final String JSON_TRIP_CODE = "code";
     private static final String JSON_TRIP_NAME = "name";
     //private static final String JSON_TRIP_SECTION = "section";
-    //private static final String JSON_TRIP_TYPE = "type";
+    private static final String JSON_TRIP_TYPE = "type";
     //private static final String JSON_TRIP_ELEMENTS = "elements";
 
 
@@ -73,16 +77,17 @@ public class TripsActivity extends ListActivity {
         if (!cd.isConnectingToInternet()) {
             // Internet Connection is not present
             alert.showAlertDialogue(TripsActivity.this, "Internet Connection Error",
-                    "Please connect to working Internet connection", false);
+                    "Please, please connect to working Internet connection", false);
             // stop executing code by return
             return;
         }
 
         // Hashmap for ListView
-        tripList = new ArrayList<HashMap<String, String>>();
+        //tripList = new ArrayList<HashMap<String, String>>();
+        tripList = new ArrayList<>();
 
         // Loading Albums JSON in Background Thread
-        new LoadAlbums().execute();
+        new LoadTrips().execute();
 
         // get listview
         ListView lv = getListView();
@@ -111,7 +116,7 @@ public class TripsActivity extends ListActivity {
     /**
      * Background Async Task to Load all Albums by making http request
      * */
-    class LoadAlbums extends AsyncTask<String, String, String> {
+    class LoadTrips extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -120,7 +125,7 @@ public class TripsActivity extends ListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(TripsActivity.this);
-            pDialog.setMessage("Listing Albums ...");
+            pDialog.setMessage("Loading SHiT Trips ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -155,17 +160,13 @@ public class TripsActivity extends ListActivity {
                             String id = c.getString(JSON_TRIP_ID);
                             String name = c.getString(JSON_TRIP_NAME);
                             String desc = c.getString(JSON_TRIP_DESC);
+                            String type = c.getString(JSON_TRIP_TYPE);
 
-                            // creating new HashMap
-                            HashMap<String, String> map = new HashMap<String, String>();
-
-                            // adding each child node to HashMap key => value
-                            map.put(JSON_TRIP_ID, id);
-                            map.put(JSON_TRIP_NAME, name);
-                            map.put(JSON_TRIP_DESC, desc);
-
-                            // adding HashList to ArrayList
-                            tripList.add(map);
+                            String icon_name = "icon_trip_" + type;
+                            int icon_id = getResources().getIdentifier(icon_name.toLowerCase(), "mipmap", getPackageName());
+                            //Log.d("Icon ID:", Integer.toString(icon_id));
+                            TripItem trip = new TripItem(Integer.valueOf(id), icon_id, name, desc);
+                            tripList.add(trip);
                         }
                     }
                 }else{
@@ -191,12 +192,15 @@ public class TripsActivity extends ListActivity {
                     /**
                      * Updating parsed JSON data into ListView
                      * */
+                    ListAdapter adapter = new TripListAdapter(TripsActivity.this, tripList);
+                    /*
                     ListAdapter adapter = new SimpleAdapter( TripsActivity.this
                                                            , tripList
                                                            , R.layout.list_item_trip
                                                            , new String[] { JSON_TRIP_ID, null, JSON_TRIP_NAME, JSON_TRIP_DESC }
                                                            , new int[] { R.id.trip_id, R.id.trip_icon, R.id.trip_name, R.id.trip_description }
                                                            );
+                    */
 
                     // updating listview
                     setListAdapter(adapter);
