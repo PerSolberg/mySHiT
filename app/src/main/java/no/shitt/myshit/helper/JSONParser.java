@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class JSONParser {
-
+/*
     static InputStream is = null;
     static JSONObject jObj = null;
     static String json = "";
@@ -38,7 +38,6 @@ public class JSONParser {
 
         // Making HTTP request
         try {
-
             // check for request method
             if (method == "POST") {
                 // request method is POST
@@ -89,4 +88,5 @@ public class JSONParser {
         return json;
 
     }
+    */
 }

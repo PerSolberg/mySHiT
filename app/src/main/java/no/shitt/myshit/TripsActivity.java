@@ -11,9 +11,13 @@ import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,8 +32,11 @@ import no.shitt.myshit.helper.ConnectionDetector;
 import no.shitt.myshit.helper.JSONParser;
 
 import no.shitt.myshit.beans.TripItem;
+import no.shitt.myshit.helper.ServerAPI;
+import no.shitt.myshit.helper.ServerAPIListener;
+import no.shitt.myshit.model.TripList;
 
-public class TripsActivity extends ListActivity {
+public class TripsActivity extends ListActivity /*implements ServerAPIListener */ {
     // Connection detector
     ConnectionDetector cd;
 
@@ -39,32 +46,12 @@ public class TripsActivity extends ListActivity {
     // Progress Dialog
     private ProgressDialog pDialog;
 
-    // Creating JSON Parser object
-    JSONParser jsonParser = new JSONParser();
-
-    //ArrayList<HashMap<String, String>> tripList;
-    List<TripItem> tripList;
-
-    // albums JSONArray
-    //JSONArray albums = null;
-    JSONObject tripData = null;
+    // Trip Data
+    //JSONObject tripData = null;
 
     // albums JSON url
     //private static final String URL_ALBUMS = "http://api.androidhive.info/songs/albums.php";
-    private static final String URL_TRIPS = "http://www.shitt.no/mySHiT/trip?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
-
-    // ALL JSON node names
-    private static final String JSON_QUERY_RESULTS = "results";
-    private static final String JSON_TRIP_ID = "id";
-    //private static final String JSON_TRIP_START_DATE = "startDate";
-    //private static final String JSON_TRIP_END_DATE = "endDate";
-    private static final String JSON_TRIP_DESC = "description";
-    //private static final String JSON_TRIP_CODE = "code";
-    private static final String JSON_TRIP_NAME = "name";
-    //private static final String JSON_TRIP_SECTION = "section";
-    private static final String JSON_TRIP_TYPE = "type";
-    //private static final String JSON_TRIP_ELEMENTS = "elements";
-
+    private static final String URL_TRIPS = "http://www.shitt.no/mySHiT/trip?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic&dummy=55";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,132 +69,79 @@ public class TripsActivity extends ListActivity {
             return;
         }
 
-        // Hashmap for ListView
-        //tripList = new ArrayList<HashMap<String, String>>();
-        tripList = new ArrayList<>();
-
-        // Loading Albums JSON in Background Thread
-        new LoadTrips().execute();
+        if (TripList.getSharedList().tripCount() == 0) {
+            loadTrips();
+        }
 
         // get listview
         ListView lv = getListView();
 
-        /**
-         * Listview item click listener
-         * TrackListActivity will be lauched by passing album id
-         * */
+        // Listview item click listener
         lv.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2,
                                     long arg3) {
-                // on selecting a single album
-                // TrackListActivity will be launched to show tracks inside the album
+                // On selecting a trip: TripDetailsActivity will be launched to trip details
                 Intent i = new Intent(getApplicationContext(), TripDetailsActivity.class);
 
                 // send album id to tracklist activity to get list of songs under that album
-                String album_id = ((TextView) view.findViewById(R.id.trip_id)).getText().toString();
-                i.putExtra("album_id", album_id);
+                String trip_code = ((TextView) view.findViewById(R.id.trip_code)).getText().toString();
+                i.putExtra("trip_code", trip_code);
 
                 startActivity(i);
             }
         });
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter("tripsLoaded"));
     }
 
-    /**
-     * Background Async Task to Load all Albums by making http request
-     * */
-    class LoadTrips extends AsyncTask<String, String, String> {
-
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(TripsActivity.this);
-            pDialog.setMessage("Loading SHiT Trips ...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        /**
-         * getting Albums JSON
-         * */
-        protected String doInBackground(String... args) {
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-
-            // getting JSON string from URL
-            String json = jsonParser.makeHttpRequest(URL_TRIPS, "GET",
-                    params);
-
-            // Check your log cat for JSON reponse
-            Log.d("TripData JSON: ", "> " + json);
-
-            try {
-                //albums = new JSONArray(json);
-                tripData = new JSONObject(json);
-
-                if (tripData != null) {
-                    JSONArray tripListData = tripData.getJSONArray(JSON_QUERY_RESULTS);
-                    if (tripListData != null) {
-                        // looping through All albums
-                        for (int i = 0; i < tripListData.length(); i++) {
-                            JSONObject c = tripListData.getJSONObject(i);
-
-                            // Storing each json item values in variable
-                            String id = c.getString(JSON_TRIP_ID);
-                            String name = c.getString(JSON_TRIP_NAME);
-                            String desc = c.getString(JSON_TRIP_DESC);
-                            String type = c.getString(JSON_TRIP_TYPE);
-
-                            String icon_name = "icon_trip_" + type;
-                            int icon_id = getResources().getIdentifier(icon_name.toLowerCase(), "mipmap", getPackageName());
-                            //Log.d("Icon ID:", Integer.toString(icon_id));
-                            TripItem trip = new TripItem(Integer.valueOf(id), icon_id, name, desc);
-                            tripList.add(trip);
-                        }
-                    }
-                }else{
-                    Log.d("TripData: ", "null");
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+    private void updateListView() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                ListAdapter adapter = new TripListAdapter(TripsActivity.this);
+                setListAdapter(adapter);
             }
-
-            return null;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog
-         * **/
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog after getting all albums
-            pDialog.dismiss();
-            // updating UI from Background Thread
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    /**
-                     * Updating parsed JSON data into ListView
-                     * */
-                    ListAdapter adapter = new TripListAdapter(TripsActivity.this, tripList);
-                    /*
-                    ListAdapter adapter = new SimpleAdapter( TripsActivity.this
-                                                           , tripList
-                                                           , R.layout.list_item_trip
-                                                           , new String[] { JSON_TRIP_ID, null, JSON_TRIP_NAME, JSON_TRIP_DESC }
-                                                           , new int[] { R.id.trip_id, R.id.trip_icon, R.id.trip_name, R.id.trip_description }
-                                                           );
-                    */
-
-                    // updating listview
-                    setListAdapter(adapter);
-                }
-            });
-
-        }
-
+        });
     }
+
+    private class HandleNotification extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("tripsLoaded")) {
+                serverCallComplete();
+            } else if (intent.getAction().equals("communicationError")) {
+                serverCallFailed();
+            }
+        }
+    }
+
+    public void serverCallComplete() {
+        if (pDialog != null) {
+            pDialog.dismiss();
+            pDialog = null;
+        }
+        Log.d("TripActivity", "Server call succeeded");
+
+        updateListView();
+    }
+
+    public void serverCallFailed() {
+        if (pDialog != null) {
+            pDialog.dismiss();
+            pDialog = null;
+        }
+        Log.d("TripActivity", "Server REST call failed.");
+    }
+
+    private void loadTrips() {
+        pDialog = new ProgressDialog(TripsActivity.this);
+        pDialog.setMessage("Loading SHiT Trips ...");
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+        TripList.getSharedList().getFromServer();
+        //new ServerAPI(this).execute(URL_TRIPS);
+    }
+
 }

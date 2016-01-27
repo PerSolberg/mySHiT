@@ -14,13 +14,20 @@ import no.shitt.myshit.adapters.TripElementListAdapter;
 import no.shitt.myshit.beans.TripElementItem;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
-import no.shitt.myshit.helper.JSONParser;
+import no.shitt.myshit.helper.ServerAPI;
+import no.shitt.myshit.helper.ServerAPIListener;
+import no.shitt.myshit.model.AnnotatedTrip;
+import no.shitt.myshit.model.TripList;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,7 +37,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TripDetailsActivity extends ListActivity {
+public class TripDetailsActivity extends ListActivity /* implements ServerAPIListener */ {
     // Connection detector
     ConnectionDetector cd;
 
@@ -40,18 +47,17 @@ public class TripDetailsActivity extends ListActivity {
     // Progress Dialog
     private ProgressDialog pDialog;
 
-    // Creating JSON Parser object
-    JSONParser jsonParser = new JSONParser();
-
+    private AnnotatedTrip annotatedTrip;
     //ArrayList<HashMap<String, String>> elementsList;
-    List<TripElementItem> elementsList;
+    //List<TripElementItem> elementsList;
 
     // tracks JSONArray
     //JSONArray albums = null;
-    JSONArray elements = null;
+    //JSONArray elements = null;
 
     // Album id
-    String trip_id, trip_name;
+    String trip_code;
+    String trip_name;
 
     // tracks JSON url
     // id - should be posted as GET params to get track list (ex: id = 5)
@@ -92,9 +98,6 @@ public class TripDetailsActivity extends ListActivity {
     //private static final String JSON_ELEM_COMPANY_CODE      = "companyCode";
     //private static final String JSON_ELEM_COMPANY_PHONE     = "companyPhone";
 
-
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,14 +116,23 @@ public class TripDetailsActivity extends ListActivity {
 
         // Get album id
         Intent i = getIntent();
-        trip_id = i.getStringExtra("trip_id");
+        trip_code = i.getStringExtra("trip_code");
 
+        annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
+
+        if (annotatedTrip == null) {
+            Log.e("TripDetailsActivity", "Invalid trip!");
+        } else if (annotatedTrip.trip.elementCount() == 0) {
+            loadTripDetails();
+        } else {
+            updateListView();
+        }
         // Hashmap for ListView
         //elementsList = new ArrayList<HashMap<String, String>>();
-        elementsList = new ArrayList<>();
+        //elementsList = new ArrayList<>();
 
         // Loading tracks in Background Thread
-        new LoadTripElements().execute();
+        //new LoadTripElements().execute();
 
         // get listview
         ListView lv = getListView();
@@ -136,8 +148,7 @@ public class TripDetailsActivity extends ListActivity {
                 // On selecting single track get song information
                 Intent i = new Intent(getApplicationContext(), FlightActivity.class);
 
-                // to get song information
-                // both album id and song is needed
+                // Pass trip id and element id to details view
                 String trip_id = ((TextView) view.findViewById(R.id.trip_id)).getText().toString();
                 String element_id = ((TextView) view.findViewById(R.id.element_id)).getText().toString();
 
@@ -150,150 +161,66 @@ public class TripDetailsActivity extends ListActivity {
             }
         });
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter("tripDetailsLoaded"));
     }
 
-    /**
-     * Background Async Task to Load all tracks under one album
-     * */
-    class LoadTripElements extends AsyncTask<String, String, String> {
-
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
+    private class HandleNotification extends BroadcastReceiver {
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(TripDetailsActivity.this);
-            pDialog.setMessage("Loading trip details ...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        /**
-         * getting tracks json and parsing
-         * */
-        protected String doInBackground(String... args) {
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-
-            // post album id as GET parameter
-            //params.add(new BasicNameValuePair(TAG_TRIP_ID, album_id));
-
-            // getting JSON string from URL
-            String json = jsonParser.makeHttpRequest(URL_TRIP_DETAILS, "GET",
-                    params);
-
-            // Check your log cat for JSON reponse
-            Log.d("Trip Details JSON: ", json);
-
-            try {
-                JSONObject jObj = new JSONObject(json);
-                if (jObj != null) {
-                    JSONArray tripListData = jObj.getJSONArray(JSON_QUERY_RESULTS);
-                    if (tripListData != null) {
-                        JSONObject tripDetailsData = tripListData.getJSONObject(0);
-                        if (tripDetailsData != null) {
-                            String trip_id = tripDetailsData.getString(JSON_TRIP_ID);
-                            trip_name = tripDetailsData.getString(JSON_TRIP_NAME);
-                            elements = tripDetailsData.getJSONArray(JSON_TRIP_ELEMENTS);
-
-                            if (elements != null) {
-                                // looping through All songs
-                                for (int i = 0; i < elements.length(); i++) {
-                                    JSONObject e = elements.getJSONObject(i);
-
-                                    // Storing each json item in variable
-                                    String element_id = e.getString(JSON_ELEM_ID);
-                                    String type       = e.getString(JSON_ELEM_TYPE);
-                                    String subtype    = e.getString(JSON_ELEM_SUBTYPE);
-                                    String start_loc  = e.getString(JSON_ELEM_DEP_LOCATION);
-                                    String start_stop = e.getString(JSON_ELEM_DEP_STOP);
-                                    String start_time = e.getString(JSON_ELEM_DEP_TIME);
-                                    String end_loc    = e.getString(JSON_ELEM_ARR_LOCATION);
-                                    String end_stop   = e.getString(JSON_ELEM_ARR_STOP);
-                                    String end_time   = e.getString(JSON_ELEM_ARR_TIME);
-
-                                    String element_title = start_loc + " - " + end_loc;
-                                    //String element_info  = start_time + ": " + start_stop + "\n" + end_time + ": " + end_stop;
-                                    String element_start = start_time + ": " + start_stop;
-                                    String element_end   = end_time + ": " + end_stop;
-                                    String element_details = "references go here";
-
-                                    /*
-                                    // creating new HashMap
-                                    HashMap<String, String> map = new HashMap<String, String>();
-
-                                    // adding each child node to HashMap key => value
-                                    map.put(JSON_TRIP_ID, trip_id);
-                                    map.put(JSON_ELEM_ID, element_id);
-                                    map.put("title", element_title);
-                                    map.put("info", element_info);
-                                    map.put("details", element_details);
-
-                                    // adding HashList to ArrayList
-                                    elementsList.add(map);
-                                    */
-
-                                    String icon_name = "icon_tripelement_" + type + "_" + subtype + "_default";
-                                    int icon_id = getResources().getIdentifier(icon_name.toLowerCase(), "mipmap", getPackageName());
-                                    Log.d("Element Icon:", icon_name + " (" + Integer.toString(icon_id) + ")");
-                                    TripElementItem element = new TripElementItem(Integer.valueOf(trip_id), Integer.valueOf(element_id), icon_id, element_title, element_start, element_end, element_details );
-                                    elementsList.add(element);
-                                }
-                            } else {
-                                Log.d("Trip Details: ", "null");
-                            }
-                        }
-                    }
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("tripDetailsLoaded")) {
+                serverCallComplete();
+            } else if (intent.getAction().equals("communicationError")) {
+                serverCallFailed();
             }
-
-            return null;
         }
-
-        /**
-         * After completing background task Dismiss the progress dialog
-         * **/
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog after getting all tracks
-            pDialog.dismiss();
-            // updating UI from Background Thread
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    /**
-                     * Updating parsed JSON data into ListView
-                     * */
-                    ListAdapter adapter = new TripElementListAdapter( TripDetailsActivity.this, elementsList );
-                    /*
-                    ListAdapter adapter = new SimpleAdapter( TripDetailsActivity.this
-                            , elementsList
-                            , R.layout.list_item_trip_element
-                            , new String[] { JSON_TRIP_ID, JSON_ELEM_ID, null, "title", "info", "details" }
-                            , new int[] { R.id.trip_id, R.id.element_id, R.id.element_icon, R.id.element_title, R.id.element_info, R.id.element_details }
-                            );
-                    */
-                    // updating listview
-                    setListAdapter(adapter);
-
-                    // Change Activity Title with Album name
-                    setTitle(trip_name);
-                }
-            });
-
-        }
-
     }
-}
 
-/*
-android:id="@+id/trip_id"
-android:id="@+id/element_id"
-android:id="@+id/element_icon"
-android:id="@+id/element_title"
-android:id="@+id/element_info"
-android:id="@+id/element_details"
-*/
+
+    private void updateListView() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                ListAdapter adapter = new TripElementListAdapter(TripDetailsActivity.this, annotatedTrip);
+                setListAdapter(adapter);
+            }
+        });
+    }
+
+    public void serverCallComplete() {
+        if (pDialog != null) {
+            pDialog.dismiss();
+            pDialog = null;
+        }
+        Log.d("TripDetailsActivity", "Server call succeeded");
+
+        updateListView();
+        /*
+        runOnUiThread(new Runnable() {
+            public void run() {
+                ListAdapter adapter = new TripElementListAdapter(TripDetailsActivity.this, annotatedTrip);
+                setListAdapter(adapter);
+            }
+        });
+        */
+    }
+
+    public void serverCallFailed() {
+        if (pDialog != null) {
+            pDialog.dismiss();
+            pDialog = null;
+        }
+        Log.d("TripDetailsActivity", "Server REST call failed.");
+    }
+
+
+    private void loadTripDetails() {
+        pDialog = new ProgressDialog(TripDetailsActivity.this);
+        pDialog.setMessage("Loading trip details ...");
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        pDialog.show();
+        //new ServerAPI(this).execute(URL_TRIP_DETAILS);
+        //new ServerAPI(this).execute(URL_PART1 + trip_code + URL_PART2);
+        annotatedTrip.trip.loadDetails();
+    }
+
+}

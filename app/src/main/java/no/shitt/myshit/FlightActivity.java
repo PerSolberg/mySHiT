@@ -21,6 +21,7 @@ import android.widget.TextView;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
 import no.shitt.myshit.helper.JSONParser;
+import no.shitt.myshit.helper.ServerAPI;
 
 
 public class FlightActivity extends Activity {
@@ -76,17 +77,16 @@ public class FlightActivity extends Activity {
         song_id = i.getStringExtra("song_id");
 
         // calling background thread
-        new LoadSingleTrack().execute();
+        //new LoadSingleTrack().execute();
     }
 
     /**
      * Background Async Task to get single song information
      * */
+    /*
     class LoadSingleTrack extends AsyncTask<String, String, String> {
 
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
+        // Before starting background thread Show Progress Dialog
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -97,9 +97,7 @@ public class FlightActivity extends Activity {
             pDialog.show();
         }
 
-        /**
-         * getting song json and parsing
-         * */
+        // getting song json and parsing
         protected String doInBackground(String... args) {
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -109,8 +107,7 @@ public class FlightActivity extends Activity {
             params.add(new BasicNameValuePair("song", song_id));
 
             // getting JSON string from URL
-            String json = jsonParser.makeHttpRequest(URL_SONG, "GET",
-                    params);
+            //String json = jsonParser.makeHttpRequest(URL_SONG, "GET", params);
 
             // Check your log cat for JSON reponse
             Log.d("Single Track JSON: ", json);
@@ -130,9 +127,7 @@ public class FlightActivity extends Activity {
             return null;
         }
 
-        /**
-         * After completing background task Dismiss the progress dialog
-         * **/
+        // After completing background task Dismiss the progress dialog
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after getting song information
             pDialog.dismiss();
@@ -162,4 +157,5 @@ public class FlightActivity extends Activity {
         }
 
     }
+    */
 }

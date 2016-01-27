@@ -14,16 +14,22 @@ import org.w3c.dom.Text;
 
 import no.shitt.myshit.R;
 //import com.theopentutorials.android.beans.RowItem;
-import no.shitt.myshit.beans.TripElementItem;
+//import no.shitt.myshit.beans.TripElementItem;
+import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.model.AnnotatedTrip;
+import no.shitt.myshit.model.AnnotatedTripElement;
+import no.shitt.myshit.model.TripList;
 
 public class TripElementListAdapter extends BaseAdapter {
     Context context;
+    AnnotatedTrip annotatedTrip;
 
-    List<TripElementItem> rowItems;
+    //List<TripElementItem> rowItems;
 
-    public TripElementListAdapter(Context context, List<TripElementItem> items) {
+    public TripElementListAdapter(Context context, AnnotatedTrip annotatedTrip) {
         this.context = context;
-        this.rowItems = items;
+        this.annotatedTrip = annotatedTrip;
+        //this.rowItems = items;
     }
 
     /*private view holder class*/
@@ -37,10 +43,9 @@ public class TripElementListAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
+        ViewHolder holder;
 
-        LayoutInflater mInflater = (LayoutInflater)
-                context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.list_item_trip_element, null);
             holder = new ViewHolder();
@@ -56,30 +61,35 @@ public class TripElementListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        TripElementItem rowItem = (TripElementItem) getItem(position);
+        //TripElementItem rowItem = (TripElementItem) getItem(position);
+        AnnotatedTripElement rowItem = (AnnotatedTripElement) getItem(position);
 
-        holder.txtTripId.setText(Integer.toString(rowItem.getTripId()));
-        holder.txtElementId.setText(Integer.toString(rowItem.getId()));
-        holder.imageView.setImageResource(rowItem.getImageId());
-        holder.txtTitle.setText(rowItem.getName());
-        holder.txtInfo.setText(rowItem.getStart() + "\n" + rowItem.getEnd());
-        holder.txtDetails.setText(rowItem.getDesc());
+        holder.txtTripId.setText(Integer.toString(rowItem.tripElement.id));
+        holder.txtElementId.setText(Integer.toString(rowItem.tripElement.id));
+        holder.imageView.setImageResource(rowItem.tripElement.getIconId(SHiTApplication.getContext()));
+        holder.txtTitle.setText(rowItem.tripElement.getTitle(SHiTApplication.getContext()));
+        holder.txtInfo.setText(rowItem.tripElement.getStartInfo(SHiTApplication.getContext()) + "\n" + rowItem.tripElement.getEndInfo(SHiTApplication.getContext()));
+        holder.txtDetails.setText(rowItem.tripElement.getDetailInfo(SHiTApplication.getContext()));
 
         return convertView;
     }
 
     @Override
     public int getCount() {
-        return rowItems.size();
+        return annotatedTrip.trip.elementCount();
+        //return rowItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return rowItems.get(position);
+        return annotatedTrip.trip.elementByPosition(position);
+        //return rowItems.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return rowItems.indexOf(getItem(position));
+        return ((AnnotatedTripElement) getItem(position)).tripElement.id;
+        //return rowItems.indexOf(getItem(position));
     }
+
 }

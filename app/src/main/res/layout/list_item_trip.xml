@@ -11,13 +11,19 @@ android:orientation="vertical">
     android:layout_height="wrap_content"
     android:visibility="gone" />
 
+<TextView
+    android:id="@+id/trip_code"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone" />
+
 <ImageView
     android:id="@+id/trip_icon"
     android:layout_width="60dp"
     android:layout_height="60dp"
-    android:paddingTop="5sp"
-    android:paddingBottom="5sp"
-    android:paddingEnd="5sp"/>
+    android:paddingTop="2sp"
+    android:paddingBottom="2sp"
+    android:paddingEnd="2sp"/>
 
 <!-- Trip Name -->
 <TextView
@@ -28,9 +34,9 @@ android:orientation="vertical">
     android:layout_toRightOf="@id/trip_icon"
     android:textSize="16sp"
     android:textColor="#000000"
-    android:paddingTop="15dip"
-    android:paddingBottom="15dip"
-    android:paddingStart="10dip"
+    android:paddingTop="2dip"
+    android:paddingBottom="2dip"
+    android:paddingStart="3dip"
     android:textStyle="bold"/>
 
 <!-- Trip description -->
