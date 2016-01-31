@@ -1,6 +1,26 @@
 package no.shitt.myshit;
 
 public class Constants {
+    public static final String CRED_U_FILE = "SHiT-U.dat";
+    public static final String CRED_P_FILE = "SHiT-P.dat";
+    public static final String LOCAL_ARCHIVE_FILE = "SHiT-trips.json";
+
+    public static final String URL_ENCODE_CHARSET = "utf-8";
+
+    public class Notification {
+        public static final String LOGON_FAILED           = "logonFailed";
+        public static final String LOGON_SUCCEEDED        = "logonSuccessful";
+
+        public static final String TRIPS_LOADED           = "tripsLoaded";
+        public static final String TRIP_DETAILS_LOADED    = "tripDetailsLoaded";
+        public static final String COMMUNICATION_FAILED   = "communicationError";
+    }
+
+    public class IntentExtra {
+        public static final String TRIP_CODE            = "trip_code";
+        public static final String ELEMENT_ID           = "element_id";
+    }
+
     public class JSON {
         public static final String QUERY_COUNT      = "count";
         public static final String QUERY_DETAILS    = "details";

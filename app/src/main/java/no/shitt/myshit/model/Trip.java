@@ -13,21 +13,27 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
 import no.shitt.myshit.helper.ServerAPIListener;
+import no.shitt.myshit.helper.ServerAPIParams;
 import no.shitt.myshit.helper.ServerDate;
 
-public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
+public class Trip implements ServerAPIListener, JSONable {
     public int id;
+    public String startDateText;  // Hold original value for saving in archive
     public Date startDate;
+    public String endDateText;    // Hold original value for saving in archive
     public Date endDate;
     public String tripDescription;
     public String code;
@@ -37,8 +43,8 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
 
     private final static String iconBaseName = "icon_trip_";
 
-    private static final String URL_PART1 = "http://www.shitt.no/mySHiT/trip/code/";
-    private static final String URL_PART2 = "?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
+    //private static final String URL_PART1 = "http://www.shitt.no/mySHiT/trip/code/";
+    //private static final String URL_PART2 = "?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
 
     //static let webServiceRootPath = "trip/code/"
 
@@ -61,7 +67,8 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
         return name;
     }
 
-    public String getDateInfo(Context ctx) {
+    public String getDateInfo() {
+        Context ctx = SHiTApplication.getContext();
         DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
         //dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
         //dateFormatter.timeStyle = NSDateFormatterStyle.NoStyle
@@ -99,7 +106,8 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
         }
     }
 
-    public int getIconId(Context ctx) {
+    public int getIconId() {
+        Context ctx = SHiTApplication.getContext();
         String path = iconBaseName;
         String iconName;
         int    iconId;
@@ -141,19 +149,6 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
     }
 
 
-    /* Identifiers for keyed archive (iOS only?)
-    struct PropertyKey {
-        static let idKey = "id"
-        static let startDateKey = "startDate"
-        static let endDateKey = "endDate"
-        static let tripDescriptionKey = "description"
-        static let codeKey = "code"
-        static let nameKey = "name"
-        static let typeKey = "type"
-        static let elementsKey = "elements"
-    }
-    */
-
     // MARK: Factory
     public static Trip createFromDictionary( JSONObject elementData ) {
         //let tripType = elementData["type"] as? String ?? ""
@@ -161,48 +156,43 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
         return new Trip(elementData);
     }
 
-    /* Encode for keyed archive (iOS only?)
-    // MARK: NSCoding
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeInteger(id, forKey: PropertyKey.idKey)
-        aCoder.encodeObject(startDate, forKey: PropertyKey.startDateKey)
-        aCoder.encodeObject(endDate, forKey: PropertyKey.endDateKey)
-        aCoder.encodeObject(tripDescription, forKey: PropertyKey.tripDescriptionKey)
-        aCoder.encodeObject(code, forKey: PropertyKey.codeKey)
-        aCoder.encodeObject(name, forKey: PropertyKey.nameKey)
-        aCoder.encodeObject(type, forKey: PropertyKey.typeKey)
-        aCoder.encodeObject(elements, forKey: PropertyKey.elementsKey)
+    // Encode to JSON for saving to file
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = new JSONObject();
+
+        jo.put(Constants.JSON.TRIP_ID, id);
+        jo.putOpt(Constants.JSON.TRIP_START_DATE, startDateText);
+        jo.putOpt(Constants.JSON.TRIP_END_DATE, endDateText);
+        jo.putOpt(Constants.JSON.TRIP_DESCRIPTION, tripDescription);
+        jo.putOpt(Constants.JSON.TRIP_CODE, code);
+        jo.putOpt(Constants.JSON.TRIP_NAME, name);
+        jo.putOpt(Constants.JSON.TRIP_TYPE, type);
+
+        JSONArray jate = new JSONArray();
+        if (elements != null) {
+            Iterator i = elements.iterator();
+            while (i.hasNext()) {
+                AnnotatedTripElement ate = (AnnotatedTripElement) i.next();
+                jate.put(ate.tripElement.toJSON());
+            }
+        }
+        jo.put(Constants.JSON.TRIP_ELEMENTS, jate);
+
+        return jo;
     }
-    */
-
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-
-    required init?(coder aDecoder: NSCoder) {
-    super.init()
-    // NB: use conditional cast (as?) for any optional properties
-    id  = aDecoder.decodeIntegerForKey(PropertyKey.idKey)
-    startDate  = aDecoder.decodeObjectForKey(PropertyKey.startDateKey) as? NSDate
-    endDate  = aDecoder.decodeObjectForKey(PropertyKey.endDateKey) as? NSDate
-    tripDescription  = aDecoder.decodeObjectForKey(PropertyKey.tripDescriptionKey) as? String
-    code  = aDecoder.decodeObjectForKey(PropertyKey.codeKey) as? String
-    name  = aDecoder.decodeObjectForKey(PropertyKey.nameKey) as? String
-    type  = aDecoder.decodeObjectForKey(PropertyKey.typeKey) as? String
-    elements  = aDecoder.decodeObjectForKey(PropertyKey.elementsKey) as? [AnnotatedTripElement]
-
-    setNotification()
-    }
-    */
 
     Trip(JSONObject elementData) {
         super();
         id = elementData.optInt(Constants.JSON.TRIP_ID, -1);
-        startDate = ServerDate.convertServerDate(elementData.optString(Constants.JSON.TRIP_START_DATE), null);
-        endDate = ServerDate.convertServerDate(elementData.optString(Constants.JSON.TRIP_END_DATE), null);
-        tripDescription = elementData.optString(Constants.JSON.TRIP_DESCRIPTION);
-        code = elementData.optString(Constants.JSON.TRIP_CODE);
-        name = elementData.optString(Constants.JSON.TRIP_NAME);
-        type = elementData.optString(Constants.JSON.TRIP_TYPE);
+        startDateText = elementData.isNull(Constants.JSON.TRIP_START_DATE) ? null : elementData.optString(Constants.JSON.TRIP_START_DATE);
+        startDate = ServerDate.convertServerDate(startDateText, null);
+        endDateText = elementData.isNull(Constants.JSON.TRIP_END_DATE) ? null : elementData.optString(Constants.JSON.TRIP_END_DATE);
+        endDate = ServerDate.convertServerDate(endDateText, null);
+        tripDescription = elementData.isNull(Constants.JSON.TRIP_DESCRIPTION) ? null : elementData.optString(Constants.JSON.TRIP_DESCRIPTION);
+        code = elementData.isNull(Constants.JSON.TRIP_CODE) ? null : elementData.optString(Constants.JSON.TRIP_CODE);
+        name = elementData.isNull(Constants.JSON.TRIP_NAME) ? null : elementData.optString(Constants.JSON.TRIP_NAME);
+        type = elementData.isNull(Constants.JSON.TRIP_TYPE) ? null : elementData.optString(Constants.JSON.TRIP_TYPE);
         JSONArray tripElements = elementData.optJSONArray(Constants.JSON.TRIP_ELEMENTS);
         if (tripElements != null) {
             elements = new ArrayList<>();
@@ -387,14 +377,14 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
         }
 
         Log.d("Trip", "Sending notification");
-        Intent intent = new Intent("tripDetailsLoaded");
+        Intent intent = new Intent(Constants.Notification.TRIP_DETAILS_LOADED);
         //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
     public void onRemoteCallFailed() {
         Log.d("Trip", "Server call failed");
-        Intent intent = new Intent("tripDetailsLoaded");
+        Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
         //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
@@ -415,7 +405,10 @@ public class Trip /* NSObject, NSCoding */ implements ServerAPIListener {
                 "password":userCred.urlsafePassword! ]
         */
 
-        String url = URL_PART1 + code + URL_PART2;
-        new ServerAPI(this).execute(url);
+        ServerAPIParams params = new ServerAPIParams(ServerAPI.URL_TRIP_INFO, "code", code);
+        params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
+        params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
+
+        new ServerAPI(this).execute(params);
     }
 }

@@ -66,10 +66,10 @@ public class TripElementListAdapter extends BaseAdapter {
 
         holder.txtTripId.setText(Integer.toString(rowItem.tripElement.id));
         holder.txtElementId.setText(Integer.toString(rowItem.tripElement.id));
-        holder.imageView.setImageResource(rowItem.tripElement.getIconId(SHiTApplication.getContext()));
-        holder.txtTitle.setText(rowItem.tripElement.getTitle(SHiTApplication.getContext()));
-        holder.txtInfo.setText(rowItem.tripElement.getStartInfo(SHiTApplication.getContext()) + "\n" + rowItem.tripElement.getEndInfo(SHiTApplication.getContext()));
-        holder.txtDetails.setText(rowItem.tripElement.getDetailInfo(SHiTApplication.getContext()));
+        holder.imageView.setImageResource(rowItem.tripElement.getIconId());
+        holder.txtTitle.setText(rowItem.tripElement.getTitle());
+        holder.txtInfo.setText(rowItem.tripElement.getStartInfo() + "\n" + rowItem.tripElement.getEndInfo());
+        holder.txtDetails.setText(rowItem.tripElement.getDetailInfo());
 
         return convertView;
     }

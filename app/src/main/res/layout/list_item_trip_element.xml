@@ -36,7 +36,7 @@ android:layout_height="wrap_content" >
     android:paddingTop="2dip"
     android:textColor="#000000"
     android:textSize="16sp"
-    android:layout_toRightOf="@+id/element_icon"/>
+    android:layout_toEndOf="@+id/element_icon"/>
 
 <!-- Element Info -->
 <TextView
@@ -45,7 +45,7 @@ android:layout_height="wrap_content" >
     android:layout_height="wrap_content"
     android:layout_alignParentRight="true"
     android:layout_centerVertical="true"
-    android:layout_toRightOf="@+id/element_icon"
+    android:layout_toEndOf="@+id/element_icon"
     android:layout_below="@+id/element_title"
     android:paddingLeft="3dip"
     android:paddingRight="3dip"

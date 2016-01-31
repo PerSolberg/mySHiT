@@ -3,6 +3,7 @@ package no.shitt.myshit.model;
 import android.content.Context;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -15,13 +16,19 @@ import java.util.List;
 import java.util.Map;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.helper.JSONable;
 
-public class TripElement /* NSObject, NSCoding */ {
+public class TripElement implements JSONable {
     public String type;
     public String subType;
     public int id;
     public List<Map<String,String>> references;
     JSONObject serverData;
+
+    public static final String REFTAG_REF_NO       = "refNo";
+    public static final String REFTAG_TYPE         = "type";
+    public static final String REFTAG_LOOKUP_URL   = "urlLookup";
 
     private static final String iconBaseName = "icon_tripelement_";
 
@@ -37,16 +44,16 @@ public class TripElement /* NSObject, NSCoding */ {
     public String getEndTimeZone() {
         return null;
     }
-    public String getTitle(Context ctx) {
+    public String getTitle() {
         return null;
     }
-    public String getStartInfo(Context ctx) {
+    public String getStartInfo() {
         return null;
     }
-    public String getEndInfo(Context ctx) {
+    public String getEndInfo() {
         return null;
     }
-    public String getDetailInfo(Context ctx) {
+    public String getDetailInfo() {
         return null;
     }
     public Tense getTense() {
@@ -75,17 +82,18 @@ public class TripElement /* NSObject, NSCoding */ {
         }
     }
 
-    public int getIconId(Context ctx) {
+    public int getIconId() {
+        Context ctx = SHiTApplication.getContext();
         String iconType = "default";
         String iconName;
         int    iconId;
 
         switch (getTense()) {
             case PAST:
-                iconType = "historic_";
+                iconType = "historic";
                 break;
             case PRESENT:
-                iconType = "active_";
+                iconType = "active";
                 break;
             default:
                 break;
@@ -115,17 +123,6 @@ public class TripElement /* NSObject, NSCoding */ {
         return 0;
     }
 
-    /* Identifiers for keyed archive (iOS only?)
-    struct PropertyKey {
-        //static let visibleKey = "visible"
-        static let typeKey = "type"
-        static let subTypeKey = "subtype"
-        static let idKey = "id"
-        static let referencesKey = "refs"
-        static let serverDataKey = "serverData"
-    }
-    */
-
     // MARK: Factory
     static TripElement createFromDictionary( JSONObject elementData ) {
         String elemType = elementData.optString(Constants.JSON.ELEM_TYPE);
@@ -145,33 +142,24 @@ public class TripElement /* NSObject, NSCoding */ {
         return elem;
     }
 
-    /* Encode for keyed archive (iOS only?)
-    // MARK: NSCoding
-    func encodeWithCoder(aCoder: NSCoder) {
-    aCoder.encodeObject(type, forKey: PropertyKey.typeKey)
-    aCoder.encodeObject(subType, forKey: PropertyKey.subTypeKey)
-    aCoder.encodeInteger(id, forKey: PropertyKey.idKey)
-    aCoder.encodeObject(references, forKey: PropertyKey.referencesKey)
-    aCoder.encodeObject(serverData, forKey: PropertyKey.serverDataKey)
-    }
-    */
+    // Encode to JSON for saving to file
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = new JSONObject();
 
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-    required init?(coder aDecoder: NSCoder) {
-        // NB: use conditional cast (as?) for any optional properties
-        //let visible  = aDecoder.decodeObjectForKey(PropertyKey.visibleKey) as! Bool
-        type  = aDecoder.decodeObjectForKey(PropertyKey.typeKey) as! String
-        subType = aDecoder.decodeObjectForKey(PropertyKey.subTypeKey) as! String
-        id = aDecoder.decodeIntegerForKey(PropertyKey.idKey)
-        references = aDecoder.decodeObjectForKey(PropertyKey.referencesKey) as? [[String:String]]
-        serverData = aDecoder.decodeObjectForKey(PropertyKey.serverDataKey) as? NSDictionary
-        //references = [ [String:String] ]() //NSDictionary()
+        jo.putOpt(Constants.JSON.ELEM_TYPE, type);
+        jo.putOpt(Constants.JSON.ELEM_SUB_TYPE, subType);
+        jo.putOpt(Constants.JSON.ELEM_ID, id);
 
-        // Must call designated initializer.
-        //self.init(type: type, subType: subType)
+        JSONArray jar = new JSONArray();
+        Iterator i = references.iterator();
+        while (i.hasNext()) {
+            Map ref = (Map) i.next();
+            jar.put(new JSONObject(ref));
+        }
+        jo.putOpt(Constants.JSON.ELEM_REFERENCES, jar);
+
+        return jo;
     }
-    */
 
     TripElement(int id, String type, String subType, List<Map<String,String>> references) {
         // Initialize stored properties.
@@ -189,8 +177,8 @@ public class TripElement /* NSObject, NSCoding */ {
 
     TripElement(JSONObject elementData) {
         id = elementData.optInt("id", -1);
-        type = elementData.optString("type");
-        subType = elementData.optString("subType");
+        type = elementData.isNull("type") ? null : elementData.optString("type");
+        subType = elementData.isNull("subType") ? null : elementData.optString("subType");
 
         JSONArray serverRefs = elementData.optJSONArray("references");
         if (serverRefs == null) {

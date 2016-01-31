@@ -1,8 +1,8 @@
 package no.shitt.myshit.model;
 
-import android.content.Context;
 import android.text.format.DateUtils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -11,23 +11,17 @@ import no.shitt.myshit.Constants;
 
 public class Flight extends GenericTransport {
     // MARK: Properties
-    String airlineCode;
-
-    /* Identifiers for keyed archive (iOS only?)
-    struct PropertyKey {
-        static let airlineCodeKey = "airlineCode"
-    }
-    */
+    public String airlineCode;
 
     @Override
-    public String getTitle(Context ctx) {
+    public String getTitle() {
         return (airlineCode != null ? airlineCode : "XX" ) + " " + (routeNo != null ? routeNo : "***") + ": "
                 + (departureLocation != null ? departureLocation : "<Departure>") + " - "
                 + (arrivalLocation != null ? arrivalLocation : "<Arrival>");
     }
 
     @Override
-    public String getStartInfo(Context ctx) {
+    public String getStartInfo() {
         String timeInfo = startTime(DateUtils.FORMAT_SHOW_TIME);
         String airportName = (departureStop != null ? departureStop : "<Departure Airport>");
         String terminalInfo = (departureTerminalCode != null && !departureTerminalCode.isEmpty() ? " [" + departureTerminalCode + "]" : "");
@@ -35,7 +29,7 @@ public class Flight extends GenericTransport {
     }
 
     @Override
-    public String getEndInfo(Context ctx) {
+    public String getEndInfo() {
         String timeInfo = endTime(DateUtils.FORMAT_SHOW_TIME);
         String airportName = (arrivalStop != null ? arrivalStop : "<Arrival Airport>");
         String terminalInfo = (arrivalTerminalCode != null && !arrivalTerminalCode.isEmpty() ? " [" + arrivalTerminalCode + "]" : "");
@@ -43,7 +37,7 @@ public class Flight extends GenericTransport {
     }
 
     @Override
-    public String getDetailInfo(Context ctx) {
+    public String getDetailInfo() {
         if (references != null) {
             String refList = "";
             for (int i = 0; i < references.size(); i++) {
@@ -57,27 +51,19 @@ public class Flight extends GenericTransport {
         return null;
     }
 
-    /* Encode for keyed archive (iOS only?)
-    // MARK: NSCoding
-    override func encodeWithCoder(aCoder: NSCoder) {
-        super.encodeWithCoder(aCoder)
-        aCoder.encodeObject(airlineCode, forKey: PropertyKey.airlineCodeKey)
-    }
-    */
+    // Encode to JSON for saving to file
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = super.toJSON();
 
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        // NB: use conditional cast (as?) for any optional properties
-        airlineCode = aDecoder.decodeObjectForKey(PropertyKey.airlineCodeKey) as? String
-        setNotification()
+        jo.putOpt(Constants.JSON.ELEM_COMPANY_CODE, airlineCode);
+
+        return jo;
     }
-    */
 
     Flight(JSONObject elementData) {
         super(elementData);
-        airlineCode = elementData.optString(Constants.JSON.ELEM_COMPANY_CODE);
+        airlineCode = elementData.isNull(Constants.JSON.ELEM_COMPANY_CODE) ? null : elementData.optString(Constants.JSON.ELEM_COMPANY_CODE);
         setNotification();
     }
 
@@ -96,5 +82,4 @@ public class Flight extends GenericTransport {
             return false;
         }
     }
-
 }

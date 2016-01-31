@@ -1,7 +1,6 @@
 package no.shitt.myshit.model;
 
-import android.content.Context;
-
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -16,25 +15,27 @@ public class GenericTransport extends TripElement {
     int segmentId;
     String segmentCode;
     int legNo;
-    Date departureTime;
-    String departureLocation;
-    String departureStop;
-    String departureAddress;
+    String departureTimeText;  // Hold original value for saving in archive
+    Date   departureTime;
+    public String departureLocation;
+    public String departureStop;
+    public String departureAddress;
     String departureTimeZone;
     String departureCoordinates;
     String departureTerminalCode;
-    String departureTerminalName;
-    Date arrivalTime;
-    String arrivalLocation;
-    String arrivalStop;
-    String arrivalAddress;
+    public String departureTerminalName;
+    String arrivalTimeText; // Hold original value for saving in archive
+    Date   arrivalTime;
+    public String arrivalLocation;
+    public String arrivalStop;
+    public String arrivalAddress;
     String arrivalTimeZone;
     String arrivalCoordinates;
     String arrivalTerminalCode;
-    String arrivalTerminalName;
-    String routeNo;
-    String companyName;
-    String companyPhone;
+    public String arrivalTerminalName;
+    public String routeNo;
+    public String companyName;
+    public String companyPhone;
 
     @Override
     public Date getStartTime() {
@@ -53,19 +54,19 @@ public class GenericTransport extends TripElement {
         return arrivalTimeZone;
     }
     @Override
-    public String getTitle(Context ctx) {
+    public String getTitle() {
         return companyName;
     }
     @Override
-    public String getStartInfo(Context ctx) {
+    public String getStartInfo() {
         return departureLocation;
     }
     @Override
-    public String getEndInfo(Context ctx) {
+    public String getEndInfo() {
         return arrivalLocation;
     }
     @Override
-    public String getDetailInfo(Context ctx) {
+    public String getDetailInfo() {
         if (references != null) {
             String refList = "";
             for (int i = 0; i < references.size(); i++) {
@@ -76,125 +77,72 @@ public class GenericTransport extends TripElement {
         return null;
     }
 
-    /* Identifiers for keyed archive (iOS only?)
-    struct PropertyKey {
-        static let segmentIdKey = "segmentId"
-        static let segmentCodeKey = "segmentCode"
-        static let legNoKey = "legNo"
-        static let departureTimeKey = "departureTime"
-        static let departureLocationKey = "departureLocation"
-        static let departureStopKey = "departureStop"
-        static let departureAddressKey = "departureAddress"
-        static let departureTimeZoneKey = "departureTimeZone"
-        static let departureCoordinatesKey = "departureCoordinates"
-        static let departureTerminalCodeKey = "departureTerminalCode"
-        static let departureTerminalNameKey = "departureTerminalName"
-        static let arrivalTimeKey = "arrivalTime"
-        static let arrivalLocationKey = "arrivalLocation"
-        static let arrivalStopKey = "arrivalStop"
-        static let arrivalAddressKey = "arrivalAddress"
-        static let arrivalTimeZoneKey = "arrivalTimeZone"
-        static let arrivalCoordinatesKey = "arrivalCoordinates"
-        static let arrivalTerminalCodeKey = "arrivalTerminalCode"
-        static let arrivalTerminalNameKey = "arrivalTerminalName"
-        static let routeNoKey = "routeNo"
-        static let companyNameKey = "companyName"
-        static let companyPhoneKey = "companyPhone"
-    }
-    */
 
-    /* Encode for keyed archive (iOS only?)
-    // MARK: NSCoding
-    override func encodeWithCoder(aCoder: NSCoder) {
-        super.encodeWithCoder(aCoder)
-        aCoder.encodeObject(segmentId, forKey: PropertyKey.segmentIdKey)
-        aCoder.encodeObject(segmentCode, forKey: PropertyKey.segmentCodeKey)
-        aCoder.encodeObject(legNo, forKey: PropertyKey.legNoKey)
-        aCoder.encodeObject(departureTime, forKey: PropertyKey.departureTimeKey)
-        aCoder.encodeObject(departureLocation, forKey: PropertyKey.departureLocationKey)
-        aCoder.encodeObject(departureStop, forKey: PropertyKey.departureStopKey)
-        aCoder.encodeObject(departureAddress, forKey: PropertyKey.departureAddressKey)
-        aCoder.encodeObject(departureTimeZone, forKey: PropertyKey.departureTimeZoneKey)
-        aCoder.encodeObject(departureCoordinates, forKey: PropertyKey.departureCoordinatesKey)
-        aCoder.encodeObject(departureTerminalCode, forKey: PropertyKey.departureTerminalCodeKey)
-        aCoder.encodeObject(departureTerminalName, forKey: PropertyKey.departureTerminalNameKey)
-        aCoder.encodeObject(arrivalTime, forKey: PropertyKey.arrivalTimeKey)
-        aCoder.encodeObject(arrivalLocation, forKey: PropertyKey.arrivalLocationKey)
-        aCoder.encodeObject(arrivalStop, forKey: PropertyKey.arrivalStopKey)
-        aCoder.encodeObject(arrivalAddress, forKey: PropertyKey.arrivalAddressKey)
-        aCoder.encodeObject(arrivalTimeZone, forKey: PropertyKey.arrivalTimeZoneKey)
-        aCoder.encodeObject(arrivalCoordinates, forKey: PropertyKey.arrivalCoordinatesKey)
-        aCoder.encodeObject(arrivalTerminalCode, forKey: PropertyKey.arrivalTerminalCodeKey)
-        aCoder.encodeObject(arrivalTerminalName, forKey: PropertyKey.arrivalTerminalNameKey)
-        aCoder.encodeObject(routeNo, forKey: PropertyKey.routeNoKey)
-        aCoder.encodeObject(companyName, forKey: PropertyKey.companyNameKey)
-        aCoder.encodeObject(companyPhone, forKey: PropertyKey.companyPhoneKey)
-    }
-    */
+    // Encode to JSON for saving to file
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = super.toJSON();
 
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-    required init?(coder aDecoder: NSCoder) {
-        // NB: use conditional cast (as?) for any optional properties
-        super.init(coder: aDecoder)
-        segmentId = aDecoder.decodeObjectForKey(PropertyKey.segmentIdKey) as? Int
-        segmentCode = aDecoder.decodeObjectForKey(PropertyKey.segmentCodeKey) as? String
-        legNo = aDecoder.decodeObjectForKey(PropertyKey.legNoKey) as? Int
-        departureTime  = aDecoder.decodeObjectForKey(PropertyKey.departureTimeKey) as? NSDate
-        departureLocation = aDecoder.decodeObjectForKey(PropertyKey.departureLocationKey) as? String
-        departureStop = aDecoder.decodeObjectForKey(PropertyKey.departureStopKey) as? String
-        departureAddress = aDecoder.decodeObjectForKey(PropertyKey.departureAddressKey) as? String
-        departureTimeZone = aDecoder.decodeObjectForKey(PropertyKey.departureTimeZoneKey) as? String
-        departureCoordinates = aDecoder.decodeObjectForKey(PropertyKey.departureCoordinatesKey) as? String
-        departureTerminalCode = aDecoder.decodeObjectForKey(PropertyKey.departureTerminalCodeKey) as? String
-        departureTerminalName = aDecoder.decodeObjectForKey(PropertyKey.departureTerminalNameKey) as? String
-        arrivalTime = aDecoder.decodeObjectForKey(PropertyKey.arrivalTimeKey) as? NSDate
-        arrivalLocation = aDecoder.decodeObjectForKey(PropertyKey.arrivalLocationKey) as? String
-        arrivalStop = aDecoder.decodeObjectForKey(PropertyKey.arrivalStopKey) as? String
-        arrivalAddress = aDecoder.decodeObjectForKey(PropertyKey.arrivalAddressKey) as? String
-        arrivalTimeZone = aDecoder.decodeObjectForKey(PropertyKey.arrivalTimeZoneKey) as? String
-        arrivalCoordinates = aDecoder.decodeObjectForKey(PropertyKey.arrivalCoordinatesKey) as? String
-        arrivalTerminalCode = aDecoder.decodeObjectForKey(PropertyKey.arrivalTerminalCodeKey) as? String
-        arrivalTerminalName = aDecoder.decodeObjectForKey(PropertyKey.arrivalTerminalNameKey) as? String
-        routeNo = aDecoder.decodeObjectForKey(PropertyKey.routeNoKey) as? String
-        companyName = aDecoder.decodeObjectForKey(PropertyKey.companyNameKey) as? String
-        companyPhone = aDecoder.decodeObjectForKey(PropertyKey.companyPhoneKey) as? String
+        jo.put(Constants.JSON.ELEM_SEGMENT_ID, segmentId);
+        jo.putOpt(Constants.JSON.ELEM_SEGMENT_CODE, segmentCode);
+        jo.put(Constants.JSON.ELEM_LEG_NO, legNo);
+        jo.putOpt(Constants.JSON.ELEM_DEP_LOCATION, departureLocation);
+        jo.putOpt(Constants.JSON.ELEM_DEP_STOP, departureStop);
+        jo.putOpt(Constants.JSON.ELEM_DEP_ADDR, departureAddress);
+        jo.putOpt(Constants.JSON.ELEM_DEP_TZ, departureTimeZone);
+        jo.putOpt(Constants.JSON.ELEM_DEP_TIME, departureTimeText);
+        jo.putOpt(Constants.JSON.ELEM_DEP_COORDINATES, departureCoordinates);
+        jo.putOpt(Constants.JSON.ELEM_DEP_TERMINAL_CODE, departureTerminalCode);
+        jo.putOpt(Constants.JSON.ELEM_DEP_TERMINAL_NAME, departureTerminalName);
+        jo.putOpt(Constants.JSON.ELEM_ARR_LOCATION, arrivalLocation);
+        jo.putOpt(Constants.JSON.ELEM_ARR_STOP, arrivalStop);
+        jo.putOpt(Constants.JSON.ELEM_ARR_ADDR, arrivalAddress);
+        jo.putOpt(Constants.JSON.ELEM_ARR_TZ, arrivalTimeZone);
+        jo.putOpt(Constants.JSON.ELEM_ARR_TIME, arrivalTimeText);
+        jo.putOpt(Constants.JSON.ELEM_ARR_COORDINATES, arrivalCoordinates);
+        jo.putOpt(Constants.JSON.ELEM_ARR_TERMINAL_CODE, arrivalTerminalCode);
+        jo.putOpt(Constants.JSON.ELEM_ARR_TERMINAL_NAME, arrivalTerminalName);
+        jo.putOpt(Constants.JSON.ELEM_ROUTE_NO, routeNo);
+        jo.putOpt(Constants.JSON.ELEM_COMPANY, companyName);
+        jo.putOpt(Constants.JSON.ELEM_PHONE, companyPhone);
+
+        return jo;
     }
-    */
+
 
     GenericTransport(JSONObject elementData) {
         super(elementData);
         segmentId = elementData.optInt(Constants.JSON.ELEM_SEGMENT_ID);
-        segmentCode = elementData.optString(Constants.JSON.ELEM_SEGMENT_CODE);
+        segmentCode = elementData.isNull(Constants.JSON.ELEM_SEGMENT_CODE) ? null : elementData.optString(Constants.JSON.ELEM_SEGMENT_CODE);
         legNo = elementData.optInt(Constants.JSON.ELEM_LEG_NO);
 
-        departureLocation = elementData.optString(Constants.JSON.ELEM_DEP_LOCATION);
-        departureStop = elementData.optString(Constants.JSON.ELEM_DEP_STOP);
-        departureAddress = elementData.optString(Constants.JSON.ELEM_DEP_ADDR);
-        departureTimeZone = elementData.optString(Constants.JSON.ELEM_DEP_TZ);
-        String depTimeText = elementData.optString(Constants.JSON.ELEM_DEP_TIME);
-        if (depTimeText != null) {
-            departureTime = ServerDate.convertServerDate(depTimeText, departureTimeZone);
+        departureLocation = elementData.isNull(Constants.JSON.ELEM_DEP_LOCATION) ? null : elementData.optString(Constants.JSON.ELEM_DEP_LOCATION);
+        departureStop = elementData.isNull(Constants.JSON.ELEM_DEP_STOP) ? null : elementData.optString(Constants.JSON.ELEM_DEP_STOP);
+        departureAddress = elementData.isNull(Constants.JSON.ELEM_DEP_ADDR) ? null : elementData.optString(Constants.JSON.ELEM_DEP_ADDR);
+        departureTimeZone = elementData.isNull(Constants.JSON.ELEM_DEP_TZ) ? null : elementData.optString(Constants.JSON.ELEM_DEP_TZ);
+        departureTimeText = elementData.isNull(Constants.JSON.ELEM_DEP_TIME) ? null : elementData.optString(Constants.JSON.ELEM_DEP_TIME);
+        if (departureTimeText != null) {
+            departureTime = ServerDate.convertServerDate(departureTimeText, departureTimeZone);
         }
-        departureCoordinates = elementData.optString(Constants.JSON.ELEM_DEP_COORDINATES);
-        departureTerminalCode = elementData.optString(Constants.JSON.ELEM_DEP_TERMINAL_CODE);
-        departureTerminalName = elementData.optString(Constants.JSON.ELEM_DEP_TERMINAL_NAME);
+        departureCoordinates = elementData.isNull(Constants.JSON.ELEM_DEP_COORDINATES) ? null : elementData.optString(Constants.JSON.ELEM_DEP_COORDINATES);
+        departureTerminalCode = elementData.isNull(Constants.JSON.ELEM_DEP_TERMINAL_CODE) ? null : elementData.optString(Constants.JSON.ELEM_DEP_TERMINAL_CODE);
+        departureTerminalName = elementData.isNull(Constants.JSON.ELEM_DEP_TERMINAL_NAME) ? null : elementData.optString(Constants.JSON.ELEM_DEP_TERMINAL_NAME);
 
-        arrivalLocation = elementData.optString(Constants.JSON.ELEM_ARR_LOCATION);
-        arrivalStop = elementData.optString(Constants.JSON.ELEM_ARR_STOP);
-        arrivalAddress = elementData.optString(Constants.JSON.ELEM_ARR_ADDR);
-        arrivalTimeZone = elementData.optString(Constants.JSON.ELEM_ARR_TZ);
-        String arrTimeText = elementData.optString(Constants.JSON.ELEM_ARR_TIME);
-        if (arrTimeText != null) {
-            arrivalTime = ServerDate.convertServerDate(arrTimeText, arrivalTimeZone);
+        arrivalLocation = elementData.isNull(Constants.JSON.ELEM_ARR_LOCATION) ? null : elementData.optString(Constants.JSON.ELEM_ARR_LOCATION);
+        arrivalStop = elementData.isNull(Constants.JSON.ELEM_ARR_STOP) ? null : elementData.optString(Constants.JSON.ELEM_ARR_STOP);
+        arrivalAddress = elementData.isNull(Constants.JSON.ELEM_ARR_ADDR) ? null : elementData.optString(Constants.JSON.ELEM_ARR_ADDR);
+        arrivalTimeZone = elementData.isNull(Constants.JSON.ELEM_ARR_TZ) ? null : elementData.optString(Constants.JSON.ELEM_ARR_TZ);
+        arrivalTimeText = elementData.isNull(Constants.JSON.ELEM_ARR_TIME) ? null : elementData.optString(Constants.JSON.ELEM_ARR_TIME);
+        if (arrivalTimeText != null) {
+            arrivalTime = ServerDate.convertServerDate(arrivalTimeText, arrivalTimeZone);
         }
-        arrivalCoordinates = elementData.optString(Constants.JSON.ELEM_ARR_COORDINATES);
-        arrivalTerminalCode = elementData.optString(Constants.JSON.ELEM_ARR_TERMINAL_CODE);
-        arrivalTerminalName = elementData.optString(Constants.JSON.ELEM_ARR_TERMINAL_NAME);
+        arrivalCoordinates = elementData.isNull(Constants.JSON.ELEM_ARR_COORDINATES) ? null : elementData.optString(Constants.JSON.ELEM_ARR_COORDINATES);
+        arrivalTerminalCode = elementData.isNull(Constants.JSON.ELEM_ARR_TERMINAL_CODE) ? null : elementData.optString(Constants.JSON.ELEM_ARR_TERMINAL_CODE);
+        arrivalTerminalName = elementData.isNull(Constants.JSON.ELEM_ARR_TERMINAL_NAME) ? null : elementData.optString(Constants.JSON.ELEM_ARR_TERMINAL_NAME);
 
-        routeNo = elementData.optString(Constants.JSON.ELEM_ROUTE_NO);
-        companyName = elementData.optString(Constants.JSON.ELEM_COMPANY);
-        companyPhone = elementData.optString(Constants.JSON.ELEM_PHONE);
+        routeNo = elementData.isNull(Constants.JSON.ELEM_ROUTE_NO) ? null : elementData.optString(Constants.JSON.ELEM_ROUTE_NO);
+        companyName = elementData.isNull(Constants.JSON.ELEM_COMPANY) ? null : elementData.optString(Constants.JSON.ELEM_COMPANY);
+        companyPhone = elementData.isNull(Constants.JSON.ELEM_PHONE) ? null : elementData.optString(Constants.JSON.ELEM_PHONE);
     }
 
     // MARK: Methods
