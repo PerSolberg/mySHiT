@@ -2,9 +2,11 @@ package no.shitt.myshit.model;
 
 //import android.text.format.Formatter;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
@@ -296,7 +299,17 @@ public class Trip implements ServerAPIListener, JSONable {
     public void setNotification() {
         // First delete any existing notifications for this trip
         // TO DO...
-        return;
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(SHiTApplication.getContext())
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Trip start")
+                        .setContentText("SHiT trip " + name + "starts soon");
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) SHiTApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        // Id allows you to update the notification later on.
+        mNotificationManager.notify(id, mBuilder.build());
+
         /*
         for notification in UIApplication.sharedApplication().scheduledLocalNotifications! as [UILocalNotification] {
             if (notification.userInfo!["TripID"] as? Int == id) {
