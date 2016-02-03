@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content" >
-
-<!-- Album id / Hidden by default -->
-<TextView
-    android:id="@+id/trip_id"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:visibility="gone" />
+    android:layout_height="wrap_content" >
 
-<!-- Song id / Hidden by default -->
-<TextView
-    android:id="@+id/element_id"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:visibility="gone" />
+    <!-- Trip id / Hidden by default -->
+    <TextView
+        android:id="@+id/trip_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
+    <!-- Element id / Hidden by default -->
+    <TextView
+        android:id="@+id/element_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
-<ImageView
-    android:id="@+id/element_icon"
-    android:layout_width="60dp"
-    android:layout_height="60dp"
-    android:paddingTop="2sp"
-    android:paddingBottom="2sp"
-    android:paddingEnd="2sp"/>
+    <ImageView
+        android:id="@+id/element_icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:paddingTop="2sp"
+        android:paddingBottom="2sp"
+        android:paddingEnd="2sp"/>
 
-<!-- Element Title -->
-<TextView
-    android:id="@+id/element_title"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="2dip"
-    android:paddingStart="3dip"
-    android:paddingTop="2dip"
-    android:textColor="#000000"
-    android:textSize="16sp"
-    android:layout_toEndOf="@+id/element_icon"/>
+    <!-- Element Title -->
+    <TextView
+        android:id="@+id/element_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dip"
+        android:paddingStart="3dip"
+        android:paddingTop="2dip"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_toEndOf="@+id/element_icon"/>
 
-<!-- Element Info -->
-<TextView
-    android:id="@+id/element_info"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentRight="true"
-    android:layout_centerVertical="true"
-    android:layout_toEndOf="@+id/element_icon"
-    android:layout_below="@+id/element_title"
-    android:paddingLeft="3dip"
-    android:paddingRight="3dip"
-    android:textColor="#202020" />
+    <!-- Element Info -->
+    <TextView
+        android:id="@+id/element_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/element_icon"
+        android:layout_below="@+id/element_title"
+        android:paddingLeft="3dip"
+        android:paddingRight="3dip"
+        android:textColor="#0000F0" />
 
     <!-- Element Details -->
     <TextView

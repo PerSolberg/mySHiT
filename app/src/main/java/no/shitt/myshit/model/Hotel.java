@@ -1,6 +1,7 @@
 package no.shitt.myshit.model;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +50,8 @@ public class Hotel extends TripElement {
         //dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
         //dateFormatter.timeStyle = NSDateFormatterStyle.NoStyle
 
-        return dateFormatter.format(checkInDate) + " - " + dateFormatter.format(checkOutDate);
+        return DateUtils.formatDateRange(ctx, checkInDate.getTime(), checkOutDate.getTime(), DateUtils.FORMAT_SHOW_DATE + DateUtils.FORMAT_ABBREV_MONTH);
+        //return dateFormatter.format(checkInDate) + " - " + dateFormatter.format(checkOutDate);
     }
     @Override
     public String getEndInfo() {
@@ -85,23 +87,6 @@ public class Hotel extends TripElement {
 
         return jo;
     }
-
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-    required init?(coder aDecoder: NSCoder) {
-        // NB: use conditional cast (as?) for any optional properties
-        super.init(coder: aDecoder)
-        checkInDate = aDecoder.decodeObjectForKey(PropertyKey.checkInDateKey) as? NSDate
-        checkOutDate = aDecoder.decodeObjectForKey(PropertyKey.checkOutDateKey) as? NSDate
-        hotelName = aDecoder.decodeObjectForKey(PropertyKey.hotelNameKey) as? String
-        address = aDecoder.decodeObjectForKey(PropertyKey.addressKey) as? String
-        postCode = aDecoder.decodeObjectForKey(PropertyKey.postCodeKey) as? String
-        city = aDecoder.decodeObjectForKey(PropertyKey.cityKey) as? String
-        phone = aDecoder.decodeObjectForKey(PropertyKey.phoneKey) as? String
-        transferInfo = aDecoder.decodeObjectForKey(PropertyKey.transferInfoKey) as? String
-        timezone = aDecoder.decodeObjectForKey(PropertyKey.timezoneKey) as? String
-    }
-    */
 
     Hotel(JSONObject elementData) {
         super(elementData);

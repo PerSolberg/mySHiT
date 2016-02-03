@@ -16,6 +16,7 @@ import no.shitt.myshit.R;
 //import com.theopentutorials.android.beans.RowItem;
 //import no.shitt.myshit.beans.TripElementItem;
 import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.AnnotatedTripElement;
 import no.shitt.myshit.model.TripList;
@@ -64,11 +65,15 @@ public class TripElementListAdapter extends BaseAdapter {
         //TripElementItem rowItem = (TripElementItem) getItem(position);
         AnnotatedTripElement rowItem = (AnnotatedTripElement) getItem(position);
 
+        StringBuilder info = new StringBuilder(rowItem.tripElement.getStartInfo());
+        StringUtil.appendWithLeadingSeparator(info, rowItem.tripElement.getEndInfo(), "\n", false);
+
         holder.txtTripId.setText(Integer.toString(rowItem.tripElement.id));
         holder.txtElementId.setText(Integer.toString(rowItem.tripElement.id));
         holder.imageView.setImageResource(rowItem.tripElement.getIconId());
         holder.txtTitle.setText(rowItem.tripElement.getTitle());
-        holder.txtInfo.setText(rowItem.tripElement.getStartInfo() + "\n" + rowItem.tripElement.getEndInfo());
+        //holder.txtInfo.setText(rowItem.tripElement.getStartInfo() + "\n" + rowItem.tripElement.getEndInfo());
+        holder.txtInfo.setText(info.toString());
         holder.txtDetails.setText(rowItem.tripElement.getDetailInfo());
 
         return convertView;

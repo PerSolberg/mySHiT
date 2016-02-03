@@ -1,13 +1,16 @@
 package no.shitt.myshit.model;
 
+import android.content.Context;
 import android.text.format.DateUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.Map;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.SHiTApplication;
 
 public class Flight extends GenericTransport {
     // MARK: Properties
@@ -22,7 +25,10 @@ public class Flight extends GenericTransport {
 
     @Override
     public String getStartInfo() {
-        String timeInfo = startTime(DateUtils.FORMAT_SHOW_TIME);
+        Context ctx = SHiTApplication.getContext();
+        DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
+        //String timeInfo = startTime(DateUtils.FORMAT_SHOW_TIME);
+        String timeInfo = dateFormatter.format(departureTime);
         String airportName = (departureStop != null ? departureStop : "<Departure Airport>");
         String terminalInfo = (departureTerminalCode != null && !departureTerminalCode.isEmpty() ? " [" + departureTerminalCode + "]" : "");
         return (timeInfo != null ? timeInfo + ": " : "") + airportName + terminalInfo;
@@ -30,8 +36,11 @@ public class Flight extends GenericTransport {
 
     @Override
     public String getEndInfo() {
-        String timeInfo = endTime(DateUtils.FORMAT_SHOW_TIME);
-        String airportName = (arrivalStop != null ? arrivalStop : "<Arrival Airport>");
+        Context ctx = SHiTApplication.getContext();
+        DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
+        //String timeInfo = endTime(DateUtils.FORMAT_SHOW_TIME);
+        String timeInfo = dateFormatter.format(arrivalTime);
+        String airportName = (arrivalStop != null ? arrivalStop : "<Arrival-Airport>");
         String terminalInfo = (arrivalTerminalCode != null && !arrivalTerminalCode.isEmpty() ? " [" + arrivalTerminalCode + "]" : "");
         return (timeInfo != null ? timeInfo + ": " : "") + airportName + terminalInfo;
     }

@@ -5,8 +5,10 @@ package no.shitt.myshit.model;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
@@ -45,6 +48,8 @@ public class Trip implements ServerAPIListener, JSONable {
     public List<AnnotatedTripElement> elements;
 
     private final static String iconBaseName = "icon_trip_";
+
+    private static int alarmcounter = 0;
 
     //private static final String URL_PART1 = "http://www.shitt.no/mySHiT/trip/code/";
     //private static final String URL_PART2 = "?userName=persolberg@hotmail.com&password=Vertex70&sectioned=0&details=non-historic";
@@ -76,7 +81,8 @@ public class Trip implements ServerAPIListener, JSONable {
         //dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
         //dateFormatter.timeStyle = NSDateFormatterStyle.NoStyle
 
-        return dateFormatter.format(startDate) + " - " + dateFormatter.format(endDate);
+        return DateUtils.formatDateRange(ctx, startDate.getTime(), endDate.getTime(), DateUtils.FORMAT_SHOW_DATE + DateUtils.FORMAT_ABBREV_MONTH);
+        //return dateFormatter.format(startDate) + " - " + dateFormatter.format(endDate);
     }
 
     public String getDetailInfo() {
@@ -299,6 +305,21 @@ public class Trip implements ServerAPIListener, JSONable {
     public void setNotification() {
         // First delete any existing notifications for this trip
         // TO DO...
+        Log.d("Trip", "Setting notification for trip " + code);
+
+        // For testing...
+        Date alarmTime = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, alarmcounter * 20);
+        alarmcounter++;
+
+        AlarmReceiver alarm = new AlarmReceiver();
+        alarm.setAlarm(calendar.getTime(), Uri.parse("alarm://shitt.no/trip/" + code), "SHiT trip " + name + " starts soon.");
+
+        Log.d("Trip", "Notification set for trip " + code);
+
+        /*
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(SHiTApplication.getContext())
                         .setSmallIcon(R.mipmap.ic_launcher)
@@ -309,6 +330,7 @@ public class Trip implements ServerAPIListener, JSONable {
                 (NotificationManager) SHiTApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
         // Id allows you to update the notification later on.
         mNotificationManager.notify(id, mBuilder.build());
+        */
 
         /*
         for notification in UIApplication.sharedApplication().scheduledLocalNotifications! as [UILocalNotification] {

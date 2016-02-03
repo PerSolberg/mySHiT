@@ -8,10 +8,14 @@
     <!-- Network State Permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Account Manager -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- Account Manager (from sample app?) -->
+    <!--uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" /-->
+
+    <!-- Get notified when system boots, so we can reschedule alarms -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".SHiTApplication"
@@ -74,6 +78,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripDetailsActivity" />
         </activity>
+
+        <!-- Components for notifications -->
+        <receiver android:name=".AlarmReceiver" />
+
+        <receiver android:name=".BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".SchedulingService" />
+
     </application>
 
 </manifest>

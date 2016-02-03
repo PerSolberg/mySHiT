@@ -23,6 +23,7 @@ public class TripListAdapter extends BaseAdapter {
     private class ViewHolder {
         ImageView imageView;
         TextView txtName;
+        TextView txtInfo;
         TextView txtDesc;
         TextView txtId;
         TextView txtCode;
@@ -40,6 +41,7 @@ public class TripListAdapter extends BaseAdapter {
             holder.txtCode = (TextView) convertView.findViewById(R.id.trip_code);
             holder.imageView = (ImageView) convertView.findViewById(R.id.trip_icon);
             holder.txtName = (TextView) convertView.findViewById(R.id.trip_name);
+            holder.txtInfo = (TextView) convertView.findViewById(R.id.trip_info);
             holder.txtDesc = (TextView) convertView.findViewById(R.id.trip_description);
             convertView.setTag(holder);
         }
@@ -53,6 +55,7 @@ public class TripListAdapter extends BaseAdapter {
         holder.txtCode.setText(rowItem.trip.code);
         holder.imageView.setImageResource(rowItem.trip.getIconId());
         holder.txtName.setText(rowItem.trip.name);
+        holder.txtInfo.setText(rowItem.trip.getDateInfo());
         holder.txtDesc.setText(rowItem.trip.tripDescription);
 
         return convertView;
