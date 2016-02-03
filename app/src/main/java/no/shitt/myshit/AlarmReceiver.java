@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -41,6 +42,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
          * This intent holds an extra identifying the wake lock.
          */
         Intent service = new Intent(context, SchedulingService.class);
+        service.setData(intent.getData());
+        service.putExtras(intent.getExtras());
+        Log.d("AlarmReceiver", "Received intent: " + intent.describeContents());
+        Log.d("AlarmReceiver", "Action: " + intent.getAction() + ", Data: " + intent.getData());
 
         // Start the service, keeping the device awake while it is launching.
         startWakefulService(context, service);
