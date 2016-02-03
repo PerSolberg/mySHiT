@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">mySHiT</string>
-    <string name="title_activity_login">Sign in</string>
 
     <string name="title_trip_details">Resedetaljer</string>
 
-    <!-- Strings related to login -->
+    <!-- Login screen-->
+    <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">E-post</string>
     <string name="prompt_password">Lösenord</string>
     <string name="welcome_message">Välkommen till SHiT.\n\nFör att se information om dina resor, var god att logga inn med användarnamnet og lösenordet du fick i ditt välkomstbrev.</string>
@@ -14,6 +14,22 @@
     <!--string name="error_invalid_password">This password is too short</string-->
     <string name="error_incorrect_password">Lösenordet är fel</string>
     <string name="error_field_required">Fältet är obligatoriskt</string>
+
+    <!-- Flight details screen -->
+    <string name="title_flight_details">Flight-detaljer</string>
+    <string name="label_flight_no">Flight #</string>
+    <string name="label_airline_name">Flygbolag</string>
+    <string name="label_flight_departure">Avgång</string>
+    <string name="label_flight_arrival">Ankomst</string>
+    <string name="label_flight_refs">Referensnummer</string>
+
+    <!-- Private transport details screen -->
+    <string name="title_private_transport_details">Detaljer</string>
+    <string name="label_privtrans_company">Bolag</string>
+    <string name="label_privtrans_departure">Avresa</string>
+    <string name="label_privtrans_arrival">Ankomst</string>
+    <string name="label_privtrans_phone">Telefon</string>
+    <string name="label_privtrans_reference">Referensnummer</string>
 
     <!-- Menu actions -->
     <string name="action_settings">Settings</string>
