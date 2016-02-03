@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">mySHiT</string>
-    <string name="title_activity_login">Logg inn</string>
 
+    <!-- Trip List -->
+
+    <!-- Trip Details List -->
     <string name="title_trip_details">Reisedetaljer</string>
 
-    <!-- Strings related to login -->
+    <!-- Login screen -->
+    <string name="title_activity_login">Logg inn</string>
     <string name="prompt_email">E-post</string>
     <string name="prompt_password">Passord</string>
     <string name="welcome_message">Velkommen til SHiT.\n\nFor å få tilgang til dine reiseopplysninger, vennligst logg på med brukernavnet og passordet du mottok i velkomstbrevet.</string>
@@ -14,6 +17,22 @@
     <!--string name="error_invalid_password">This password is too short</string-->
     <string name="error_incorrect_password">Passordet er feil</string>
     <string name="error_field_required">Dette feltet er påkrevd</string>
+
+    <!-- Flight details screen -->
+    <string name="title_flight_details">Flight-detaljer</string>
+    <string name="label_flight_no">Flight #</string>
+    <string name="label_airline_name">Flyselskap</string>
+    <string name="label_flight_departure">Avgang</string>
+    <string name="label_flight_arrival">Ankomst</string>
+    <string name="label_flight_refs">Referanser</string>
+
+    <!-- Private transport details screen -->
+    <string name="title_private_transport_details">Detaljer</string>
+    <string name="label_privtrans_company">Selskap</string>
+    <string name="label_privtrans_departure">Avreise</string>
+    <string name="label_privtrans_arrival">Ankomst</string>
+    <string name="label_privtrans_phone">Telefon</string>
+    <string name="label_privtrans_reference">Referanser</string>
 
     <!-- Menu actions -->
     <string name="action_settings">Settings</string>
