@@ -1,12 +1,18 @@
 package no.shitt.myshit.model;
 
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.helper.ServerDate;
 
@@ -36,6 +42,8 @@ public class GenericTransport extends TripElement {
     public String routeNo;
     public String companyName;
     public String companyPhone;
+
+    private static int alarmcounter = 0;
 
     @Override
     public Date getStartTime() {
@@ -217,6 +225,31 @@ public class GenericTransport extends TripElement {
     @Override
     public void setNotification() {
         // First delete any existing notifications for this trip element (either one or two)
+        AnnotatedTrip trip = TripList.getSharedList().tripByElementId(id);
+        if (trip == null) {
+            // Shouldn't happen
+            Log.e("GenericTransport", "Couldn't find trip for element " + Integer.toString(id));
+            return;
+        }
+        String code = trip.trip.code;
+        Log.d("GenericTransport", "Setting notification for trip " + code);
+
+        // For testing...
+        alarmcounter++;
+        Date alarmTime = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, (alarmcounter % 20) * 10 + 5);
+
+        AlarmReceiver alarm = new AlarmReceiver();
+        Bundle extras = new Bundle();
+        extras.putString("msg", "Element " + alarmcounter + " (" + getTitle() + ") departs soon.");
+        extras.putString("tripCode", code);
+        extras.putInt("tripElement", id);
+        alarm.setAlarm(calendar.getTime(), Uri.parse("alarm://test.shitt.no/element/" + code), extras);
+        alarm.setAlarm(getStartTime(), Uri.parse("alarm://shitt.no/element/" + code), extras);
+
+        Log.d("GenericTransport", "Notification set for trip element " + code + "." + Integer.toString(id));
 
         /*
         for notification in UIApplication.sharedApplication().scheduledLocalNotifications! as [UILocalNotification] {

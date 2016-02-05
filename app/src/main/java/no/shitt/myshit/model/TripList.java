@@ -211,6 +211,26 @@ public class TripList implements ServerAPIListener, JSONable {
         return null;
     }
 
+    public AnnotatedTrip tripByElementId(int elementId) {
+        for (int i = 0; i < trips.size(); i++) {
+            if (trips.get(i).trip.elementById(elementId) != null) {
+                return trips.get(i);
+            }
+        }
+        return null;
+    }
+
+    public AnnotatedTripElement elementById(int elementId) {
+        AnnotatedTripElement element;
+        for (int i = 0; i < trips.size(); i++) {
+            element = trips.get(i).trip.elementById(elementId);
+            if (element != null) {
+                return element;
+            }
+        }
+        return null;
+    }
+
     public void clear() {
         trips = new ArrayList<>();
         saveToArchive();

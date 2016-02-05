@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * This {@code IntentService} does the app's actual work.
@@ -43,6 +45,12 @@ public class SchedulingService extends IntentService {
         // indicates the presence of a doodle. Post a "Doodle Alert" notification.
         Log.d("SchedulingService", "Intent: " + intent.describeContents());
         Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
+        Set<String> keys = intent.getExtras().keySet();
+        Iterator<String> it = keys.iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            Log.e("SchedulingService", "[" + key + "=" + intent.getExtras().get(key)+"]");
+        }
 
         sendNotification("SHiT trip starts soon...");
 

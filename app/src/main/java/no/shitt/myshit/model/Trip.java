@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
@@ -308,14 +309,18 @@ public class Trip implements ServerAPIListener, JSONable {
         Log.d("Trip", "Setting notification for trip " + code);
 
         // For testing...
+        alarmcounter++;
         Date alarmTime = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, alarmcounter * 20);
-        alarmcounter++;
+        calendar.add(Calendar.SECOND, (alarmcounter % 10) * 20);
 
         AlarmReceiver alarm = new AlarmReceiver();
-        alarm.setAlarm(calendar.getTime(), Uri.parse("alarm://shitt.no/trip/" + code), "SHiT trip " + name + " starts soon.");
+        Bundle extras = new Bundle();
+        extras.putString("msg", "SHiT trip " + alarmcounter + " (" + name + ") starts soon.");
+        extras.putString("tripCode", code);
+        alarm.setAlarm(calendar.getTime(), Uri.parse("alarm://test.shitt.no/trip/" + code), extras);
+        alarm.setAlarm(getStartTime(), Uri.parse("alarm://shitt.no/trip/" + code), extras);
 
         Log.d("Trip", "Notification set for trip " + code);
 

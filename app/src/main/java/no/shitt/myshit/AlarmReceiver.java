@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -60,12 +61,13 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
      * @param data
      * @param message
      */
-    public void setAlarm(Date alertTime, Uri data, String message) {
+    public void setAlarm(Date alertTime, Uri data, Bundle extras) {
         Context ctx = SHiTApplication.getContext();
         alarmMgr = (AlarmManager)ctx.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(ctx, AlarmReceiver.class);
         intent.setData(data);
-        intent.putExtra("msg", message);
+        //intent.putExtra("msg", message);
+        intent.putExtras(extras);
         alarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
