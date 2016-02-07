@@ -1,21 +1,22 @@
 package no.shitt.myshit;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Set;
+import no.shitt.myshit.model.AnnotatedTrip;
+import no.shitt.myshit.model.AnnotatedTripElement;
+import no.shitt.myshit.model.TripList;
 
 /**
  * This {@code IntentService} does the app's actual work.
@@ -26,33 +27,40 @@ import java.util.Set;
  */
 
 public class SchedulingService extends IntentService {
+    // An ID used to post the notification.
+    private static final int NOTIFICATION_ID = 1;
+    private static final long[] VIBRATION_PATTERN = new long[] { 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50 };
+
+    // Keys for intent extras (bundle keys)
+    public static final String KEY_TRIP_CODE  = "tripCode";
+    public static final String KEY_ELEMENT_ID = "tripElement";
+    public static final String KEY_TITLE      = "title";
+    public static final String KEY_MESSAGE    = "msg";
+
+
     public SchedulingService() {
         super("SchedulingService");
     }
 
-    public static final String TAG = "Scheduling Demo";
-    // An ID used to post the notification.
-    public static final int NOTIFICATION_ID = 1;
 
     private NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
 
     @Override
     protected void onHandleIntent(Intent intent) {
         // BEGIN_INCLUDE(service_onhandle)
 
-        // If the app finds the string "doodle" in the Google home page content, it
-        // indicates the presence of a doodle. Post a "Doodle Alert" notification.
-        Log.d("SchedulingService", "Intent: " + intent.describeContents());
         Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
+        /*
         Set<String> keys = intent.getExtras().keySet();
         Iterator<String> it = keys.iterator();
         while (it.hasNext()) {
             String key = it.next();
-            Log.e("SchedulingService", "[" + key + "=" + intent.getExtras().get(key)+"]");
+            Log.d("SchedulingService", "[" + key + "=" + intent.getExtras().get(key)+"]");
         }
+        */
 
-        sendNotification("SHiT trip starts soon...");
+        String msg = intent.getStringExtra("msg");
+        sendNotification(intent.getData().toString(), intent.getExtras());
 
         // Release the wake lock provided by the BroadcastReceiver.
         AlarmReceiver.completeWakefulIntent(intent);
@@ -60,22 +68,55 @@ public class SchedulingService extends IntentService {
     }
 
     // Post a notification indicating whether a doodle was found.
-    private void sendNotification(String msg) {
+    //private void sendNotification(String tag, String msg) {
+    private void sendNotification(String tag, Bundle extras) {
+        String tripCode = extras.getString(KEY_TRIP_CODE);
+        int elementId = extras.getInt(KEY_ELEMENT_ID, -1);
+
+        Log.d("SchedulingService", "sendNotification for " + tripCode + ":" + elementId);
+
+        AnnotatedTrip trip = TripList.getSharedList().tripByCode(tripCode);
+        if (trip == null) {
+            // If trip not found, it's probably a notification for a deleted trip - ignore
+            return;
+        }
+        AnnotatedTripElement tripElement = null;
+        if (elementId > 0) {
+            tripElement = trip.trip.elementById(elementId);
+            if (tripElement == null) {
+                // If element not found, it's probably a notification for a deleted element - ignore
+                return;
+            }
+        }
+
+        String title = extras.getString(KEY_TITLE);
+        String msg   = extras.getString(KEY_MESSAGE);
+
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, TripsActivity.class), 0);
+        //PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+        //        new Intent(this, TripsActivity.class), 0);
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(getString(R.string.alert_title_trip))
+                        .setLargeIcon(largeIcon)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setVibrate(VIBRATION_PATTERN)
+                        .setSound(alarmSound)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setCategory(Notification.CATEGORY_EVENT)
+                        .setContentTitle(title)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);
 
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        //mBuilder.setContentIntent(contentIntent);
+        mNotificationManager.notify(tag, NOTIFICATION_ID, mBuilder.build());
     }
 }

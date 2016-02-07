@@ -1,5 +1,9 @@
 package no.shitt.myshit.helper;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.text.format.DateUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -7,6 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+
+import no.shitt.myshit.R;
+import no.shitt.myshit.SHiTApplication;
 
 public class ServerDate {
     //iOS feature
@@ -52,5 +59,37 @@ public class ServerDate {
         } else {
             return null;
         }
+    }
+
+    public static String formatInterval(long intervalInMillis) {
+        long days = intervalInMillis / DateUtils.DAY_IN_MILLIS;
+        long hours = (intervalInMillis % DateUtils.DAY_IN_MILLIS) / DateUtils.HOUR_IN_MILLIS;
+        long minutes = (intervalInMillis % DateUtils.HOUR_IN_MILLIS) / DateUtils.MINUTE_IN_MILLIS;
+
+        Context ctx = SHiTApplication.getContext();
+        Resources res = ctx.getResources();
+
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(res.getQuantityString(R.plurals.days, (int) days, (int) days));
+        }
+        if (hours > 0) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(res.getQuantityString(R.plurals.hours, (int) hours, (int) hours));
+        }
+        if (minutes > 0 || sb.length() == 0) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(res.getQuantityString(R.plurals.minutes, (int) minutes, (int) minutes));
+        }
+
+        return sb.toString();
+    }
+
+    public static boolean equal(Date str1, Date str2) {
+        return (str1 == null ? str2 == null : str1.equals(str2));
     }
 }

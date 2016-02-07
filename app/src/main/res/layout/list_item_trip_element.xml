@@ -5,7 +5,7 @@
 
     <!-- Trip id / Hidden by default -->
     <TextView
-        android:id="@+id/trip_id"
+        android:id="@+id/element_trip_code"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:visibility="gone" />
@@ -19,6 +19,14 @@
 
     <ImageView
         android:id="@+id/element_icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:paddingTop="2sp"
+        android:paddingBottom="2sp"
+        android:paddingEnd="2sp"/>
+
+    <ImageView
+        android:id="@+id/element_icon_overlay"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:paddingTop="2sp"

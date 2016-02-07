@@ -11,6 +11,7 @@ import java.util.Map;
 
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.helper.StringUtil;
 
 public class Flight extends GenericTransport {
     // MARK: Properties
@@ -26,9 +27,9 @@ public class Flight extends GenericTransport {
     @Override
     public String getStartInfo() {
         Context ctx = SHiTApplication.getContext();
-        DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
-        //String timeInfo = startTime(DateUtils.FORMAT_SHOW_TIME);
-        String timeInfo = dateFormatter.format(departureTime);
+        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
+        String timeInfo = startTime(null, DateFormat.SHORT);
+        //String timeInfo = dateFormatter.format(departureTime);
         String airportName = (departureStop != null ? departureStop : "<Departure Airport>");
         String terminalInfo = (departureTerminalCode != null && !departureTerminalCode.isEmpty() ? " [" + departureTerminalCode + "]" : "");
         return (timeInfo != null ? timeInfo + ": " : "") + airportName + terminalInfo;
@@ -36,10 +37,10 @@ public class Flight extends GenericTransport {
 
     @Override
     public String getEndInfo() {
-        Context ctx = SHiTApplication.getContext();
-        DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
-        //String timeInfo = endTime(DateUtils.FORMAT_SHOW_TIME);
-        String timeInfo = dateFormatter.format(arrivalTime);
+        //Context ctx = SHiTApplication.getContext();
+        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
+        String timeInfo = endTime(null, DateFormat.SHORT);
+        //String timeInfo = dateFormatter.format(arrivalTime);
         String airportName = (arrivalStop != null ? arrivalStop : "<Arrival-Airport>");
         String terminalInfo = (arrivalTerminalCode != null && !arrivalTerminalCode.isEmpty() ? " [" + arrivalTerminalCode + "]" : "");
         return (timeInfo != null ? timeInfo + ": " : "") + airportName + terminalInfo;
@@ -70,10 +71,10 @@ public class Flight extends GenericTransport {
         return jo;
     }
 
-    Flight(JSONObject elementData) {
-        super(elementData);
+    Flight(int tripId, String tripCode, JSONObject elementData) {
+        super(tripId, tripCode, elementData);
         airlineCode = elementData.isNull(Constants.JSON.ELEM_COMPANY_CODE) ? null : elementData.optString(Constants.JSON.ELEM_COMPANY_CODE);
-        setNotification();
+        //setNotification();
     }
 
     // MARK: Methods
@@ -84,7 +85,7 @@ public class Flight extends GenericTransport {
         }
         try {
             Flight otherFlight = (Flight) otherObject;
-            if (this.airlineCode.equals(otherFlight.airlineCode))      { return false; }
+            if (!StringUtil.equal(this.airlineCode, otherFlight.airlineCode))      { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {

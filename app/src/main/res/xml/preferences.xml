@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_upcoming"
+        android:title="@string/pref_upcoming"
+        android:dialogTitle="@string/pref_upcoming"
+        android:entries="@array/pref_upcoming_entries"
+        android:entryValues="@array/pref_upcoming_values"
+        android:summary="%s"
+        android:defaultValue="@string/pref_upcoming_default" />
+    <ListPreference
+        android:key="pref_alertLeadTime_trip"
+        android:title="@string/pref_alertLeadTime_trip"
+        android:dialogTitle="@string/pref_alertLeadTime_trip"
+        android:entries="@array/pref_alertLeadTime_trip_entries"
+        android:entryValues="@array/pref_alertLeadTime_trip_values"
+        android:summary="@string/pref_alertLeadTime_trip_summary"
+        android:defaultValue="@string/pref_alertLeadTime_trip_default" />
+    <ListPreference
+        android:key="pref_alertLeadTime_departure"
+        android:title="@string/pref_alertLeadTime_departure"
+        android:dialogTitle="@string/pref_alertLeadTime_departure"
+        android:entries="@array/pref_alertLeadTime_departure_entries"
+        android:entryValues="@array/pref_alertLeadTime_departure_values"
+        android:summary="@string/pref_alertLeadTime_departure_summary"
+        android:defaultValue="@string/pref_alertLeadTime_departure_default" />
+    <ListPreference
+        android:key="pref_alertLeadTime_connection"
+        android:title="@string/pref_alertLeadTime_connection"
+        android:dialogTitle="@string/pref_alertLeadTime_connection"
+        android:entries="@array/pref_alertLeadTime_connection_entries"
+        android:entryValues="@array/pref_alertLeadTime_connection_values"
+        android:summary="@string/pref_alertLeadTime_connection_summary"
+        android:defaultValue="@string/pref_alertLeadTime_connection_default" />
+</PreferenceScreen>

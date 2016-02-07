@@ -22,9 +22,14 @@ public class Constants {
     }
 
     public class JSON {
-        public static final String QUERY_COUNT      = "count";
-        public static final String QUERY_DETAILS    = "details";
-        public static final String QUERY_RESULTS    = "results";
+        public static final String QUERY_COUNT             = "count";
+        public static final String QUERY_DETAILS           = "details";
+        public static final String QUERY_RESULTS           = "results";
+
+        public static final String ANNTRIP_TRIP            = "trip";
+        public static final String ANNTRIP_MODIFIED        = "modified";
+        public static final String ANNELEMENT_ELEMENT      = "element";
+        public static final String ANNELEMENT_MODIFIED     = "modified";
 
         public static final String TRIP_ID          = "id";
         public static final String TRIP_START_DATE  = "startDate";

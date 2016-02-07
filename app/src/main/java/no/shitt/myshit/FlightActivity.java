@@ -6,11 +6,16 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+
+import no.shitt.myshit.adapters.ReferenceListAdapter;
+import no.shitt.myshit.adapters.TripElementListAdapter;
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.Flight;
 import no.shitt.myshit.model.TripList;
@@ -24,6 +29,7 @@ public class FlightActivity extends AppCompatActivity {
 
     Flight flight;
     Intent intent;
+    ListView refListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +47,8 @@ public class FlightActivity extends AppCompatActivity {
             Log.e("FlightActivity", "Unexpected NullPointerException when setting up toolbar");
         }
 
+        refListView = (ListView) findViewById(R.id.reference_list);
+
         // Get trip code and element ID
         intent = getIntent();
         trip_code = intent.getStringExtra(Constants.IntentExtra.TRIP_CODE);
@@ -52,7 +60,7 @@ public class FlightActivity extends AppCompatActivity {
             flight = (Flight) TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id)).tripElement;
 
             String flightNo = StringUtil.stringWithDefault(flight.airlineCode, "XX") + " " + StringUtil.stringWithDefault(flight.routeNo, "***");
-            StringBuilder departureInfo = new StringBuilder(flight.startTime(DateUtils.FORMAT_SHOW_TIME));
+            StringBuilder departureInfo = new StringBuilder(flight.startTime(DateFormat.MEDIUM, DateFormat.SHORT));
             departureInfo.append("\n");
             departureInfo.append(StringUtil.stringWithDefault(flight.departureStop, StringUtil.stringWithDefault(flight.departureLocation, "")));
             if (flight.departureTerminalName != null && !flight.departureTerminalName.isEmpty()) {
@@ -63,7 +71,7 @@ public class FlightActivity extends AppCompatActivity {
                 departureInfo.append("\n");
                 departureInfo.append(flight.departureAddress);
             }
-            StringBuilder arrivalInfo = new StringBuilder(flight.endTime(DateUtils.FORMAT_SHOW_TIME));
+            StringBuilder arrivalInfo = new StringBuilder(flight.endTime(DateFormat.MEDIUM, DateFormat.SHORT));
             arrivalInfo.append("\n");
             arrivalInfo.append(StringUtil.stringWithDefault(flight.arrivalStop, StringUtil.stringWithDefault(flight.arrivalLocation, "")));
             if (flight.arrivalTerminalName != null && !flight.arrivalTerminalName.isEmpty()) {
@@ -80,6 +88,13 @@ public class FlightActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.departure)).setText(departureInfo.toString());
             ((TextView) findViewById(R.id.arrival)).setText(arrivalInfo.toString());
             //((TextView) findViewById(R.id.referenceTitle)).setText();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    ListAdapter adapter = new ReferenceListAdapter(FlightActivity.this, flight.references);
+                    //setListAdapter(adapter);
+                    refListView.setAdapter(adapter);
+                }
+            });
 
         }
         catch (Exception e) {

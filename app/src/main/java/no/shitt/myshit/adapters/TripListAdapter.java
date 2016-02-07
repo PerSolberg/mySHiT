@@ -22,6 +22,7 @@ public class TripListAdapter extends BaseAdapter {
     /*private view holder class*/
     private class ViewHolder {
         ImageView imageView;
+        ImageView overlayView;
         TextView txtName;
         TextView txtInfo;
         TextView txtDesc;
@@ -40,6 +41,7 @@ public class TripListAdapter extends BaseAdapter {
             holder.txtId = (TextView) convertView.findViewById(R.id.trip_id);
             holder.txtCode = (TextView) convertView.findViewById(R.id.trip_code);
             holder.imageView = (ImageView) convertView.findViewById(R.id.trip_icon);
+            holder.overlayView = (ImageView) convertView.findViewById(R.id.trip_icon_overlay);
             holder.txtName = (TextView) convertView.findViewById(R.id.trip_name);
             holder.txtInfo = (TextView) convertView.findViewById(R.id.trip_info);
             holder.txtDesc = (TextView) convertView.findViewById(R.id.trip_description);
@@ -58,6 +60,14 @@ public class TripListAdapter extends BaseAdapter {
         holder.txtInfo.setText(rowItem.trip.getDateInfo());
         holder.txtDesc.setText(rowItem.trip.tripDescription);
 
+        switch (rowItem.modified) {
+            case CHANGED:
+                holder.overlayView.setImageResource(R.mipmap.icon_overlay_changed);
+                break;
+            case NEW:
+                holder.overlayView.setImageResource(R.mipmap.icon_overlay_new);
+                break;
+        }
         return convertView;
     }
 

@@ -25,6 +25,14 @@
         android:paddingBottom="2sp"
         android:paddingEnd="2sp"/>
 
+    <ImageView
+        android:id="@+id/trip_icon_overlay"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:paddingTop="2sp"
+        android:paddingBottom="2sp"
+        android:paddingEnd="2sp"/>
+
     <!-- Trip Name -->
     <TextView
         android:id="@+id/trip_name"

@@ -1,12 +1,16 @@
 package no.shitt.myshit.model;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,7 +18,11 @@ import java.util.TimeZone;
 
 import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.R;
+import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.ServerDate;
+import no.shitt.myshit.helper.StringUtil;
 
 public class GenericTransport extends TripElement {
     // MARK: Properties
@@ -43,7 +51,7 @@ public class GenericTransport extends TripElement {
     public String companyName;
     public String companyPhone;
 
-    private static int alarmcounter = 0;
+    //private static int alarmcounter = 0;
 
     @Override
     public Date getStartTime() {
@@ -118,8 +126,8 @@ public class GenericTransport extends TripElement {
     }
 
 
-    GenericTransport(JSONObject elementData) {
-        super(elementData);
+    GenericTransport(int tripId, String tripCode, JSONObject elementData) {
+        super(tripId, tripCode, elementData);
         segmentId = elementData.optInt(Constants.JSON.ELEM_SEGMENT_ID);
         segmentCode = elementData.isNull(Constants.JSON.ELEM_SEGMENT_CODE) ? null : elementData.optString(Constants.JSON.ELEM_SEGMENT_CODE);
         legNo = elementData.optInt(Constants.JSON.ELEM_LEG_NO);
@@ -157,45 +165,52 @@ public class GenericTransport extends TripElement {
     @Override
     public boolean isEqual(Object otherObject) {
         if (this.getClass() != otherObject.getClass()) {
+            Log.d("GenericTransport", "Changed class!");
             return false;
         }
         try {
             GenericTransport otherTransport = (GenericTransport) otherObject;
-            if (this.segmentId             != otherTransport.segmentId                  ) { return false; }
-            if (this.legNo                 != otherTransport.legNo                      ) { return false; }
-            if (!this.segmentCode.equals(otherTransport.segmentCode)                    ) { return false; }
-            if (!this.departureTime.equals(otherTransport.departureTime)                ) { return false; }
-            if (!this.departureLocation.equals(otherTransport.departureLocation)        ) { return false; }
-            if (!this.departureStop.equals(otherTransport.departureStop)                ) { return false; }
-            if (!this.departureAddress.equals(otherTransport.departureAddress)          ) { return false; }
-            if (!this.departureTimeZone.equals(otherTransport.departureTimeZone)        ) { return false; }
-            if (!this.departureCoordinates.equals(otherTransport.departureCoordinates)  ) { return false; }
-            if (!this.departureTerminalCode.equals(otherTransport.departureTerminalCode)) { return false; }
-            if (!this.departureTerminalName.equals(otherTransport.departureTerminalName)) { return false; }
-            if (!this.arrivalTime.equals(otherTransport.arrivalTime)                    ) { return false; }
-            if (!this.arrivalLocation.equals(otherTransport.arrivalLocation)            ) { return false; }
-            if (!this.arrivalStop.equals(otherTransport.arrivalStop)                    ) { return false; }
-            if (!this.arrivalAddress.equals(otherTransport.arrivalAddress)              ) { return false; }
-            if (!this.arrivalTimeZone.equals(otherTransport.arrivalTimeZone)            ) { return false; }
-            if (!this.arrivalCoordinates.equals(otherTransport.arrivalCoordinates)      ) { return false; }
-            if (!this.arrivalTerminalCode.equals(otherTransport.arrivalTerminalCode)    ) { return false; }
-            if (!this.arrivalTerminalName.equals(otherTransport.arrivalTerminalName)    ) { return false; }
-            if (!this.routeNo.equals(otherTransport.routeNo)                            ) { return false; }
-            if (!this.companyName.equals(otherTransport.companyName)                    ) { return false; }
-            if (!this.companyPhone.equals(otherTransport.companyPhone)                  ) { return false; }
+            if (this.segmentId             != otherTransport.segmentId                             ) { Log.d("GenericTransport", "Changed Segment ID");  return false; }
+            if (this.legNo                 != otherTransport.legNo                                 ) { Log.d("GenericTransport", "Changed Leg #");       return false; }
+            if (!StringUtil.equal(this.segmentCode, otherTransport.segmentCode)                    ) { Log.d("GenericTransport", "Changed Segment CD");  return false; }
+            if (!ServerDate.equal(this.departureTime, otherTransport.departureTime)                ) { Log.d("GenericTransport", "Changed Dep Time");    return false; }
+            if (!StringUtil.equal(this.departureLocation, otherTransport.departureLocation)        ) { Log.d("GenericTransport", "Changed Dep Loc");     return false; }
+            if (!StringUtil.equal(this.departureStop, otherTransport.departureStop)                ) { Log.d("GenericTransport", "Changed Dep Stop");    return false; }
+            if (!StringUtil.equal(this.departureAddress, otherTransport.departureAddress)          ) { Log.d("GenericTransport", "Changed Dep Addr");    return false; }
+            if (!StringUtil.equal(this.departureTimeZone, otherTransport.departureTimeZone)        ) { Log.d("GenericTransport", "Changed Dep TZ");      return false; }
+            if (!StringUtil.equal(this.departureCoordinates, otherTransport.departureCoordinates)  ) { Log.d("GenericTransport", "Changed Dep Coord");   return false; }
+            if (!StringUtil.equal(this.departureTerminalCode, otherTransport.departureTerminalCode)) { Log.d("GenericTransport", "Changed Dep Term CD"); return false; }
+            if (!StringUtil.equal(this.departureTerminalName, otherTransport.departureTerminalName)) { Log.d("GenericTransport", "Changed Dep Terminal");return false; }
+            if (!ServerDate.equal(this.arrivalTime, otherTransport.arrivalTime)                    ) { Log.d("GenericTransport", "Changed Arr Time");    return false; }
+            if (!StringUtil.equal(this.arrivalLocation, otherTransport.arrivalLocation)            ) { Log.d("GenericTransport", "Changed Arr Loc");     return false; }
+            if (!StringUtil.equal(this.arrivalStop, otherTransport.arrivalStop)                    ) { Log.d("GenericTransport", "Changed Arr Stop");    return false; }
+            if (!StringUtil.equal(this.arrivalAddress, otherTransport.arrivalAddress)              ) { Log.d("GenericTransport", "Changed Arr Addr");    return false; }
+            if (!StringUtil.equal(this.arrivalTimeZone, otherTransport.arrivalTimeZone)            ) { Log.d("GenericTransport", "Changed Arr TZ");      return false; }
+            if (!StringUtil.equal(this.arrivalCoordinates, otherTransport.arrivalCoordinates)      ) { Log.d("GenericTransport", "Changed Arr Coord");   return false; }
+            if (!StringUtil.equal(this.arrivalTerminalCode, otherTransport.arrivalTerminalCode)    ) { Log.d("GenericTransport", "Changed Arr Term CD"); return false; }
+            if (!StringUtil.equal(this.arrivalTerminalName, otherTransport.arrivalTerminalName)    ) { Log.d("GenericTransport", "Changed Arr Terminal");return false; }
+            if (!StringUtil.equal(this.routeNo, otherTransport.routeNo)                            ) { Log.d("GenericTransport", "Changed Route #");     return false; }
+            if (!StringUtil.equal(this.companyName, otherTransport.companyName)                    ) { Log.d("GenericTransport", "Changed Company");     return false; }
+            if (!StringUtil.equal(this.companyPhone, otherTransport.companyPhone)                  ) { Log.d("GenericTransport", "Changed Phone");       return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {
+            Log.d("GenericTransport", "Comparison failed with exception");
             return false;
         }
     }
 
     @Override
-    public String startTime(int dateTimeStyle) {
+    public String startTime(Integer dateStyle, Integer timeStyle) {
         if (departureTime != null) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat();
-            //dateFormatter.dateStyle = dateStyle
-            //dateFormatter.timeStyle = timeStyle
+            DateFormat dateFormatter;
+            if (dateStyle == null) {
+                dateFormatter = SimpleDateFormat.getTimeInstance(timeStyle);
+            } else if (timeStyle == null) {
+                dateFormatter = SimpleDateFormat.getDateInstance(dateStyle);
+            } else {
+                dateFormatter = SimpleDateFormat.getDateTimeInstance(dateStyle, timeStyle);
+            }
             if (departureTimeZone != null) {
                 TimeZone timezone = TimeZone.getTimeZone(departureTimeZone);
                 dateFormatter.setTimeZone(timezone);
@@ -207,11 +222,16 @@ public class GenericTransport extends TripElement {
     }
 
     @Override
-    public String endTime(int dateTimeStyle) {
+    public String endTime(Integer dateStyle, Integer timeStyle) {
         if (arrivalTime != null) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat();
-            //dateFormatter.dateStyle = dateStyle
-            //dateFormatter.timeStyle = timeStyle
+            DateFormat dateFormatter;
+            if (dateStyle == null) {
+                dateFormatter = SimpleDateFormat.getTimeInstance(timeStyle);
+            } else if (timeStyle == null) {
+                dateFormatter = SimpleDateFormat.getDateInstance(dateStyle);
+            } else {
+                dateFormatter = SimpleDateFormat.getDateTimeInstance(dateStyle, timeStyle);
+            }
             if (arrivalTimeZone != null) {
                 TimeZone timezone = TimeZone.getTimeZone(arrivalTimeZone);
                 dateFormatter.setTimeZone(timezone);
@@ -224,106 +244,99 @@ public class GenericTransport extends TripElement {
 
     @Override
     public void setNotification() {
-        // First delete any existing notifications for this trip element (either one or two)
-        AnnotatedTrip trip = TripList.getSharedList().tripByElementId(id);
-        if (trip == null) {
-            // Shouldn't happen
-            Log.e("GenericTransport", "Couldn't find trip for element " + Integer.toString(id));
+        if (getStartTime() == null) {
+            //Log.d("Trip", "Not setting notification for trip element " + tripCode + ":" + Integer.toString(id) + " without start time");
+            return;
+        } else if (getTense() != Tense.FUTURE) {
+            //Log.d("Trip", "Not setting notification for historic (or started) trip element " + tripCode + ":" + Integer.toString(id));
             return;
         }
-        String code = trip.trip.code;
-        Log.d("GenericTransport", "Setting notification for trip " + code);
+
+        //String code = tripCode; //trip.trip.code;
+        //Log.d("GenericTransport", "Setting notification for trip element " + tripCode + ":" + Integer.toString(id));
 
         // For testing...
-        alarmcounter++;
-        Date alarmTime = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, (alarmcounter % 20) * 10 + 5);
+        //alarmcounter++;
+        //alarmTime.setTimeInMillis(System.currentTimeMillis());
+        //alarmTime.add(Calendar.SECOND, (alarmcounter % 20) * 10 + 5);
 
-        AlarmReceiver alarm = new AlarmReceiver();
+        Context ctx = SHiTApplication.getContext();
+
+        // Get lead time from preferences
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+
+        int leadTimeDepartureMinutes;
+        try {
+            String leadTimeDeparture = sharedPref.getString("pref_alertLeadTime_departure" /*SettingsActivity.KEY_PREF_SYNC_CONN*/, "");
+            leadTimeDepartureMinutes = Integer.valueOf(leadTimeDeparture);
+        }
+        catch (Exception e) {
+            leadTimeDepartureMinutes = -1;
+        }
+
+        int leadTimeConnectionMinutes;
+        try {
+            String leadtimeConnection = sharedPref.getString("pref_alertLeadTime_connection" /*SettingsActivity.KEY_PREF_SYNC_CONN*/, "");
+            leadTimeConnectionMinutes = Integer.valueOf(leadtimeConnection);
+        }
+        catch (Exception e) {
+            leadTimeConnectionMinutes = -1;
+        }
+
+        //Log.d("GenericTransport", "Departure leadtime = " + leadTimeDepartureMinutes + ", connection leadtime = " + leadTimeConnectionMinutes);
+
+        // Set up information to be passed to AlarmReceiver/SchedulingService
         Bundle extras = new Bundle();
-        extras.putString("msg", "Element " + alarmcounter + " (" + getTitle() + ") departs soon.");
-        extras.putString("tripCode", code);
-        extras.putInt("tripElement", id);
-        alarm.setAlarm(calendar.getTime(), Uri.parse("alarm://test.shitt.no/element/" + code), extras);
-        alarm.setAlarm(getStartTime(), Uri.parse("alarm://shitt.no/element/" + code), extras);
+        extras.putString(SchedulingService.KEY_TRIP_CODE, tripCode);
+        extras.putInt(SchedulingService.KEY_ELEMENT_ID, id);
+        extras.putString(SchedulingService.KEY_TITLE, getTitle());
 
-        Log.d("GenericTransport", "Notification set for trip element " + code + "." + Integer.toString(id));
+        //AlarmReceiver alarm = new AlarmReceiver();
+        Calendar now = Calendar.getInstance();
+        //alarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://test.shitt.no/element/" + tripCode + "/" + Integer.toString(id)), extras);
 
-        /*
-        for notification in UIApplication.sharedApplication().scheduledLocalNotifications! as [UILocalNotification] {
-            if (notification.userInfo!["TripElementID"] as? Int == id) {
-                UIApplication.sharedApplication().cancelLocalNotification(notification)
+        // If this is first leg of a segment, set the departure notification
+        if (leadTimeDepartureMinutes > 0 && legNo == 1) {
+            Calendar alarmTime = Calendar.getInstance();
+            alarmTime.setTime(getStartTime());
+            alarmTime.add(Calendar.MINUTE, -leadTimeDepartureMinutes);
+
+            // If we're already past the warning time, set a notification for right now instead
+            if (alarmTime.before(now)) {
+                alarmTime = now;
             }
+
+            int actualLeadTime = alarmTime.compareTo(now);
+            String leadTimeText = ServerDate.formatInterval(actualLeadTime);
+            extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_travel, leadTimeText, startTime(null, DateFormat.SHORT)));
+
+            AlarmReceiver departureAlarm = new AlarmReceiver();
+            departureAlarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/departure/" + tripCode + "/" + Integer.toString(id)), extras);
         }
 
-        // Set notification (if we have a start date)
-        if let tripStart = startTime {
-            if tense == .future {
-                let defaults = NSUserDefaults.standardUserDefaults()
-                let departureLeadtime = Int(defaults.floatForKey("dept_notification_leadtime"))
-                let legLeadtime = Int(defaults.floatForKey("leg_notification_leadtime"))
-                let startTimeText = startTime(dateStyle: .NoStyle, timeStyle: .ShortStyle)
-                let now = NSDate()
-                let dcf = NSDateComponentsFormatter()
-                let genericAlertMessage = NSLocalizedString("%@ departs in %@, at %@", comment: "Some dummy comment")
+        if (leadTimeConnectionMinutes > 0) {
+            // Get new instance in case previous section set it to "now" (in which case we'd be modifying our reference timestamp)
+            Calendar alarmTime = Calendar.getInstance();
+            alarmTime.setTime(getStartTime());
+            alarmTime.add(Calendar.MINUTE, -leadTimeConnectionMinutes);
 
-                dcf.unitsStyle = .Short
-                dcf.zeroFormattingBehavior = .DropAll
-
-                var userInfo: [String:NSObject] = ["TripElementID": id]
-                if let departureTimeZone = departureTimeZone {
-                    userInfo["TimeZone"] = departureTimeZone
-                }
-
-
-                if (departureLeadtime ?? -1) > 0 && (legNo ?? 1) == 1 {
-                    var alertTime = tripStart.addMinutes( -departureLeadtime )
-                    // If we're already past the warning time, set a notification for right now instead
-                    if alertTime.isLessThanDate(now) {
-                        alertTime = now
-                    }
-                    let notification = UILocalNotification()
-
-                    let actualLeadTime = tripStart.timeIntervalSinceDate(alertTime)
-                    let leadTimeText = dcf.stringFromTimeInterval(actualLeadTime)
-                    //notification.alertBody = "\(title!) departs in \(leadTimeText!), at \(startTimeText!)"
-                    notification.alertBody = NSString.localizedStringWithFormat(genericAlertMessage, title!, leadTimeText!, startTimeText!) as String
-                    //notification.alertAction = "open" // text that is displayed after "slide to..." on the lock screen - defaults to "slide to view"
-                    notification.fireDate = alertTime
-                    notification.soundName = UILocalNotificationDefaultSoundName
-                    notification.userInfo = userInfo
-                    notification.category = "SHiT"
-                    UIApplication.sharedApplication().scheduleLocalNotification(notification)
-                }
-                setLegNotification: if (legLeadtime ?? -1) > 0 {
-                    var alertTime = tripStart.addMinutes( -legLeadtime )
-                    // If we're already past the warning time, set a notification for right now instead
-                    // unless it's the first leg, in which case we already have one from above
-                    if alertTime.isLessThanDate(now) {
-                        if (legNo ?? 1) == 1 {
-                            break setLegNotification
-                        } else {
-                            alertTime = now
-                        }
-                    }
-                    let notification = UILocalNotification()
-
-                    let actualLeadTime = tripStart.timeIntervalSinceDate(alertTime)
-                    let leadTimeText = dcf.stringFromTimeInterval(actualLeadTime)
-
-                    notification.alertBody = NSString.localizedStringWithFormat(genericAlertMessage, title!, leadTimeText!, startTimeText!) as String
-                    //"\(title!) departs in \(leadTimeText!), at \(startTimeText!)"
-                    //notification.alertAction = "open" // text that is displayed after "slide to..." on the lock screen - defaults to "slide to view"
-                    notification.fireDate = alertTime
-                    notification.soundName = UILocalNotificationDefaultSoundName
-                    notification.userInfo = userInfo
-                    notification.category = "SHiT"
-                    UIApplication.sharedApplication().scheduleLocalNotification(notification)
+            // If we're already past the warning time, set a notification for right now instead
+            // unless it's the first leg, in which case we already have one from above
+            if (alarmTime.before(now)) {
+                if (legNo == 1) {
+                    alarmTime = null;
+                } else {
+                    alarmTime = now;
                 }
             }
+            if (alarmTime != null) {
+                int actualLeadTime = alarmTime.compareTo(now);
+                String leadTimeText = ServerDate.formatInterval(actualLeadTime);
+                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_connection, leadTimeText, startTime(null, DateFormat.SHORT)));
+
+                AlarmReceiver connectionAlarm = new AlarmReceiver();
+                connectionAlarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/connection/" + tripCode + "/" + Integer.toString(id)), extras);
+            }
         }
-        */
     }
 }

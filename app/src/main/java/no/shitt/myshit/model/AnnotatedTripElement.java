@@ -1,39 +1,31 @@
 package no.shitt.myshit.model;
 
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import no.shitt.myshit.Constants;
+
 public class AnnotatedTripElement /* NSObject, NSCoding */ {
     public TripElement tripElement;
     public ChangeState modified;
 
-    /* Identifiers for keyed archive (iOS only?)
-    struct PropertyKey {
-        static let modifiedKey = "modified"
-        static let tripElementKey = "tripElement"
+    AnnotatedTripElement(int tripId, String tripCode, JSONObject jsonData) {
+        super();
+        String modifiedRaw = jsonData.optString(Constants.JSON.ANNELEMENT_MODIFIED);
+        modified = ChangeState.fromString(modifiedRaw);
+        tripElement = TripElement.createFromDictionary(tripId, tripCode, jsonData.optJSONObject(Constants.JSON.ANNELEMENT_ELEMENT));
     }
-    */
 
-    /* Encode for keyed archive (iOS only?)
-    // MARK: NSCoding
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(modified.rawValue, forKey: PropertyKey.modifiedKey)
-        aCoder.encodeObject(tripElement, forKey: PropertyKey.tripElementKey)
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = new JSONObject();
+
+        jo.put(Constants.JSON.ANNELEMENT_MODIFIED, modified.getRawValue());
+        jo.put(Constants.JSON.ANNELEMENT_ELEMENT, tripElement.toJSON());
+
+        return jo;
     }
-    */
-
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-    required convenience init?(coder aDecoder: NSCoder) {
-        // NB: use conditional cast (as?) for any optional properties
-        let _modified   = aDecoder.decodeObjectForKey(PropertyKey.modifiedKey) as? String
-        var modified:ChangeState = .Unchanged
-        if (_modified != nil) {
-            modified  = ChangeState(rawValue: _modified!)!
-        }
-        let tripElement = aDecoder.decodeObjectForKey(PropertyKey.tripElementKey) as! TripElement
-
-        // Must call designated initializer.
-        self.init(tripElement: tripElement, modified: modified)
-    }
-    */
 
     AnnotatedTripElement(TripElement tripElement) {
         super();

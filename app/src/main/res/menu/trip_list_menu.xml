@@ -7,16 +7,14 @@
         android:title="@string/action_logout"
         app:showAsAction="ifRoom"/>
 
-    <!-- Alert list goes in overflow -->
-    <item
-        android:id="@+id/action_alerts"
-        android:icon="@mipmap/icon_alerts"
-        android:title="@string/action_alerts"
-        app:showAsAction="never"/>
-
+    <!-- Refresh, should always be in the overflow -->
+    <item android:id="@+id/action_refresh"
+        android:icon="@mipmap/icon_refresh"
+        android:title="@string/action_refresh"
+        app:showAsAction="never" />
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
         android:icon="@mipmap/icon_settings"
         android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

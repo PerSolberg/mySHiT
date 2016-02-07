@@ -2,7 +2,8 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:stretchColumns="2">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/flight_toolbar"
@@ -31,7 +32,10 @@
             android:layout_column="2" />
     </TableRow>
 
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
         <TextView
             android:text="@string/label_airline_name"
             android:layout_width="wrap_content"
@@ -46,7 +50,11 @@
             android:layout_column="2"/>
     </TableRow>
 
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+    <TableRow
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
         <TextView
             android:text="@string/label_flight_departure"
             android:layout_width="wrap_content"
@@ -61,7 +69,11 @@
             android:layout_column="2"/>
     </TableRow>
 
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+    <TableRow
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
         <TextView
             android:text="@string/label_flight_arrival"
             android:layout_width="wrap_content"
@@ -81,7 +93,11 @@
         android:layout_height="fill_parent"
         android:minHeight="10dp"/-->
 
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+    <TableRow
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
         <TextView
             android:text="@string/label_flight_refs"
             android:id="@+id/referenceTitle"
@@ -89,8 +105,15 @@
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:layout_column="1" />
+            android:layout_column="1"
+            />
+        <ListView
+            android:id="@+id/reference_list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:cacheColorHint="#00000000"
+            android:layout_column="2"
+            />
     </TableRow>
-
 
 </TableLayout>

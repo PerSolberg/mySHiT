@@ -46,7 +46,7 @@ public class TripList implements ServerAPIListener, JSONable {
         while (i.hasNext()) {
             count++;
             AnnotatedTrip at = (AnnotatedTrip) i.next();
-            jat.put(at.trip.toJSON());
+            jat.put(at.toJSON());
         }
         jo.put(Constants.JSON.QUERY_COUNT, count);
         jo.put(Constants.JSON.QUERY_RESULTS, jat);
@@ -70,15 +70,22 @@ public class TripList implements ServerAPIListener, JSONable {
     }
 
     // Copy data received from server to memory structure
-    public void copyServerData(JSONArray serverData) {
+    //
+    public void copyServerData(JSONArray jsonData, boolean fromServer) {
         // Clear current data and repopulate from server data
         List<AnnotatedTrip> newTripList = new ArrayList<>();
 
         Log.d("TripList copyServerData", "Copy elements");
-        for (int i = 0; i < serverData.length(); i++) {
-            Trip newTrip = new Trip(serverData.optJSONObject(i));
-            //Log.d("TripList copyServerData", "Element #" + String.valueOf(i));
-            newTripList.add(new AnnotatedTrip(TripListSection.HISTORIC, newTrip, ChangeState.UNCHANGED));
+        for (int i = 0; i < jsonData.length(); i++) {
+            if (fromServer) {
+                Trip newTrip = new Trip(jsonData.optJSONObject(i), fromServer);
+                //Log.d("TripList copyServerData", "Element #" + String.valueOf(i));
+                newTripList.add(new AnnotatedTrip(TripListSection.HISTORIC, newTrip, ChangeState.UNCHANGED));
+            } else {
+                AnnotatedTrip newAnnTrip = new AnnotatedTrip(jsonData.optJSONObject(i));
+                //Log.d("TripList copyServerData", "Element #" + String.valueOf(i));
+                newTripList.add(newAnnTrip);
+            }
         }
 
         // Determine changes
@@ -88,7 +95,7 @@ public class TripList implements ServerAPIListener, JSONable {
                 AnnotatedTrip newTrip = newTripList.get(i);
                 AnnotatedTrip oldTrip = null;
                 for (int j = 0; j < trips.size(); j++) {
-                    if (trips.get(i).trip.id == newTrip.trip.id) {
+                    if (trips.get(j).trip.id == newTrip.trip.id) {
                         oldTrip = trips.get(j);
                         break;
                     }
@@ -109,7 +116,7 @@ public class TripList implements ServerAPIListener, JSONable {
 
     public void onRemoteCallComplete(JSONObject response) {
         Log.d("TripList", "Trip list retrieved - building model");
-        copyServerData(response.optJSONArray(Constants.JSON.QUERY_RESULTS));
+        copyServerData(response.optJSONArray(Constants.JSON.QUERY_RESULTS), true);
 
         Intent intent = new Intent(Constants.Notification.TRIPS_LOADED);
         //intent.putExtra("message", "SHiT trips loaded");
@@ -148,7 +155,7 @@ public class TripList implements ServerAPIListener, JSONable {
             }
             */
             JSONObject jo = new JSONObject(jsonString);
-            copyServerData(jo.optJSONArray(Constants.JSON.QUERY_RESULTS));
+            copyServerData(jo.optJSONArray(Constants.JSON.QUERY_RESULTS), false);
         }
         catch (FileNotFoundException e) {
             Log.d("TripList", "File not found: " + e.toString());
@@ -169,13 +176,13 @@ public class TripList implements ServerAPIListener, JSONable {
             fos.write(jsonString.getBytes());
             fos.close();
 
-            Log.d("Trip", "Trips saved to JSON file");
+            Log.d("TripList", "Trips saved to JSON file");
         }
         catch (JSONException je) {
-            Log.e("Trip", "Failed to save trips due to JSON error...");
+            Log.e("TripList", "Failed to save trips due to JSON error...");
         }
         catch (IOException ioe) {
-            Log.e("Trip", "Failed to save trips due to IO error...");
+            Log.e("TripList", "Failed to save trips due to IO error...");
         }
     }
 
@@ -234,5 +241,11 @@ public class TripList implements ServerAPIListener, JSONable {
     public void clear() {
         trips = new ArrayList<>();
         saveToArchive();
+    }
+
+    public void refreshNotifications() {
+        for (int i = 0; i < trips.size(); i++) {
+            trips.get(i).trip.refreshNotifications();
+        }
     }
 }

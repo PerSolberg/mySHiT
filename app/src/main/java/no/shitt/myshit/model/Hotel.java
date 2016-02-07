@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
+import no.shitt.myshit.helper.StringUtil;
 
 public class Hotel extends TripElement {
     // MARK: Properties
@@ -46,7 +47,7 @@ public class Hotel extends TripElement {
     @Override
     public String getStartInfo() {
         Context ctx = SHiTApplication.getContext();
-        DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
+        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
         //dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
         //dateFormatter.timeStyle = NSDateFormatterStyle.NoStyle
 
@@ -88,8 +89,8 @@ public class Hotel extends TripElement {
         return jo;
     }
 
-    Hotel(JSONObject elementData) {
-        super(elementData);
+    Hotel(int tripId, String tripCode, JSONObject elementData) {
+        super(tripId, tripCode, elementData);
 
         checkInDateText = elementData.isNull(Constants.JSON.ELEM_HOTEL_CHECK_IN) ? null : elementData.optString(Constants.JSON.ELEM_HOTEL_CHECK_IN);
         if (checkInDateText != null) {
@@ -116,15 +117,15 @@ public class Hotel extends TripElement {
         }
         try {
             Hotel otherHotel = (Hotel) otherObject;
-            if (!this.checkInDate.equals(otherHotel.checkInDate))    { return false; }
-            if (!this.checkOutDate.equals(otherHotel.checkOutDate))  { return false; }
-            if (!this.hotelName.equals(otherHotel.hotelName))        { return false; }
-            if (!this.address.equals(otherHotel.address))            { return false; }
-            if (!this.postCode.equals(otherHotel.postCode))          { return false; }
-            if (!this.city.equals(otherHotel.city))                  { return false; }
-            if (!this.phone.equals(otherHotel.phone))                { return false; }
-            if (!this.transferInfo.equals(otherHotel.transferInfo))  { return false; }
-            if (!this.timezone.equals(otherHotel.timezone))          { return false; }
+            if (!ServerDate.equal(this.checkInDate, otherHotel.checkInDate))    { return false; }
+            if (!ServerDate.equal(this.checkOutDate, otherHotel.checkOutDate))  { return false; }
+            if (!StringUtil.equal(this.hotelName, otherHotel.hotelName))        { return false; }
+            if (!StringUtil.equal(this.address, otherHotel.address))            { return false; }
+            if (!StringUtil.equal(this.postCode, otherHotel.postCode))          { return false; }
+            if (!StringUtil.equal(this.city, otherHotel.city))                  { return false; }
+            if (!StringUtil.equal(this.phone, otherHotel.phone))                { return false; }
+            if (!StringUtil.equal(this.transferInfo, otherHotel.transferInfo))  { return false; }
+            if (!StringUtil.equal(this.timezone, otherHotel.timezone))          { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {
@@ -133,11 +134,16 @@ public class Hotel extends TripElement {
     }
 
     @Override
-    public String startTime(int dateTimeStyle) {
+    public String startTime(Integer dateStyle, Integer timeStyle) {
         if (checkInDate != null) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat();
-            //dateFormatter.dateStyle = dateStyle
-            //dateFormatter.timeStyle = timeStyle
+            DateFormat dateFormatter;
+            if (dateStyle == null) {
+                dateFormatter = SimpleDateFormat.getTimeInstance(timeStyle);
+            } else if (timeStyle == null) {
+                dateFormatter = SimpleDateFormat.getDateInstance(dateStyle);
+            } else {
+                dateFormatter = SimpleDateFormat.getDateTimeInstance(dateStyle, timeStyle);
+            }
             if (timezone != null) {
                 TimeZone timezone = TimeZone.getTimeZone(this.timezone);
                 dateFormatter.setTimeZone(timezone);
@@ -149,11 +155,16 @@ public class Hotel extends TripElement {
     }
 
     @Override
-    public String endTime(int dateTimeStyle) {
+    public String endTime(Integer dateStyle, Integer timeStyle) {
         if (checkOutDate != null) {
-            SimpleDateFormat dateFormatter = new SimpleDateFormat();
-            //dateFormatter.dateStyle = dateStyle
-            //dateFormatter.timeStyle = timeStyle
+            DateFormat dateFormatter;
+            if (dateStyle == null) {
+                dateFormatter = SimpleDateFormat.getTimeInstance(timeStyle);
+            } else if (timeStyle == null) {
+                dateFormatter = SimpleDateFormat.getDateInstance(dateStyle);
+            } else {
+                dateFormatter = SimpleDateFormat.getDateTimeInstance(dateStyle, timeStyle);
+            }
             if (timezone != null) {
                 TimeZone timezone = TimeZone.getTimeZone(this.timezone);
                 dateFormatter.setTimeZone(timezone);

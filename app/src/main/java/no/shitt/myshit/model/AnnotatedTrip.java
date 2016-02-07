@@ -1,44 +1,37 @@
 package no.shitt.myshit.model;
 
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import no.shitt.myshit.Constants;
+import no.shitt.myshit.helper.ServerDate;
+
 public class AnnotatedTrip /* NSObject, NSCoding */ {
     public TripListSection section;
     public Trip trip;
     public ChangeState modified;
 
-    /* Identifiers for keyed archive (iOS only?)
-    struct PropertyKey {
-        static let modifiedKey = "modified"
-        static let sectionKey = "section"
-        static let tripKey = "trip"
+    AnnotatedTrip(JSONObject jsonData) {
+        super();
+        String modifiedRaw = jsonData.optString(Constants.JSON.ANNTRIP_MODIFIED);
+        modified = ChangeState.fromString(modifiedRaw);
+        trip = new Trip(jsonData.optJSONObject(Constants.JSON.ANNTRIP_TRIP), false);
     }
-    */
 
-    /* Encode for keyed archive (iOS only?)
-    // MARK: NSCoding
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(modified.rawValue, forKey: PropertyKey.modifiedKey)
-        aCoder.encodeObject(section.rawValue, forKey: PropertyKey.sectionKey)
-        aCoder.encodeObject(trip, forKey: PropertyKey.tripKey)
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = new JSONObject();
+
+        jo.put(Constants.JSON.ANNTRIP_MODIFIED, modified.getRawValue());
+        jo.put(Constants.JSON.ANNTRIP_TRIP, trip.toJSON());
+
+        return jo;
     }
-    */
-
-    // MARK: Constructors
-    /* Decode from keyed archive (iOS only?)
-    required convenience init?(coder aDecoder: NSCoder) {
-        // NB: use conditional cast (as?) for any optional properties
-        let _modified   = aDecoder.decodeObjectForKey(PropertyKey.modifiedKey) as? String
-        var modified:ChangeState = .Unchanged
-        if (_modified != nil) {
-            modified  = ChangeState(rawValue: _modified!)!
-        }
-
-        let section  = aDecoder.decodeObjectForKey(PropertyKey.sectionKey) as? TripListSection ?? .Historic
-        let trip = aDecoder.decodeObjectForKey(PropertyKey.tripKey) as! Trip
-
-        // Must call designated initializer.
-        self.init(section: section, trip: trip, modified: modified)
-    }
-    */
 
     AnnotatedTrip(TripListSection section, Trip trip, ChangeState modified) {
         super();

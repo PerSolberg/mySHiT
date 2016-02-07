@@ -1,6 +1,7 @@
 package no.shitt.myshit.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,12 +19,16 @@ import java.util.Map;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.JSONable;
+import no.shitt.myshit.helper.StringUtil;
 
 public class TripElement implements JSONable {
     public String type;
     public String subType;
     public int id;
     public List<Map<String,String>> references;
+
+    public String tripCode;
+    public int    tripId;
     JSONObject serverData;
 
     public static final String REFTAG_REF_NO       = "refNo";
@@ -124,17 +129,17 @@ public class TripElement implements JSONable {
     }
 
     // MARK: Factory
-    static TripElement createFromDictionary( JSONObject elementData ) {
+    static TripElement createFromDictionary( int tripId, String tripCode, JSONObject elementData ) {
         String elemType = elementData.optString(Constants.JSON.ELEM_TYPE);
         String elemSubType = elementData.optString(Constants.JSON.ELEM_SUB_TYPE);
 
         TripElement elem;
         if (elemType.equals("TRA") && elemSubType.equals("AIR")) {
-            elem = new Flight(elementData);
+            elem = new Flight(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA")) {
-            elem = new GenericTransport(elementData);
+            elem = new GenericTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("ACM")) {
-            elem = new Hotel(elementData);
+            elem = new Hotel(tripId, tripCode, elementData);
         } else {
             elem = null;
         }
@@ -175,10 +180,13 @@ public class TripElement implements JSONable {
         this.references = references;
     }
 
-    TripElement(JSONObject elementData) {
+    TripElement(int tripId, String tripCode, JSONObject elementData) {
         id = elementData.optInt("id", -1);
         type = elementData.isNull("type") ? null : elementData.optString("type");
         subType = elementData.isNull("subType") ? null : elementData.optString("subType");
+
+        this.tripId = tripId;
+        this.tripCode = tripCode;
 
         JSONArray serverRefs = elementData.optJSONArray("references");
         if (serverRefs == null) {
@@ -205,37 +213,43 @@ public class TripElement implements JSONable {
     // MARK: Methods
     public boolean isEqual(Object otherObject) {
         if (this.getClass() != otherObject.getClass()) {
+            Log.d("GenericTransport", "Changed class! " + this.getClass().getCanonicalName() + " != " + otherObject.getClass().getCanonicalName());
             return false;
         }
         try {
             TripElement otherTripElement = (TripElement) otherObject;
 
-            if (this.id != otherTripElement.id)                      { return false; }
-            if (!this.type.equals(otherTripElement.type))            { return false; }
-            if (!this.subType.equals(otherTripElement.subType))      { return false; }
+            if (this.id != otherTripElement.id)                             { return false; }
+            if (!StringUtil.equal(this.type, otherTripElement.type)      )  { return false; }
+            if (!StringUtil.equal(this.subType, otherTripElement.subType))  { return false; }
 
             if (this.references != null && otherTripElement.references != null) {
                 if (this.references.size() != otherTripElement.references.size()) {
+                    //Log.d("TripElement", "Changed reference count");
                     return false;
                 }
 
-                return (this.references.containsAll(otherTripElement.references) && otherTripElement.references.containsAll(this.references));
+                boolean match = this.references.containsAll(otherTripElement.references) && otherTripElement.references.containsAll(this.references);
+                //Log.d("TripElement", "Reference match = " + match);
+                return match;
             } else if (this.references != null || otherTripElement.references != null) {
+                //Log.d("TripElement", "Changed references");
                 return false;
             }
 
             return true;
         } catch (Exception e) {
+            Log.e("TripElement", "Comparison failed with exception");
             return false;
         }
     }
 
 
-    public String startTime(int dateTimeStyle) {
+    public String startTime(Integer dateStyle, Integer timeStyle) {
         return null;
     }
 
-    public String endTime(int dateTimeStyle) {
+    public String endTime(Integer dateStyle, Integer timeStyle) {
         return null;
     }
 
