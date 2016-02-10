@@ -49,15 +49,7 @@ public class SchedulingService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         // BEGIN_INCLUDE(service_onhandle)
 
-        Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
-        /*
-        Set<String> keys = intent.getExtras().keySet();
-        Iterator<String> it = keys.iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            Log.d("SchedulingService", "[" + key + "=" + intent.getExtras().get(key)+"]");
-        }
-        */
+        //Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
 
         String msg = intent.getStringExtra("msg");
         sendNotification(intent.getData().toString(), intent.getExtras());
@@ -73,7 +65,7 @@ public class SchedulingService extends IntentService {
         String tripCode = extras.getString(KEY_TRIP_CODE);
         int elementId = extras.getInt(KEY_ELEMENT_ID, -1);
 
-        Log.d("SchedulingService", "sendNotification for " + tripCode + ":" + elementId);
+        //Log.d("SchedulingService", "sendNotification for " + tripCode + ":" + elementId);
 
         AnnotatedTrip trip = TripList.getSharedList().tripByCode(tripCode);
         if (trip == null) {

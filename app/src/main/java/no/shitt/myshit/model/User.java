@@ -3,6 +3,8 @@ package no.shitt.myshit.model;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -51,12 +53,12 @@ public class User implements ServerAPIListener {
 
     public String getUserName() {
         if (userName == null) {
-            Log.d("User", "Loading U from local file");
+            //Log.d("User", "Loading U from local file");
             try {
                 InputStream inputStream = SHiTApplication.getContext().openFileInput(Constants.CRED_U_FILE);
 
                 if (inputStream != null) {
-                    Log.d("User", "Input file open");
+                    //Log.d("User", "Input file open");
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                     String receiveString;
                     StringBuilder stringBuilder = new StringBuilder();
@@ -68,12 +70,12 @@ public class User implements ServerAPIListener {
                     inputStream.close();
                     userName = stringBuilder.toString();
 
-                    Log.d("User", "Loaded U");
+                    //Log.d("User", "Loaded U");
                 }
             } catch (FileNotFoundException e) {
-                Log.d("User", "File not found: " + e.toString());
+                //Log.d("User", "File not found: " + e.toString());
             } catch (IOException ioe) {
-                Log.e("User", "Failed to load U due to IO error...");
+                //Log.e("User", "Failed to load U due to IO error...");
             }
         }
         return userName;
@@ -91,21 +93,21 @@ public class User implements ServerAPIListener {
                 fos.write(newName.getBytes());
                 fos.close();
 
-                Log.d("User", "U saved to file");
+                //Log.d("User", "U saved to file");
             } catch (IOException ioe) {
-                Log.e("User", "Failed to save U due to IO error...");
+                //Log.e("User", "Failed to save U due to IO error...");
             }
         }
     }
 
     String getPassword() {
         if (password == null) {
-            Log.d("User", "Loading P from local file");
+            //Log.d("User", "Loading P from local file");
             try {
                 InputStream inputStream = SHiTApplication.getContext().openFileInput(Constants.CRED_P_FILE);
 
                 if (inputStream != null) {
-                    Log.d("User", "Input file open");
+                    //Log.d("User", "Input file open");
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                     String receiveString;
                     StringBuilder stringBuilder = new StringBuilder();
@@ -117,30 +119,16 @@ public class User implements ServerAPIListener {
                     inputStream.close();
                     password = stringBuilder.toString();
 
-                    Log.d("User", "Loaded P");
+                    //Log.d("User", "Loaded P");
                 }
             } catch (FileNotFoundException e) {
-                Log.d("User", "File not found: " + e.toString());
+                //Log.d("User", "File not found: " + e.toString());
             } catch (IOException ioe) {
-                Log.e("User", "Failed to load P due to IO error...");
+                //Log.e("User", "Failed to load P due to IO error...");
             }
         }
         return password;
     }
-
-    /*
-    String getUrlSafePassword() {
-        String rawPassword = getPassword();
-        String urlPassword;
-        try {
-            urlPassword = URLEncoder.encode(rawPassword, Constants.URL_ENCODE_CHARSET);
-        }
-        catch (UnsupportedEncodingException uee) {
-            urlPassword = null;
-        }
-        return urlPassword;
-    }
-    */
 
     void setPassword(String newPassword) {
         password = newPassword;
@@ -152,9 +140,9 @@ public class User implements ServerAPIListener {
                 fos.write(newPassword.getBytes());
                 fos.close();
 
-                Log.d("User", "P saved to file");
+                //Log.d("User", "P saved to file");
             } catch (IOException ioe) {
-                Log.e("User", "Failed to save P due to IO error...");
+                //Log.e("User", "Failed to save P due to IO error...");
             }
         }
     }
@@ -199,18 +187,21 @@ public class User implements ServerAPIListener {
 
     public void onRemoteCallComplete(JSONObject response) {
         if (response.isNull(User.JSON_ERROR)) {
-            Log.d("User", "User authenticated");
+            //Log.d("User", "User authenticated");
             setUserName(serverParams.parameters.get(ServerAPI.PARAM_USER_NAME));
             setPassword(serverParams.parameters.get(ServerAPI.PARAM_PASSWORD));
 
             srvCommonName = response.isNull(User.JSON_USER_COMMON_NAME) ? null : response.optString(User.JSON_USER_COMMON_NAME);
             srvFullName = response.isNull(User.JSON_USER_FULL_NAME) ? null : response.optString(User.JSON_USER_FULL_NAME);
 
+            //Log.d("User", "Common name = " + srvCommonName);
+            //Log.d("User", "Full name = " + srvFullName);
+
             Intent intent = new Intent(Constants.Notification.LOGON_SUCCEEDED);
             //intent.putExtra("message", "SHiT trips loaded");
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
         } else {
-            Log.d("User", "User authentication failed");
+            //Log.d("User", "User authentication failed");
             Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
             intent.putExtra("message", response.optString(User.JSON_ERROR));
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
@@ -218,7 +209,7 @@ public class User implements ServerAPIListener {
     }
 
     public void onRemoteCallFailed() {
-        Log.d("User", "User authentication call failed");
+        //Log.d("User", "User authentication call failed");
         Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
         //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);

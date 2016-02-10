@@ -75,7 +75,7 @@ public class TripList implements ServerAPIListener, JSONable {
         // Clear current data and repopulate from server data
         List<AnnotatedTrip> newTripList = new ArrayList<>();
 
-        Log.d("TripList copyServerData", "Copy elements");
+        //Log.d("TripList copyServerData", "Copy elements");
         for (int i = 0; i < jsonData.length(); i++) {
             if (fromServer) {
                 Trip newTrip = new Trip(jsonData.optJSONObject(i), fromServer);
@@ -89,7 +89,7 @@ public class TripList implements ServerAPIListener, JSONable {
         }
 
         // Determine changes
-        Log.d("TripList copyServerData", "Determine changes");
+        //Log.d("TripList copyServerData", "Determine changes");
         if (!trips.isEmpty()) {
             for (int i = 0; i < newTripList.size(); i++) {
                 AnnotatedTrip newTrip = newTripList.get(i);
@@ -115,7 +115,7 @@ public class TripList implements ServerAPIListener, JSONable {
     }
 
     public void onRemoteCallComplete(JSONObject response) {
-        Log.d("TripList", "Trip list retrieved - building model");
+        //Log.d("TripList", "Trip list retrieved - building model");
         copyServerData(response.optJSONArray(Constants.JSON.QUERY_RESULTS), true);
 
         Intent intent = new Intent(Constants.Notification.TRIPS_LOADED);
@@ -131,7 +131,7 @@ public class TripList implements ServerAPIListener, JSONable {
     public void loadFromArchive() {
         String jsonString = "";
 
-        Log.d("TripList", "Loading from local file");
+        //Log.d("TripList", "Loading from local file");
         try {
             InputStream inputStream = SHiTApplication.getContext().openFileInput(Constants.LOCAL_ARCHIVE_FILE);
 
@@ -146,7 +146,7 @@ public class TripList implements ServerAPIListener, JSONable {
 
                 inputStream.close();
                 jsonString = stringBuilder.toString();
-                Log.d("TripList", "File loaded");
+                //Log.d("TripList", "File loaded");
             }
 
             /*
@@ -158,13 +158,13 @@ public class TripList implements ServerAPIListener, JSONable {
             copyServerData(jo.optJSONArray(Constants.JSON.QUERY_RESULTS), false);
         }
         catch (FileNotFoundException e) {
-            Log.d("TripList", "File not found: " + e.toString());
+            //Log.d("TripList", "File not found: " + e.toString());
         }
         catch (IOException ioe) {
-            Log.e("TripList", "Failed to load trips due to IO error...");
+            //Log.e("TripList", "Failed to load trips due to IO error...");
         }
         catch (JSONException je) {
-            Log.e("TripList", "Failed to load trips due to JSON error...");
+            //Log.e("TripList", "Failed to load trips due to JSON error...");
         }
     }
 
@@ -176,13 +176,13 @@ public class TripList implements ServerAPIListener, JSONable {
             fos.write(jsonString.getBytes());
             fos.close();
 
-            Log.d("TripList", "Trips saved to JSON file");
+            //Log.d("TripList", "Trips saved to JSON file");
         }
         catch (JSONException je) {
-            Log.e("TripList", "Failed to save trips due to JSON error...");
+            //Log.e("TripList", "Failed to save trips due to JSON error...");
         }
         catch (IOException ioe) {
-            Log.e("TripList", "Failed to save trips due to IO error...");
+            //Log.e("TripList", "Failed to save trips due to IO error...");
         }
     }
 

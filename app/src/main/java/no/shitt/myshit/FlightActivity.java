@@ -2,6 +2,7 @@ package no.shitt.myshit;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,22 @@ public class FlightActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        if (Constants.DEVELOPER_MODE) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                            //.penaltyDeath()
+                    .build());
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flight);
 
@@ -44,7 +61,7 @@ public class FlightActivity extends AppCompatActivity {
             ab.setDisplayHomeAsUpEnabled(true);
         }
         catch (NullPointerException npe) {
-            Log.e("FlightActivity", "Unexpected NullPointerException when setting up toolbar");
+            //Log.e("FlightActivity", "Unexpected NullPointerException when setting up toolbar");
         }
 
         refListView = (ListView) findViewById(R.id.reference_list);
@@ -98,7 +115,7 @@ public class FlightActivity extends AppCompatActivity {
 
         }
         catch (Exception e) {
-            Log.e("FlightActivity", "Unexpected error: " + e.toString());
+            //Log.e("FlightActivity", "Unexpected error: " + e.toString());
         }
 
     }

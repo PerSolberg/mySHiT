@@ -1,13 +1,24 @@
 <resources>
     <string name="app_name">mySHiT</string>
 
+    <!-- Placeholder text (mainly for design verification purposes -->
+    <string name="placeholder_short">Placeholder</string>
+    <string name="placeholder_medium">Medium length placeholder text</string>
+    <string name="placeholder_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="placeholder_multiline_2">Placeholder text\nSecond line of placeholder</string>
+    <string name="placeholder_multiline_3">Placeholder text\nSecond line of placeholder\nThird line of text</string>
+
     <!-- Trip List -->
-    <string name="title_activity_login">Sign in</string>
+    <string name="group_title_future">Future</string>
+    <string name="group_title_upcoming">Upcoming</string>
+    <string name="group_title_current">Current</string>
+    <string name="group_title_historic">Historic</string>
 
     <!-- Trip Details List -->
     <string name="title_trip_details">Trip Details</string>
 
     <!-- Login screen -->
+    <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="welcome_message">Welcome to SHiT.\n\nTo access your travel details, please log on using the user name and password provided in your welcome letter.</string>
@@ -26,14 +37,31 @@
     <string name="label_flight_arrival">Arrival</string>
     <string name="label_flight_refs">References</string>
 
-
     <!-- Private transport details screen -->
-    <string name="title_private_transport_details">Details</string>
+    <string name="title_private_transport_details">Travel details</string>
     <string name="label_privtrans_company">Company</string>
     <string name="label_privtrans_departure">Departure</string>
     <string name="label_privtrans_arrival">Arrival</string>
     <string name="label_privtrans_phone">Phone</string>
     <string name="label_privtrans_reference">Reference</string>
+
+    <!-- Scheduled transport details screen -->
+    <string name="title_scheduled_transport_details">Travel details</string>
+    <string name="label_scheduled_transport_company">Company</string>
+    <string name="label_scheduled_transport_route_no">Route #</string>
+    <string name="label_scheduled_transport_departure">Departure</string>
+    <string name="label_scheduled_transport_arrival">Arrival</string>
+    <string name="label_scheduled_transport_phone">Phone</string>
+    <string name="label_scheduled_transport_reference">Reference</string>
+
+    <!-- Hotel details screen -->
+    <string name="title_hotel_details">Hotel details</string>
+    <string name="label_hotel">Hotel</string>
+    <string name="label_hotel_checkin">Check-in</string>
+    <string name="label_hotel_checkout">Check-out</string>
+    <string name="label_hotel_reference">Reference</string>
+    <string name="label_hotel_phone">Phone</string>
+    <string name="label_hotel_transfer_info">Transfer info</string>
 
     <!-- Menu actions -->
     <string name="action_settings">Settings</string>

@@ -54,7 +54,7 @@ public class ServerAPI extends AsyncTask<ServerAPIParams, String, String> {
             urlBuilder.append("/");
             urlBuilder.append(params[0].verbArgument);
         }
-        Log.d("ServerAPI", "Base URL = " + urlBuilder.toString());
+        //Log.d("ServerAPI", "Base URL = " + urlBuilder.toString());
 
         try {
             if (params[0].parameters != null) {
@@ -79,14 +79,14 @@ public class ServerAPI extends AsyncTask<ServerAPIParams, String, String> {
         // Invoke REST API
         InputStream in;
 
-        Log.d("Server API", "Connecting to " + urlString);
+        //Log.d("Server API", "Connecting to " + urlString);
         // HTTP Get
         try {
             URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream(urlConnection.getInputStream());
 
-            Log.d("Server API", "Result retrieved");
+            //Log.d("Server API", "Result retrieved");
             BufferedReader reader = new BufferedReader(new InputStreamReader(in, "iso-8859-1"), 8);
             StringBuilder sb = new StringBuilder();
             String line;
@@ -102,11 +102,11 @@ public class ServerAPI extends AsyncTask<ServerAPIParams, String, String> {
             //Log.d("Server API JSON Data", resultToDisplay);
             response = new JSONObject(sb.toString());
             if (response == null) {
-                Log.e("ServerAPI", "Empty JSON: " + resultToDisplay);
+                //Log.e("ServerAPI", "Empty JSON: " + resultToDisplay);
                 throw new IOException("JSON empty");
             }
         } catch (Exception e ) {
-            Log.e("Buffer Error", "Error converting result " + e.getMessage());
+            //Log.e("Buffer Error", "Error converting result " + e.getMessage());
             listener.onRemoteCallFailed();
             return e.getMessage();
         }
@@ -115,7 +115,7 @@ public class ServerAPI extends AsyncTask<ServerAPIParams, String, String> {
     }
 
     protected void onPostExecute(String result) {
-        Log.d("ServerAPI", "Calling listener");
+        //Log.d("ServerAPI", "Calling listener");
         listener.onRemoteCallComplete(response);
     }
 }

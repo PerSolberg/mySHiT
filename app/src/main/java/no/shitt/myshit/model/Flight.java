@@ -13,7 +13,7 @@ import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.StringUtil;
 
-public class Flight extends GenericTransport {
+public class Flight extends ScheduledTransport {
     // MARK: Properties
     public String airlineCode;
 

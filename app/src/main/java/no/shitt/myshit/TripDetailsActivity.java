@@ -11,14 +11,13 @@ import no.shitt.myshit.model.TripList;
 import no.shitt.myshit.model.User;
 
 //import android.app.ActionBar;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
+import android.os.StrictMode;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -29,15 +28,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
+public class TripDetailsActivity extends AppCompatActivity {
     // Connection detector
     ConnectionDetector cd;
 
@@ -58,25 +52,31 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        if (Constants.DEVELOPER_MODE) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                            //.penaltyDeath()
+                    .build());
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
 
         // Set up toolbar and enable Up button
         Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_details_toolbar);
-        myToolbar.setLogo(R.mipmap.ic_launcher);
+        //myToolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-
-        // Check if Internet present
-        cd = new ConnectionDetector(getApplicationContext());
-        if (!cd.isConnectingToInternet()) {
-            // Internet Connection is not present
-            alert.showAlertDialogue(TripDetailsActivity.this, "Internet Connection Error",
-                    "Please connect to working Internet connection", false);
-            // stop executing code by return
-            return;
-        }
 
         // Get trip code
         Intent i = getIntent();
@@ -92,11 +92,10 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
         /**
          * Listview on item click listener
          * */
-        listView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View view, int arg2,
-                                    long arg3) {
-                // On selecting trip element, show appropriate details screen
+            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id)
+            {
                 String trip_code = ((TextView) view.findViewById(R.id.element_trip_code)).getText().toString();
                 String element_id = ((TextView) view.findViewById(R.id.element_id)).getText().toString();
                 AnnotatedTripElement annotatedElement = TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id));
@@ -116,18 +115,21 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
                     i = new Intent(getApplicationContext(), PrivateTransportActivity.class);
                 } else if ("TRA".equals(element.type) && "LIMO".equals(element.subType)) {
                     i = new Intent(getApplicationContext(), PrivateTransportActivity.class);
+                } else if ("TRA".equals(element.type) && "BUS".equals(element.subType)) {
+                    i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
+                } else if ("ACM".equals(element.type) && "HTL".equals(element.subType)) {
+                    i = new Intent(getApplicationContext(), HotelActivity.class);
                 } else {
-                    Log.e("TripDetailsActivity", "Unsupported element type");
-                    return;
+                    //Log.e("TripDetailsActivity", "ChildItemClick: Unsupported element type");
+                    return false;
                 }
-
-                Log.d("TripDetailsActivity", "Trip Code: " + trip_code + ", Element Id: " + element_id);
 
                 // Pass trip id and element id to details view
                 i.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);
                 i.putExtra(Constants.IntentExtra.ELEMENT_ID, element_id);
 
                 startActivity(i);
+                return true;
             }
         });
 
@@ -136,7 +138,7 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        Log.i("TripDetailsActivity", "onRefresh called from SwipeRefreshLayout");
+                        //Log.i("TripDetailsActivity", "onRefresh called from SwipeRefreshLayout");
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
                         loadTripDetails(true);
@@ -145,9 +147,18 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
         );
 
         if (annotatedTrip == null) {
-            Log.e("TripDetailsActivity", "Invalid trip!");
+            //Log.e("TripDetailsActivity", "Invalid trip!");
         } else if (annotatedTrip.trip.elementCount() == 0) {
-            loadTripDetails(false);
+            // Check if Internet present
+            cd = new ConnectionDetector(getApplicationContext());
+            if (!cd.isConnectingToInternet()) {
+                // Internet Connection is not present
+                alert.showAlertDialogue(TripDetailsActivity.this, "Internet Connection Error",
+                        "Please connect to working Internet connection", false);
+                // stop executing code by return
+            } else {
+                loadTripDetails(false);
+            }
         } else {
             updateListView();
         }
@@ -170,13 +181,13 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Log.d("TripDetailsActivity", "Opening settings screen");
+                //Log.d("TripDetailsActivity", "Opening settings screen");
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;
 
             case R.id.action_refresh:
-                Log.d("TripDetailsActivity", "Refreshing from menu");
+                //Log.d("TripDetailsActivity", "Refreshing from menu");
                 SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
                 swipeLayout.setRefreshing(true);
                 loadTripDetails(true);
@@ -224,7 +235,7 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
             pDialog.dismiss();
             pDialog = null;
         }
-        Log.d("TripDetailsActivity", "Server call succeeded");
+        //Log.d("TripDetailsActivity", "Server call succeeded");
         TripList.getSharedList().saveToArchive();
 
         updateListView();
@@ -237,7 +248,7 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
             pDialog.dismiss();
             pDialog = null;
         }
-        Log.d("TripDetailsActivity", "Server REST call failed.");
+        //Log.d("TripDetailsActivity", "Server REST call failed.");
     }
 
 
@@ -246,7 +257,7 @@ public class TripDetailsActivity extends AppCompatActivity /* ListActivity */ {
             pDialog = new ProgressDialog(TripDetailsActivity.this);
             pDialog.setMessage("Loading trip details ...");
             pDialog.setIndeterminate(false);
-            pDialog.setCancelable(false);
+            pDialog.setCancelable(true);
             pDialog.show();
         }
 

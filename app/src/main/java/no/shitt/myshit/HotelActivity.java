@@ -12,41 +12,41 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.Map;
 
 import no.shitt.myshit.helper.StringUtil;
-import no.shitt.myshit.model.Flight;
-import no.shitt.myshit.model.GenericTransport;
+//import no.shitt.myshit.model.GenericTransport;
+import no.shitt.myshit.model.Hotel;
 import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
-public class PrivateTransportActivity extends AppCompatActivity {
-    // Trip element info
+
+public class HotelActivity extends AppCompatActivity {
     String trip_code;
     String element_id;
 
-    private GenericTransport transport;
+    private Hotel hotel;
     private Intent intent;
 
-    StringBuilder departureInfo;
-    StringBuilder arrivalInfo;
+    StringBuilder hotelInfo;
     StringBuilder references;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_private_transport);
+        setContentView(R.layout.activity_hotel);
 
         // Set up toolbar and enable Up button
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.private_transport_toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.hotel_toolbar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
         try {
             ab.setDisplayHomeAsUpEnabled(true);
         }
         catch (NullPointerException npe) {
-            //Log.e("PrivateTransportAct", "Unexpected NullPointerException when setting up toolbar");
+            //Log.e("Hotel", "Unexpected NullPointerException when setting up toolbar");
         }
 
         // Get trip code and element ID
@@ -56,17 +56,17 @@ public class PrivateTransportActivity extends AppCompatActivity {
 
         // calling background thread
         //new LoadSingleTrack().execute();
-        //Log.d("PrivateTransportAct", "Invoking background service");
+        //Log.d("Hotel", "Invoking background service");
         new getData().execute();
     }
 
-
     private void fillScreen() {
-        ((TextView) findViewById(R.id.company)).setText(StringUtil.stringWithDefault(transport.companyName, ""));
-        ((TextView) findViewById(R.id.departure)).setText(departureInfo.toString());
-        ((TextView) findViewById(R.id.arrival)).setText(arrivalInfo.toString());
-        ((TextView) findViewById(R.id.phone)).setText(StringUtil.stringWithDefault(transport.companyPhone, ""));
-        ((TextView) findViewById(R.id.reference)).setText(references.toString());
+        ((TextView) findViewById(R.id.hotel)).setText(hotelInfo.toString());
+        ((TextView) findViewById(R.id.hotel_checkin)).setText(hotel.startTime(DateFormat.MEDIUM, null));
+        ((TextView) findViewById(R.id.hotel_checkout)).setText(hotel.endTime(DateFormat.MEDIUM, null));
+        ((TextView) findViewById(R.id.hotel_reference)).setText(references.toString());
+        ((TextView) findViewById(R.id.hotel_phone)).setText(StringUtil.stringWithDefault(hotel.phone, ""));
+        ((TextView) findViewById(R.id.hotel_transfer_info)).setText(StringUtil.stringWithDefault(hotel.transferInfo, ""));
     }
 
     @Override
@@ -82,20 +82,15 @@ public class PrivateTransportActivity extends AppCompatActivity {
     private class getData extends AsyncTask<String,String,String> {
         protected String doInBackground(String... params) {
             try {
-                transport = (GenericTransport) TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id)).tripElement;
+                hotel = (Hotel) TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id)).tripElement;
 
-                departureInfo = new StringBuilder(StringUtil.stringWithDefault(transport.departureStop, ""));
-                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureTerminalName, "\n", false);
-                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureAddress, "\n", false);
-                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureLocation, "\n", false);
-
-                arrivalInfo = new StringBuilder(StringUtil.stringWithDefault(transport.arrivalStop, ""));
-                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalTerminalName, "\n", false);
-                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalAddress, "\n", false);
-                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalLocation, "\n", false);
+                hotelInfo = new StringBuilder(StringUtil.stringWithDefault(hotel.hotelName, ""));
+                StringUtil.appendWithLeadingSeparator(hotelInfo, hotel.address, "\n", false);
+                StringUtil.appendWithLeadingSeparator(hotelInfo, hotel.postCode, "\n", false);
+                StringUtil.appendWithLeadingSeparator(hotelInfo, hotel.city, "\n", false);
 
                 references = new StringBuilder();
-                Iterator i = transport.references.iterator();
+                Iterator i = hotel.references.iterator();
                 String sep = "";
                 while (i.hasNext()) {
                     Map<String,String> refMap = (Map<String,String>) i.next();
@@ -105,7 +100,7 @@ public class PrivateTransportActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                //Log.e("PrivTransAct/get", "Unexpected error: " + e.toString());
+                //Log.e("Hotel/get", "Unexpected error: " + e.toString());
             }
             return null;
         }
@@ -115,3 +110,4 @@ public class PrivateTransportActivity extends AppCompatActivity {
         }
     }
 }
+

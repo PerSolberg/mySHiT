@@ -24,7 +24,7 @@
         android:paddingStart="3dp"
         android:textSize="16dp"
         android:textColor="#F0F0F0"
-        android:text="placeholder"
+        android:text="@string/placeholder_short"
         android:layout_gravity="center_vertical"
         android:textStyle="bold"
         />

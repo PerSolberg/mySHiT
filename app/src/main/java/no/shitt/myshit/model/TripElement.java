@@ -136,6 +136,8 @@ public class TripElement implements JSONable {
         TripElement elem;
         if (elemType.equals("TRA") && elemSubType.equals("AIR")) {
             elem = new Flight(tripId, tripCode, elementData);
+        } else if (elemType.equals("TRA") && elemSubType.equals("BUS")) {
+            elem = new ScheduledTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA")) {
             elem = new GenericTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("ACM")) {
@@ -213,7 +215,7 @@ public class TripElement implements JSONable {
     // MARK: Methods
     public boolean isEqual(Object otherObject) {
         if (this.getClass() != otherObject.getClass()) {
-            Log.d("GenericTransport", "Changed class! " + this.getClass().getCanonicalName() + " != " + otherObject.getClass().getCanonicalName());
+            //Log.d("GenericTransport", "Changed class! " + this.getClass().getCanonicalName() + " != " + otherObject.getClass().getCanonicalName());
             return false;
         }
         try {
@@ -239,7 +241,7 @@ public class TripElement implements JSONable {
 
             return true;
         } catch (Exception e) {
-            Log.e("TripElement", "Comparison failed with exception");
+            //Log.e("TripElement", "Comparison failed with exception");
             return false;
         }
     }

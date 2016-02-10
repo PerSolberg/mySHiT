@@ -75,11 +75,17 @@ public class GenericTransport extends TripElement {
     }
     @Override
     public String getStartInfo() {
-        return departureLocation;
+        StringBuilder sb = new StringBuilder();
+        StringUtil.appendWithLeadingSeparator(sb, departureStop, "", false);
+        StringUtil.appendWithLeadingSeparator(sb, departureLocation, ", ", false);
+        return sb.toString();
     }
     @Override
     public String getEndInfo() {
-        return arrivalLocation;
+        StringBuilder sb = new StringBuilder();
+        StringUtil.appendWithLeadingSeparator(sb, arrivalStop, "", false);
+        StringUtil.appendWithLeadingSeparator(sb, arrivalLocation, ", ", false);
+        return sb.toString();
     }
     @Override
     public String getDetailInfo() {
@@ -165,37 +171,37 @@ public class GenericTransport extends TripElement {
     @Override
     public boolean isEqual(Object otherObject) {
         if (this.getClass() != otherObject.getClass()) {
-            Log.d("GenericTransport", "Changed class!");
+            //Log.d("GenericTransport", "Changed class!");
             return false;
         }
         try {
             GenericTransport otherTransport = (GenericTransport) otherObject;
-            if (this.segmentId             != otherTransport.segmentId                             ) { Log.d("GenericTransport", "Changed Segment ID");  return false; }
-            if (this.legNo                 != otherTransport.legNo                                 ) { Log.d("GenericTransport", "Changed Leg #");       return false; }
-            if (!StringUtil.equal(this.segmentCode, otherTransport.segmentCode)                    ) { Log.d("GenericTransport", "Changed Segment CD");  return false; }
-            if (!ServerDate.equal(this.departureTime, otherTransport.departureTime)                ) { Log.d("GenericTransport", "Changed Dep Time");    return false; }
-            if (!StringUtil.equal(this.departureLocation, otherTransport.departureLocation)        ) { Log.d("GenericTransport", "Changed Dep Loc");     return false; }
-            if (!StringUtil.equal(this.departureStop, otherTransport.departureStop)                ) { Log.d("GenericTransport", "Changed Dep Stop");    return false; }
-            if (!StringUtil.equal(this.departureAddress, otherTransport.departureAddress)          ) { Log.d("GenericTransport", "Changed Dep Addr");    return false; }
-            if (!StringUtil.equal(this.departureTimeZone, otherTransport.departureTimeZone)        ) { Log.d("GenericTransport", "Changed Dep TZ");      return false; }
-            if (!StringUtil.equal(this.departureCoordinates, otherTransport.departureCoordinates)  ) { Log.d("GenericTransport", "Changed Dep Coord");   return false; }
-            if (!StringUtil.equal(this.departureTerminalCode, otherTransport.departureTerminalCode)) { Log.d("GenericTransport", "Changed Dep Term CD"); return false; }
-            if (!StringUtil.equal(this.departureTerminalName, otherTransport.departureTerminalName)) { Log.d("GenericTransport", "Changed Dep Terminal");return false; }
-            if (!ServerDate.equal(this.arrivalTime, otherTransport.arrivalTime)                    ) { Log.d("GenericTransport", "Changed Arr Time");    return false; }
-            if (!StringUtil.equal(this.arrivalLocation, otherTransport.arrivalLocation)            ) { Log.d("GenericTransport", "Changed Arr Loc");     return false; }
-            if (!StringUtil.equal(this.arrivalStop, otherTransport.arrivalStop)                    ) { Log.d("GenericTransport", "Changed Arr Stop");    return false; }
-            if (!StringUtil.equal(this.arrivalAddress, otherTransport.arrivalAddress)              ) { Log.d("GenericTransport", "Changed Arr Addr");    return false; }
-            if (!StringUtil.equal(this.arrivalTimeZone, otherTransport.arrivalTimeZone)            ) { Log.d("GenericTransport", "Changed Arr TZ");      return false; }
-            if (!StringUtil.equal(this.arrivalCoordinates, otherTransport.arrivalCoordinates)      ) { Log.d("GenericTransport", "Changed Arr Coord");   return false; }
-            if (!StringUtil.equal(this.arrivalTerminalCode, otherTransport.arrivalTerminalCode)    ) { Log.d("GenericTransport", "Changed Arr Term CD"); return false; }
-            if (!StringUtil.equal(this.arrivalTerminalName, otherTransport.arrivalTerminalName)    ) { Log.d("GenericTransport", "Changed Arr Terminal");return false; }
-            if (!StringUtil.equal(this.routeNo, otherTransport.routeNo)                            ) { Log.d("GenericTransport", "Changed Route #");     return false; }
-            if (!StringUtil.equal(this.companyName, otherTransport.companyName)                    ) { Log.d("GenericTransport", "Changed Company");     return false; }
-            if (!StringUtil.equal(this.companyPhone, otherTransport.companyPhone)                  ) { Log.d("GenericTransport", "Changed Phone");       return false; }
+            if (this.segmentId             != otherTransport.segmentId                             ) { return false; }
+            if (this.legNo                 != otherTransport.legNo                                 ) { return false; }
+            if (!StringUtil.equal(this.segmentCode, otherTransport.segmentCode)                    ) { return false; }
+            if (!ServerDate.equal(this.departureTime, otherTransport.departureTime)                ) { return false; }
+            if (!StringUtil.equal(this.departureLocation, otherTransport.departureLocation)        ) { return false; }
+            if (!StringUtil.equal(this.departureStop, otherTransport.departureStop)                ) { return false; }
+            if (!StringUtil.equal(this.departureAddress, otherTransport.departureAddress)          ) { return false; }
+            if (!StringUtil.equal(this.departureTimeZone, otherTransport.departureTimeZone)        ) { return false; }
+            if (!StringUtil.equal(this.departureCoordinates, otherTransport.departureCoordinates)  ) { return false; }
+            if (!StringUtil.equal(this.departureTerminalCode, otherTransport.departureTerminalCode)) { return false; }
+            if (!StringUtil.equal(this.departureTerminalName, otherTransport.departureTerminalName)) { return false; }
+            if (!ServerDate.equal(this.arrivalTime, otherTransport.arrivalTime)                    ) { return false; }
+            if (!StringUtil.equal(this.arrivalLocation, otherTransport.arrivalLocation)            ) { return false; }
+            if (!StringUtil.equal(this.arrivalStop, otherTransport.arrivalStop)                    ) { return false; }
+            if (!StringUtil.equal(this.arrivalAddress, otherTransport.arrivalAddress)              ) { return false; }
+            if (!StringUtil.equal(this.arrivalTimeZone, otherTransport.arrivalTimeZone)            ) { return false; }
+            if (!StringUtil.equal(this.arrivalCoordinates, otherTransport.arrivalCoordinates)      ) { return false; }
+            if (!StringUtil.equal(this.arrivalTerminalCode, otherTransport.arrivalTerminalCode)    ) { return false; }
+            if (!StringUtil.equal(this.arrivalTerminalName, otherTransport.arrivalTerminalName)    ) { return false; }
+            if (!StringUtil.equal(this.routeNo, otherTransport.routeNo)                            ) { return false; }
+            if (!StringUtil.equal(this.companyName, otherTransport.companyName)                    ) { return false; }
+            if (!StringUtil.equal(this.companyPhone, otherTransport.companyPhone)                  ) { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {
-            Log.d("GenericTransport", "Comparison failed with exception");
+            //Log.d("GenericTransport", "Comparison failed with exception");
             return false;
         }
     }

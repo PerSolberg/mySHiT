@@ -1,10 +1,24 @@
 <resources>
     <string name="app_name">mySHiT</string>
 
+    <!-- Placeholder text (mainly for design verification purposes -->
+    <string name="placeholder_short">Eksempeltekst</string>
+    <string name="placeholder_medium">Middels lang eksempeltekst</string>
+    <string name="placeholder_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="placeholder_multiline_2">Eksempeltekst\nAndre linje av eksempeltekst</string>
+    <string name="placeholder_multiline_3">Eksempeltekst\nAndre linje av eksempeltekst\nTredje tekstlinje</string>
+
+    <!-- Trip List -->
+    <string name="group_title_future">Framtidiga</string>
+    <string name="group_title_upcoming">Förestående</string>
+    <string name="group_title_current">Aktiva</string>
+    <string name="group_title_historic">Historiska</string>
+
+    <!-- Trip Details List -->
     <string name="title_trip_details">Resedetaljer</string>
 
     <!-- Login screen-->
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">Logga in</string>
     <string name="prompt_email">E-post</string>
     <string name="prompt_password">Lösenord</string>
     <string name="welcome_message">Välkommen till SHiT.\n\nFör att se information om dina resor, var god att logga inn med användarnamnet og lösenordet du fick i ditt välkomstbrev.</string>
@@ -29,10 +43,110 @@
     <string name="label_privtrans_departure">Avresa</string>
     <string name="label_privtrans_arrival">Ankomst</string>
     <string name="label_privtrans_phone">Telefon</string>
-    <string name="label_privtrans_reference">Referensnummer</string>
+    <string name="label_privtrans_reference">Referensnr.</string>
+
+    <!-- Scheduled transport details screen -->
+    <string name="title_scheduled_transport_details">Resedetaljer</string>
+    <string name="label_scheduled_transport_company">Bolag</string>
+    <string name="label_scheduled_transport_route_no">Linjenr.</string>
+    <string name="label_scheduled_transport_departure">Avgång</string>
+    <string name="label_scheduled_transport_arrival">Ankomst</string>
+    <string name="label_scheduled_transport_phone">Telefon</string>
+    <string name="label_scheduled_transport_reference">Referensnr.</string>
+
+    <!-- Hotel details screen -->
+    <string name="title_hotel_details">Hotelldetaljer</string>
+    <string name="label_hotel">Hotell</string>
+    <string name="label_hotel_checkin">Incheckning</string>
+    <string name="label_hotel_checkout">Utchekning</string>
+    <string name="label_hotel_reference">Referensnr.</string>
+    <string name="label_hotel_phone">Telefon</string>
+    <string name="label_hotel_transfer_info">Transfer-information</string>
 
     <!-- Menu actions -->
-    <string name="action_settings">Settings</string>
-    <string name="action_alerts">Larm</string>
+    <string name="action_settings">Inställningar</string>
+    <string name="action_refresh">Uppdatera</string>
     <string name="action_logout">Logga ut</string>
+
+    <!-- Alerts -->
+    <string name="alert_title_trip">Resestart</string>
+    <string name="alert_title_travel">Avresa</string>
+    <string name="alert_title_connection">Avgång</string>
+    <string name="alert_msg_trip">SHiT-resan börjar om %1$s (%2$s)</string>
+    <string name="alert_msg_travel">Avresa om %1$s, kl. %2$s</string>
+    <string name="alert_msg_connection">Avgång om %1$s, kl. %2$s</string>
+
+    <!-- Settings -->
+    <string name="title_activity_settings">Inställningar</string>
+    <string name="pref_upcoming">Förestående resor</string>
+    <string name="pref_upcoming_default">N7</string>
+    <string name="pref_alertLeadTime_trip">Alarm om resestart</string>
+    <string name="pref_alertLeadTime_trip_default">48</string>
+    <string name="pref_alertLeadTime_trip_summary">%s innan resan börjar</string>
+    <string name="pref_alertLeadTime_departure">Alarm om avresa</string>
+    <string name="pref_alertLeadTime_departure_default">240</string>
+    <string name="pref_alertLeadTime_departure_summary">%s innan avresa</string>
+    <string name="pref_alertLeadTime_connection">Alarm om avgång</string>
+    <string name="pref_alertLeadTime_connection_default">45</string>
+    <string name="pref_alertLeadTime_connection_summary">%s innan avgång</string>
+
+    <string-array name="pref_upcoming_entries">
+        <item>Enbart nästa resa</item>
+        <item>Resor som börjar innom 7 dagar</item>
+        <item>Resor som börjar innom 30 dagar</item>
+        <item>Nästa resa + börjar innom 7 dager</item>
+        <item>Nästa resa + börjar innom 30 dager</item>
+    </string-array>
+    <string-array name="pref_upcoming_values">
+        <item>N</item>
+        <item>7</item>
+        <item>30</item>
+        <item>N7</item>
+        <item>N30</item>
+    </string-array>
+
+    <string-array name="pref_alertLeadTime_trip_entries">
+        <item>Avstängd</item>
+        <item>6 timmar</item>
+        <item>12 timmar</item>
+        <item>24 timmar</item>
+        <item>2 dygn</item>
+    </string-array>
+    <string-array name="pref_alertLeadTime_trip_values">
+        <item>-1</item>
+        <item>6</item>
+        <item>12</item>
+        <item>24</item>
+        <item>48</item>
+    </string-array>
+
+    <string-array name="pref_alertLeadTime_departure_entries">
+        <item>Avstängd</item>
+        <item>30 minuter</item>
+        <item>1 timme</item>
+        <item>2 timmar</item>
+        <item>4 timmar</item>
+    </string-array>
+    <string-array name="pref_alertLeadTime_departure_values">
+        <item>-1</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>240</item>
+    </string-array>
+
+    <string-array name="pref_alertLeadTime_connection_entries">
+        <item>Avstängd</item>
+        <item>15 minuter</item>
+        <item>30 minuter</item>
+        <item>45 minuter</item>
+        <item>60 minuter</item>
+    </string-array>
+    <string-array name="pref_alertLeadTime_connection_values">
+        <item>-1</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+    </string-array>
 </resources>

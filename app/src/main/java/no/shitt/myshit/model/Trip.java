@@ -256,7 +256,7 @@ public class Trip implements ServerAPIListener, JSONable {
 
     public void compareTripElements(Trip otherTrip) {
         if (elements == null || otherTrip.elements == null || elements.size() == 0 || otherTrip.elements.size() == 0) {
-            Log.d("Trip", "compareTripElements: Empty element list in one or both trips");
+            //Log.d("Trip", "compareTripElements: Empty element list in one or both trips");
             return;
         }
 
@@ -378,10 +378,10 @@ public class Trip implements ServerAPIListener, JSONable {
     }
 
     public void onRemoteCallComplete(JSONObject response) {
-        Log.d("Trip", "Trip details retrieved");
+        //Log.d("Trip", "Trip details retrieved");
         int count = response.optInt(Constants.JSON.QUERY_COUNT, -1);
         if (count != 1) {
-            Log.e("Trip", "loadDetails returned " + Integer.toString(count) + " elements, expected 1.");
+            //Log.e("Trip", "loadDetails returned " + Integer.toString(count) + " elements, expected 1.");
         } else {
             JSONArray results = response.optJSONArray(Constants.JSON.QUERY_RESULTS);
             JSONObject serverData = null;
@@ -393,9 +393,9 @@ public class Trip implements ServerAPIListener, JSONable {
                 newTrip = Trip.createFromDictionary(serverData, true);
             }
             if (newTrip != null) {
-                Log.d("Trip", "Comparing new trip details to existing");
+                //Log.d("Trip", "Comparing new trip details to existing");
                 newTrip.compareTripElements(this);
-                Log.d("Trip", "Updating trip");
+                //Log.d("Trip", "Updating trip");
                 this.id              = newTrip.id;
                 this.startDate       = newTrip.startDate;
                 this.endDate         = newTrip.endDate;
@@ -407,14 +407,14 @@ public class Trip implements ServerAPIListener, JSONable {
             }
         }
 
-        Log.d("Trip", "Sending notification");
+        //Log.d("Trip", "Sending notification");
         Intent intent = new Intent(Constants.Notification.TRIP_DETAILS_LOADED);
         //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
     public void onRemoteCallFailed() {
-        Log.d("Trip", "Server call failed");
+        //Log.d("Trip", "Server call failed");
         Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
         //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);

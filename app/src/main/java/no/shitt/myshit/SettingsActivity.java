@@ -31,7 +31,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         //     do something...
         // }
 
-        Log.d("SettingsActivity", "Settings changed, refreshing notifications");
+        //Log.d("SettingsActivity", "Settings changed, refreshing notifications");
         TripList.getSharedList().refreshNotifications();
     }
 

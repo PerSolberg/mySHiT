@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    >
 
     <!-- Trip id / Hidden by default -->
     <TextView
@@ -19,11 +20,12 @@
 
     <ImageView
         android:id="@+id/element_icon"
+        android:src="@mipmap/ic_launcher"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
-        android:paddingEnd="2sp"/>
+        />
 
     <ImageView
         android:id="@+id/element_icon_overlay"
@@ -31,7 +33,7 @@
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
-        android:paddingEnd="2sp"/>
+        />
 
     <!-- Element Title -->
     <TextView
@@ -40,7 +42,9 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dip"
         android:paddingStart="3dip"
+        android:paddingEnd="3dip"
         android:paddingTop="2dip"
+        android:text="@string/placeholder_short"
         android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -51,12 +55,13 @@
         android:id="@+id/element_info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/element_icon"
         android:layout_below="@+id/element_title"
-        android:paddingLeft="3dip"
-        android:paddingRight="3dip"
+        android:paddingStart="3dip"
+        android:paddingEnd="3dip"
+        android:text="@string/placeholder_multiline_2"
         android:textColor="#0000F0" />
 
     <!-- Element Details -->
@@ -64,12 +69,13 @@
         android:id="@+id/element_details"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/element_icon"
+        android:layout_toEndOf="@+id/element_icon"
         android:layout_below="@+id/element_info"
         android:paddingLeft="3dip"
         android:paddingRight="3dip"
+        android:text="@string/placeholder_medium"
         android:textColor="#202020" />
 
 </RelativeLayout>

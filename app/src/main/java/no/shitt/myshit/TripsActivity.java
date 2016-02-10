@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ExpandableListView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -40,7 +43,8 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     private ProgressDialog pDialog;
 
     // List view
-    ListView listView;
+    ExpandableListView listView;
+    TripListAdapter listAdapter;
 
     // Trip code to show in details list
     String tripCode = null;
@@ -50,7 +54,23 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("TripsActivity", "onCreate: savedInstanceState = " + savedInstanceState);
+        if (Constants.DEVELOPER_MODE) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    //.penaltyDeath()
+                    .build());
+        }
+
+        //Log.d("TripsActivity", "onCreate: savedInstanceState = " + savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
 
@@ -59,12 +79,34 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
         // Set up toolbar and enable Up button
         Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_list_toolbar);
-        myToolbar.setLogo(R.mipmap.ic_launcher);
+        //myToolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(myToolbar);
 
+        // Common name isn't persisted so may not work (especially if app crashes due to race condition)
+        //ActionBar ab = getSupportActionBar();
+        //ab.setTitle(User.sharedUser.getCommonName());
+
         // Set up list view
-        listView = (ListView) findViewById(R.id.trip_list);
-        //ListView lv = getListView();
+        listView = (ExpandableListView) findViewById(R.id.trip_list);
+        listAdapter = new TripListAdapter(TripsActivity.this);
+        listView.setAdapter(listAdapter);
+
+        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
+                // On selecting a trip: TripDetailsActivity will be launched to trip details
+                Intent i = new Intent(getApplicationContext(), TripDetailsActivity.class);
+
+                // send trip code to TripDetails activity to get list of trip elements
+                tripCode = ((TextView) view.findViewById(R.id.trip_code)).getText().toString();
+                i.putExtra(Constants.IntentExtra.TRIP_CODE, tripCode);
+
+                startActivity(i);
+                return true;
+            }
+        });
+
+        /*
         listView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2,
@@ -79,13 +121,14 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
                 startActivity(i);
             }
         });
+        */
 
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        Log.i("TripsActivity", "onRefresh called from SwipeRefreshLayout");
+                        //Log.i("TripsActivity", "onRefresh called from SwipeRefreshLayout");
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
                         loadTrips(true);
@@ -113,11 +156,11 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         }
 
         if (savedInstanceState != null) {
-            Log.d("TripsActivity", "Restoring state");
+            //Log.d("TripsActivity", "Restoring state");
             // Restore value of members from saved state
             tripCode = savedInstanceState.getString(STATE_TRIP_CODE);
             if (tripCode != null) {
-                Log.d("TripsActivity", "onCreate refreshing modification flag for trip");
+                //Log.d("TripsActivity", "onCreate refreshing modification flag for trip");
                 AnnotatedTrip annotatedTrip = TripList.getSharedList().tripByCode(tripCode);
                 if (annotatedTrip.trip.areTripElementsUnchanged()) {
                     annotatedTrip.modified = ChangeState.UNCHANGED;
@@ -136,12 +179,12 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        Log.d("TripsActivity", "onRestoreInstanceState (state = " + savedInstanceState + ")");
+        //Log.d("TripsActivity", "onRestoreInstanceState (state = " + savedInstanceState + ")");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d("TripsActivity", "onCreateOptionsMenu");
+        //Log.d("TripsActivity", "onCreateOptionsMenu");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.trip_list_menu, menu);
         return true;
@@ -149,16 +192,16 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("TripsActivity", "onOptionsItemSelected");
+        //Log.d("TripsActivity", "onOptionsItemSelected");
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Log.d("TripsActivity", "Opening settings screen");
+                //Log.d("TripsActivity", "Opening settings screen");
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;
 
             case R.id.action_refresh:
-                Log.d("TripsActivity", "Refreshing from menu");
+                //Log.d("TripsActivity", "Refreshing from menu");
                 SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
                 swipeLayout.setRefreshing(true);
                 loadTrips(true);
@@ -179,7 +222,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
-        Log.d("TripsActivity", "Saving state");
+        //Log.d("TripsActivity", "Saving state");
         if (tripCode != null) {
             savedInstanceState.putString(STATE_TRIP_CODE, tripCode);
         }
@@ -197,12 +240,12 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onResume() {
-        Log.d("TripsActivity", "Resuming, Trip Code = " + tripCode);
+        //Log.d("TripsActivity", "Resuming, Trip Code = " + tripCode);
         super.onResume();
 
         // Check if we're logged out, if so, show logon screen
         if (User.sharedUser.getUserName() == null) {
-            Log.d("TripsActivity", "Not logged in - launching logon screen");
+            //Log.d("TripsActivity", "Not logged in - launching logon screen");
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(i);
 
@@ -212,7 +255,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
         // If we've viewed trip details, reset modification flag if all element changes have been reviewed
         if (tripCode != null) {
-            Log.d("TripsActivity", "Refreshing modification flag for trip");
+            //Log.d("TripsActivity", "Refreshing modification flag for trip");
             AnnotatedTrip annotatedTrip = TripList.getSharedList().tripByCode(tripCode);
             if (annotatedTrip != null && annotatedTrip.trip.areTripElementsUnchanged()) {
                 annotatedTrip.modified = ChangeState.UNCHANGED;
@@ -233,12 +276,13 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     */
 
     private void updateListView() {
-        Log.d("TripsActivity", "updateListView");
+        //Log.d("TripsActivity", "updateListView");
         runOnUiThread(new Runnable() {
             public void run() {
-                ListAdapter adapter = new TripListAdapter(TripsActivity.this);
-                //setListAdapter(adapter);
-                listView.setAdapter(adapter);
+                listAdapter.notifyDataSetChanged();
+                //TripListAdapter adapter = new TripListAdapter(TripsActivity.this);
+                //listView.setAdapter(adapter);
+                listAdapter.applyPreviousCollapse(listView);
             }
         });
     }
@@ -246,7 +290,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("TripsAct.HandleNotif", "onReceive");
+            //Log.d("TripsAct.HandleNotif", "onReceive");
             if (intent.getAction().equals(Constants.Notification.LOGON_SUCCEEDED)) {
                 loadTrips(false);
             } else if (intent.getAction().equals(Constants.Notification.TRIPS_LOADED)) {
@@ -258,7 +302,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     public void serverCallComplete() {
-        Log.d("TripsActivity", "serverCallComplete");
+        //Log.d("TripsActivity", "serverCallComplete");
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setRefreshing(false);
         if (pDialog != null) {
@@ -271,7 +315,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     public void serverCallFailed() {
-        Log.d("TripsActivity", "serverCallFailed");
+        //Log.d("TripsActivity", "serverCallFailed");
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setRefreshing(false);
         if (pDialog != null) {
@@ -281,7 +325,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     private void loadTrips(boolean refresh) {
-        Log.d("TripsActivity", "loadTrips");
+        //Log.d("TripsActivity", "loadTrips");
         if ( ! refresh ) {
             pDialog = new ProgressDialog(TripsActivity.this);
             pDialog.setMessage("Loading SHiT Trips ...");
@@ -295,7 +339,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     private void logout() {
-        Log.d("TripsActivity", "logout");
+        //Log.d("TripsActivity", "logout");
         TripList.getSharedList().clear();
         User.sharedUser.logout();
         //this.recreate();

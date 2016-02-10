@@ -22,7 +22,7 @@ import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.AnnotatedTripElement;
 import no.shitt.myshit.model.Tense;
 
-public class TripElementListAdapter extends BaseExpandableListAdapter /*BaseAdapter*/ {
+public class TripElementListAdapter extends BaseExpandableListAdapter {
     Context context;
     AnnotatedTrip annotatedTrip;
 
@@ -170,16 +170,14 @@ public class TripElementListAdapter extends BaseExpandableListAdapter /*BaseAdap
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        // TODO
         if (groupPosition < sections.size()) {
             ElementSectionInfo section = sections.get(groupPosition);
             int elementPosition = section.firstElement + childPosition;
             if (elementPosition < annotatedTrip.trip.elementCount()) {
-                return annotatedTrip.trip.elementByPosition(childPosition);
+                return annotatedTrip.trip.elementByPosition(elementPosition);
             }
         }
         return null;
-        //return rowItems.get(position);
     }
 
     @Override
@@ -202,7 +200,12 @@ public class TripElementListAdapter extends BaseExpandableListAdapter /*BaseAdap
     public void notifyDataSetChanged() {
         updateSections();
     }
-    
+
+    @Override
+    public boolean areAllItemsEnabled () {
+        return true;
+    }
+
     private void updateSections() {
         sections = new ArrayList<>();
         String lastSectionTitle = "";

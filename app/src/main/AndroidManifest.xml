@@ -19,6 +19,12 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <supports-screens
+        android:smallScreens="false"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+    />
 
     <application
         android:name=".SHiTApplication"
@@ -79,6 +85,32 @@
             android:name=".PrivateTransportActivity"
             android:label="@string/title_private_transport_details"
             android:parentActivityName=".TripDetailsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <!--android:theme="@style/AppTheme"-->
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".TripDetailsActivity" />
+        </activity>
+
+        <activity
+            android:name=".ScheduledTransportActivity"
+            android:label="@string/title_scheduled_transport_details"
+            android:parentActivityName=".TripDetailsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <!--android:theme="@style/AppTheme"-->
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".TripDetailsActivity" />
+        </activity>
+
+        <activity
+            android:name=".HotelActivity"
+            android:label="@string/title_hotel_details"
+            android:parentActivityName=".HotelActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <!--android:theme="@style/AppTheme"-->
             <!-- Parent activity meta-data to support 4.0 and lower -->

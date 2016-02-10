@@ -22,12 +22,12 @@ public class Hotel extends TripElement {
     String checkOutDateText; // Hold original value for saving in archive
     Date checkInDate;
     Date checkOutDate;
-    String hotelName;
-    String address;
-    String postCode;
-    String city;
-    String phone;
-    String transferInfo;
+    public String hotelName;
+    public String address;
+    public String postCode;
+    public String city;
+    public String phone;
+    public String transferInfo;
     String timezone;
 
 

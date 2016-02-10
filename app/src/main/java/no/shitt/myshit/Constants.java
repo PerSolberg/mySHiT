@@ -1,6 +1,8 @@
 package no.shitt.myshit;
 
 public class Constants {
+    public static final boolean DEVELOPER_MODE = false;  // Change to false for release version!
+
     public static final String CRED_U_FILE = "SHiT-U.dat";
     public static final String CRED_P_FILE = "SHiT-P.dat";
     public static final String LOCAL_ARCHIVE_FILE = "SHiT-trips.json";
@@ -19,6 +21,14 @@ public class Constants {
     public class IntentExtra {
         public static final String TRIP_CODE            = "trip_code";
         public static final String ELEMENT_ID           = "element_id";
+    }
+
+    public class UpcomingPreference {
+        public static final String NEXT_ONLY               = "N";
+        public static final String WITHIN_7_DAYS           = "7";
+        public static final String WITHIN_30_DAYS          = "30";
+        public static final String NEXT_AND_WITHIN_7_DAYS  = "N7";
+        public static final String NEXT_AND_WITHIN_30_DAYS = "N30";
     }
 
     public class JSON {

@@ -5,7 +5,7 @@
     android:layout_height="fill_parent">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/private_transport_toolbar"
+        android:id="@+id/scheduled_transport_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -16,7 +16,7 @@
 
     <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
         <TextView
-            android:text="@string/label_privtrans_company"
+            android:text="@string/label_scheduled_transport_company"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
@@ -26,13 +26,13 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_short"
-            android:id="@+id/company"
+            android:id="@+id/scheduled_transport_company"
             android:layout_column="2"/>
     </TableRow>
 
     <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
         <TextView
-            android:text="@string/label_privtrans_departure"
+            android:text="@string/label_scheduled_transport_route_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
@@ -42,13 +42,13 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_short"
-            android:id="@+id/departure"
+            android:id="@+id/scheduled_transport_route_no"
             android:layout_column="2"/>
     </TableRow>
 
     <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
         <TextView
-            android:text="@string/label_privtrans_arrival"
+            android:text="@string/label_scheduled_transport_departure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
@@ -58,13 +58,13 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_short"
-            android:id="@+id/arrival"
+            android:id="@+id/scheduled_transport_departure"
             android:layout_column="2"/>
     </TableRow>
 
     <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
         <TextView
-            android:text="@string/label_privtrans_phone"
+            android:text="@string/label_scheduled_transport_arrival"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
@@ -74,13 +74,29 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_short"
-            android:id="@+id/phone"
+            android:id="@+id/scheduled_transport_arrival"
             android:layout_column="2"/>
     </TableRow>
 
     <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
         <TextView
-            android:text="@string/label_privtrans_reference"
+            android:text="@string/label_scheduled_transport_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_column="1" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_short"
+            android:id="@+id/scheduled_transport_phone"
+            android:layout_column="2"/>
+    </TableRow>
+
+    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:text="@string/label_scheduled_transport_reference"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
@@ -90,7 +106,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_medium"
-            android:id="@+id/reference"
+            android:id="@+id/scheduled_transport_reference"
             android:layout_column="2"/>
     </TableRow>
 
