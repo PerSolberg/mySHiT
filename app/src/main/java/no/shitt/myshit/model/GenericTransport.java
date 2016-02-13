@@ -312,7 +312,8 @@ public class GenericTransport extends TripElement {
                 alarmTime = now;
             }
 
-            int actualLeadTime = alarmTime.compareTo(now);
+            //int actualLeadTime = alarmTime.compareTo(now);
+            long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis(); // alarmTime.compareTo(now);
             String leadTimeText = ServerDate.formatInterval(actualLeadTime);
             extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_travel, leadTimeText, startTime(null, DateFormat.SHORT)));
 
@@ -336,7 +337,8 @@ public class GenericTransport extends TripElement {
                 }
             }
             if (alarmTime != null) {
-                int actualLeadTime = alarmTime.compareTo(now);
+                //int actualLeadTime = alarmTime.compareTo(now);
+                long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis(); // alarmTime.compareTo(now);
                 String leadTimeText = ServerDate.formatInterval(actualLeadTime);
                 extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_connection, leadTimeText, startTime(null, DateFormat.SHORT)));
 

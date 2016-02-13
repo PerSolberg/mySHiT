@@ -368,7 +368,7 @@ public class Trip implements ServerAPIListener, JSONable {
                 alarmTime = now;
             }
 
-            int actualLeadTime = alarmTime.compareTo(now);
+            long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis(); // alarmTime.compareTo(now);
             String leadTimeText = ServerDate.formatInterval(actualLeadTime);
             extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_travel, leadTimeText, startTime(DateUtils.FORMAT_SHOW_TIME)));
 
