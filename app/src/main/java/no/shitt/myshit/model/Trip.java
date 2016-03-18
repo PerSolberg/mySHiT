@@ -432,6 +432,7 @@ public class Trip implements ServerAPIListener, JSONable {
         ServerAPIParams params = new ServerAPIParams(ServerAPI.URL_TRIP_INFO, "code", code);
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
         params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
+        params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
 
         new ServerAPI(this).execute(params);
     }

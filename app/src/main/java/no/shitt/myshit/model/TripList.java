@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
@@ -65,6 +66,7 @@ public class TripList implements ServerAPIListener, JSONable {
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
         params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
         params.addParameter(ServerAPI.PARAM_DETAILS_TYPE, "non-historic");
+        params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
 
         new ServerAPI(this).execute(params);
     }

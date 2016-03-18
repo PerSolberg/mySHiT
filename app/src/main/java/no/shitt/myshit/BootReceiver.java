@@ -7,6 +7,8 @@ import android.net.Uri;
 
 import java.util.Date;
 
+import no.shitt.myshit.model.TripList;
+
 /**
  * This BroadcastReceiver automatically (re)starts the alarm when the device is
  * rebooted. This receiver is set to be disabled (android:enabled="false") in the
@@ -21,7 +23,9 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
         {
-            alarm.setAlarm(new Date(), Uri.parse("http://www.shitt.no/boot"), null);
+            //alarm.setAlarm(new Date(), Uri.parse("http://www.shitt.no/boot"), null);
+            // Load trips from local archive; alerts will be set as part of the process
+            TripList.getSharedList().loadFromArchive();
         }
     }
 }
