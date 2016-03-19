@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="no.shitt.myshit">
+    package="no.shitt.myshit"
+    android:installLocation="internalOnly"
+    >
 
     <!-- Permission - Internet Connect -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -123,10 +125,13 @@
         <!-- Components for notifications -->
         <receiver android:name=".AlarmReceiver" />
 
-        <receiver android:name=".BootReceiver"
-            android:enabled="false">
+        <receiver android:name="no.shitt.myshit.BootReceiver"
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
 

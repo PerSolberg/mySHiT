@@ -129,6 +129,10 @@ public class TripList implements ServerAPIListener, JSONable {
         //
     }
 
+    public void onRemoteCallFailed(Exception e) {
+        //
+    }
+
     // Load from JSON archive
     public void loadFromArchive() {
         String jsonString = "";

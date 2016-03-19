@@ -202,7 +202,7 @@ public class User implements ServerAPIListener {
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
         } else {
             //Log.d("User", "User authentication failed");
-            Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
+            Intent intent = new Intent(Constants.Notification.LOGON_UNAUTHORISED);
             intent.putExtra("message", response.optString(User.JSON_ERROR));
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
         }
@@ -215,5 +215,12 @@ public class User implements ServerAPIListener {
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
+
+    public void onRemoteCallFailed(Exception e) {
+        //Log.d("User", "User authentication call failed with exception");
+        Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
+        intent.putExtra("message", e.getMessage());
+        LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+    }
 
 }

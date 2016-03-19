@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.model.User;
 
 /**
@@ -34,6 +35,9 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     //private UserLoginTask mAuthTask = null;
+
+    // Alert dialog manager
+    AlertDialogueManager alert = new AlertDialogueManager();
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -98,9 +102,13 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
             showProgress(false);
             if (intent.getAction().equals(Constants.Notification.LOGON_SUCCEEDED)) {
                 finish();
-            } else if (intent.getAction().equals(Constants.Notification.LOGON_FAILED)) {
+            } else if (intent.getAction().equals(Constants.Notification.LOGON_UNAUTHORISED)) {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            } else if (intent.getAction().equals(Constants.Notification.LOGON_FAILED)) {
+                // TODO
+                alert.showAlertDialogue(LoginActivity.this, "Logon Error",
+                        intent.getStringExtra("message"), false);
             }
         }
     }

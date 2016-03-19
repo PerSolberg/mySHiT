@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Date;
 
@@ -21,9 +23,12 @@ public class BootReceiver extends BroadcastReceiver {
     AlarmReceiver alarm = new AlarmReceiver();
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
+        //Context context = SHiTApplication.getContext();
+        //Log.d("BootReceiver", "onReceive");
+        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")
+                || intent.getAction().equals("android.intent.action.QUICKBOOT_POWERON"))
         {
-            //alarm.setAlarm(new Date(), Uri.parse("http://www.shitt.no/boot"), null);
+            //Log.d("BootReceiver", "onReceive: BOOT_COMPLETED");
             // Load trips from local archive; alerts will be set as part of the process
             TripList.getSharedList().loadFromArchive();
         }

@@ -11,6 +11,7 @@ public class Constants {
 
     public class Notification {
         public static final String LOGON_FAILED           = "logonFailed";
+        public static final String LOGON_UNAUTHORISED     = "logonUnauthorised";
         public static final String LOGON_SUCCEEDED        = "logonSuccessful";
 
         public static final String TRIPS_LOADED           = "tripsLoaded";

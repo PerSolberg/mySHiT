@@ -3,14 +3,14 @@
 
     <!-- Placeholder text (mainly for design verification purposes -->
     <string name="placeholder_short">Eksempeltekst</string>
-    <string name="placeholder_medium">Middels lang eksempeltekst</string>
+    <string name="placeholder_medium">Medels lång eksempeltekst</string>
     <string name="placeholder_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
-    <string name="placeholder_multiline_2">Eksempeltekst\nAndre linje av eksempeltekst</string>
-    <string name="placeholder_multiline_3">Eksempeltekst\nAndre linje av eksempeltekst\nTredje tekstlinje</string>
+    <string name="placeholder_multiline_2">Eksempeltekst\nAndra rad av eksempeltekst</string>
+    <string name="placeholder_multiline_3">Eksempeltekst\nAndra rad av eksempeltekst\nTredje tekstrad</string>
 
     <!-- Trip List -->
     <string name="group_title_future">Framtidiga</string>
-    <string name="group_title_upcoming">Förestående</string>
+    <string name="group_title_upcoming">Kommande</string>
     <string name="group_title_current">Aktiva</string>
     <string name="group_title_historic">Historiska</string>
 
@@ -21,7 +21,7 @@
     <string name="title_activity_login">Logga in</string>
     <string name="prompt_email">E-post</string>
     <string name="prompt_password">Lösenord</string>
-    <string name="welcome_message">Välkommen till SHiT.\n\nFör att se information om dina resor, var god att logga inn med användarnamnet og lösenordet du fick i ditt välkomstbrev.</string>
+    <string name="welcome_message">Välkommen till SHiT.\n\nFör att se information om dina resor, var god att logga in med användarnamnet og lösenordet du fick i ditt välkomstbrev.</string>
     <string name="action_sign_in">Logga in</string>
     <string name="action_sign_in_short">Logga in</string>
     <string name="error_invalid_email">E-postadressen är ogiltig</string>
@@ -92,10 +92,10 @@
 
     <string-array name="pref_upcoming_entries">
         <item>Enbart nästa resa</item>
-        <item>Resor som börjar innom 7 dagar</item>
-        <item>Resor som börjar innom 30 dagar</item>
-        <item>Nästa resa + börjar innom 7 dager</item>
-        <item>Nästa resa + börjar innom 30 dager</item>
+        <item>Resor som börjar inom 7 dagar</item>
+        <item>Resor som börjar inom 30 dagar</item>
+        <item>Nästa resa + börjar inom 7 dager</item>
+        <item>Nästa resa + börjar inom 30 dager</item>
     </string-array>
     <string-array name="pref_upcoming_values">
         <item>N</item>

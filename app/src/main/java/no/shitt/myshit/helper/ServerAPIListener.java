@@ -5,4 +5,5 @@ import org.json.JSONObject;
 public interface ServerAPIListener {
     void onRemoteCallComplete(JSONObject jsonFromNet);
     void onRemoteCallFailed();
+    void onRemoteCallFailed(Exception e);
 }

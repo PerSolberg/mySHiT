@@ -107,7 +107,7 @@ public class ServerAPI extends AsyncTask<ServerAPIParams, String, String> {
             }
         } catch (Exception e ) {
             //Log.e("Buffer Error", "Error converting result " + e.getMessage());
-            listener.onRemoteCallFailed();
+            listener.onRemoteCallFailed(e);
             return e.getMessage();
         }
 
@@ -116,6 +116,8 @@ public class ServerAPI extends AsyncTask<ServerAPIParams, String, String> {
 
     protected void onPostExecute(String result) {
         //Log.d("ServerAPI", "Calling listener");
-        listener.onRemoteCallComplete(response);
+        if (response != null) {
+            listener.onRemoteCallComplete(response);
+        }
     }
 }

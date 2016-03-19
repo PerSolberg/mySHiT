@@ -420,6 +420,13 @@ public class Trip implements ServerAPIListener, JSONable {
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
+    public void onRemoteCallFailed(Exception e) {
+        //Log.d("Trip", "Server call failed");
+        Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
+        intent.putExtra("message", e.getMessage());
+        LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+    }
+
 
     public void refreshNotifications() {
         setNotification();
