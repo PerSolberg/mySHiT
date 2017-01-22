@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="days">
+        <item quantity="one">%d døgn</item>
         <item quantity="other">%d døgn</item>
     </plurals>
     <plurals name="hours">

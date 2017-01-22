@@ -19,6 +19,14 @@ public class Constants {
         public static final String COMMUNICATION_FAILED   = "communicationError";
     }
 
+    public class PushNotification {
+        //private static final String TOPIC_ROOT             = "/topics";
+        public  static final String TOPIC_ROOT_USER        = "U-";
+        public  static final String TOPIC_ROOT_ITINERARY   = "I-";
+        public  static final String TOPIC_ROOT_TRIP        = "T-";
+        public  static final String TOPIC_GLOBAL           = "GLOBAL";
+    }
+
     public class IntentExtra {
         public static final String TRIP_CODE            = "trip_code";
         public static final String ELEMENT_ID           = "element_id";
@@ -42,15 +50,16 @@ public class Constants {
         public static final String ANNELEMENT_ELEMENT      = "element";
         public static final String ANNELEMENT_MODIFIED     = "modified";
 
-        public static final String TRIP_ID          = "id";
-        public static final String TRIP_START_DATE  = "startDate";
-        public static final String TRIP_END_DATE    = "endDate";
-        public static final String TRIP_DESCRIPTION = "description";
-        public static final String TRIP_CODE        = "code";
-        public static final String TRIP_NAME        = "name";
-        public static final String TRIP_SECTION     = "section";
-        public static final String TRIP_TYPE        = "type";
-        public static final String TRIP_ELEMENTS    = "elements";
+        public static final String TRIP_ID                 = "id";
+        public static final String TRIP_ITINERARY_ID       = "itineraryId";
+        public static final String TRIP_START_DATE         = "startDate";
+        public static final String TRIP_END_DATE           = "endDate";
+        public static final String TRIP_DESCRIPTION        = "description";
+        public static final String TRIP_CODE               = "code";
+        public static final String TRIP_NAME               = "name";
+        public static final String TRIP_SECTION            = "section";
+        public static final String TRIP_TYPE               = "type";
+        public static final String TRIP_ELEMENTS           = "elements";
 
         public static final String ELEM_TYPE               = "type";
         public static final String ELEM_SUB_TYPE           = "subType";
@@ -88,5 +97,16 @@ public class Constants {
         public static final String ELEM_HOTEL_CITY          = "city";
         public static final String ELEM_HOTEL_PHONE         = "phone";
         public static final String ELEM_HOTEL_TRANSFER_INFO = "transferInfo";
+
+        public static final String ELEM_EVENT_VENUE_NAME       = "venueName";
+        public static final String ELEM_EVENT_START_TIME       = "startTime";
+        public static final String ELEM_EVENT_TIMEZONE         = "timezone";
+        public static final String ELEM_EVENT_TRAVEL_TIME      = "travelTime";
+        public static final String ELEM_EVENT_VENUE_ADDR       = "venueAddress";
+        public static final String ELEM_EVENT_VENUE_CITY       = "venueCity";
+        public static final String ELEM_EVENT_VENUE_POST_CODE  = "venuePostCode";
+        public static final String ELEM_EVENT_VENUE_PHONE      = "venuePhone";
+        public static final String ELEM_EVENT_ACCESS_INFO      = "accessInfo";
+
     }
 }

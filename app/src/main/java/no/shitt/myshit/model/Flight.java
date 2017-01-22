@@ -26,7 +26,7 @@ public class Flight extends ScheduledTransport {
 
     @Override
     public String getStartInfo() {
-        Context ctx = SHiTApplication.getContext();
+        //Context ctx = SHiTApplication.getContext();
         //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
         String timeInfo = startTime(null, DateFormat.SHORT);
         //String timeInfo = dateFormatter.format(departureTime);

@@ -32,4 +32,12 @@
         android:entryValues="@array/pref_alertLeadTime_connection_values"
         android:summary="@string/pref_alertLeadTime_connection_summary"
         android:defaultValue="@string/pref_alertLeadTime_connection_default" />
+    <ListPreference
+        android:key="pref_alertLeadTime_event"
+        android:title="@string/pref_alertLeadTime_event"
+        android:dialogTitle="@string/pref_alertLeadTime_event"
+        android:entries="@array/pref_alertLeadTime_event_entries"
+        android:entryValues="@array/pref_alertLeadTime_event_values"
+        android:summary="@string/pref_alertLeadTime_event_summary"
+        android:defaultValue="@string/pref_alertLeadTime_event_default" />
 </PreferenceScreen>

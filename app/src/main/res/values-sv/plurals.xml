@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="days">
+        <item quantity="one">%d dygn</item>
         <item quantity="other">%d dygn</item>
     </plurals>
     <plurals name="hours">
+        <item quantity="one">%d t</item>
         <item quantity="other">%d t</item>
     </plurals>
     <plurals name="minutes">
+        <item quantity="one">%d min</item>
         <item quantity="other">%d min</item>
     </plurals>
 </resources>

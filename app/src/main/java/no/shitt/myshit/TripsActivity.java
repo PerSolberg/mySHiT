@@ -10,7 +10,7 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
+//import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,11 +18,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+//import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+//import android.widget.ListAdapter;
+//import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import no.shitt.myshit.adapters.TripListAdapter;
 import no.shitt.myshit.helper.AlertDialogueManager;
@@ -54,6 +56,9 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        //Log.d("TripActivity", "onCreate starting");
+        //Log.d("TripActivity", "onCreate Intent action = " + getIntent().getAction());
+
         if (Constants.DEVELOPER_MODE) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
@@ -144,7 +149,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
                 if (!cd.isConnectingToInternet()) {
                     // Internet Connection is not present
                     alert.showAlertDialogue(TripsActivity.this, "Internet Connection Error",
-                            "Please, please connect to working Internet connection", false);
+                            "Please connect to working Internet connection", false);
                     // stop executing code by return
                     return;
                 }
@@ -169,8 +174,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
                 }
                 tripCode = null;
             }
-        } else {
-            //tripCode = null;
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIPS_LOADED));
@@ -240,8 +243,9 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onResume() {
-        //Log.d("TripsActivity", "Resuming, Trip Code = " + tripCode);
         super.onResume();
+
+        //Log.d("TripActivity", "onResume Starting, action = " + getIntent().getAction() );
 
         // Check if we're logged out, if so, show logon screen
         if (User.sharedUser.getUserName() == null) {
@@ -251,6 +255,9 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
             // Prevent refresh attempt below
             tripCode = null;
+        } else {
+            // Otherwise refresh data
+            TripList.getSharedList().getFromServer();
         }
 
         // If we've viewed trip details, reset modification flag if all element changes have been reviewed
@@ -264,6 +271,15 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
             }
             tripCode = null;
         }
+
+        {
+            String fcmToken;
+
+            fcmToken = FirebaseInstanceId.getInstance().getToken();
+            if (fcmToken != null) {
+                //Log.d("TripsActivity", "Firebase token = " + fcmToken);
+            }
+        }
     }
 
     /*
@@ -274,6 +290,18 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         super.onWindowFocusChanged(hasFocus);
     }
     */
+
+    /*
+    @Override
+    public void onNewIntent(Intent intent) {
+        Log.d("TripActivity", "onNewIntent Starting, action = " + getIntent().getAction() + ", Selector = " + getIntent().getSelector());
+        if (getIntent().getAction() == "NTF.OPEN") {
+            Log.d("TripActivity", "Launched from notification");
+            TripList.getSharedList().getFromServer();
+        }
+    }
+    */
+
 
     private void updateListView() {
         //Log.d("TripsActivity", "updateListView");

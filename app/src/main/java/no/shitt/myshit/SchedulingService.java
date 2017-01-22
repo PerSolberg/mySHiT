@@ -51,7 +51,7 @@ public class SchedulingService extends IntentService {
 
         //Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
 
-        String msg = intent.getStringExtra("msg");
+        //String msg = intent.getStringExtra("msg");
         sendNotification(intent.getData().toString(), intent.getExtras());
 
         // Release the wake lock provided by the BroadcastReceiver.
@@ -72,7 +72,7 @@ public class SchedulingService extends IntentService {
             // If trip not found, it's probably a notification for a deleted trip - ignore
             return;
         }
-        AnnotatedTripElement tripElement = null;
+        AnnotatedTripElement tripElement;
         if (elementId > 0) {
             tripElement = trip.trip.elementById(elementId);
             if (tripElement == null) {

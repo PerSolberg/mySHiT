@@ -63,6 +63,16 @@
     <string name="label_hotel_phone">Telefon</string>
     <string name="label_hotel_transfer_info">Transfer info</string>
 
+    <!-- Event details screen -->
+    <string name="title_event_details">Arrangementsdetaljer</string>
+    <string name="title_event_details_rstdnr">Restaurantdetaljer</string>
+    <string name="label_event_venue">Sted</string>
+    <string name="label_event_start">Start</string>
+    <string name="label_event_travel_time">Reisetid</string>
+    <string name="label_event_reference">Referanse</string>
+    <string name="label_event_venue_phone">Telefon</string>
+    <string name="label_event_access_info">Adkomstinformasjon</string>
+
     <!-- Menu actions -->
     <string name="action_settings">Innstillinger</string>
     <string name="action_refresh">Oppdater</string>
@@ -72,9 +82,11 @@
     <string name="alert_title_trip">Reisestart</string>
     <string name="alert_title_travel">Avreise</string>
     <string name="alert_title_connection">Avgang</string>
+    <string name="alert_title_event">Arrangement</string>
     <string name="alert_msg_trip">SHiT-reisen starter om %1$s (%2$s)</string>
     <string name="alert_msg_travel">Avreise om %1$s, kl. %2$s</string>
     <string name="alert_msg_connection">Avgang om %1$s, kl. %2$s</string>
+    <string name="alert_msg_event">Starter om %1$s, kl. %2$s</string>
 
     <!-- Settings -->
     <string name="title_activity_settings">Innstillinger</string>
@@ -89,6 +101,9 @@
     <string name="pref_alertLeadTime_connection">Varsel om avgang</string>
     <string name="pref_alertLeadTime_connection_default">45</string>
     <string name="pref_alertLeadTime_connection_summary">%s før avgang</string>
+    <string name="pref_alertLeadTime_event">Varsel om arrangement</string>
+    <string name="pref_alertLeadTime_event_default">45</string>
+    <string name="pref_alertLeadTime_event_summary">%s før arrangement/avreise</string>
 
     <string-array name="pref_upcoming_entries">
         <item>Kun neste reise</item>
@@ -149,4 +164,45 @@
         <item>45</item>
         <item>60</item>
     </string-array>
+
+    <string-array name="pref_alertLeadTime_event_entries">
+        <item>Av</item>
+        <item>15 minutter</item>
+        <item>30 minutter</item>
+        <item>45 minutter</item>
+        <item>60 minutter</item>
+    </string-array>
+    <string-array name="pref_alertLeadTime_event_values">
+        <item>-1</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+    </string-array>
+
+    <!-- Push notifications -->
+    <string name="NTF.INSERT.ADDRESS">%1$s: Adresseinformasjon oppdatert</string>
+    <string name="NTF.INSERT.BOOKING">%1$s: Ny booking lagt til</string>
+    <string name="NTF.INSERT.BOOKINGREF">%1$s: Ny booking-referanse lagt til</string>
+    <string name="NTF.INSERT.HOTEL">%1$s: Ny hotellreservasjon lagt til</string>
+    <string name="NTF.INSERT.ITINERARY">%1$s: Reiserute oppdatert</string>
+    <string name="NTF.INSERT.TRIP">%1$s: Ny reise lagt til</string>
+    <string name="NTF.INSERT.USERPROFILE">Brukerprofil oppdatert</string>
+
+    <string name="NTF.UPDATE.ADDRESS">%1$s: Adresseinformasjon oppdatert</string>
+    <string name="NTF.UPDATE.BOOKING">%1$s: Booking oppdatert</string>
+    <string name="NTF.UPDATE.BOOKINGREF">%1$s: Booking-referanse oppdatert</string>
+    <string name="NTF.UPDATE.HOTEL">%1$s: Hotellreservasjon oppdatert</string>
+    <string name="NTF.UPDATE.ITINERARY">%1$s: Reiserute oppdatert</string>
+    <string name="NTF.UPDATE.TRIP">%1$s: Reise oppdatert</string>
+    <string name="NTF.UPDATE.USERPROFILE">Brukerprofil oppdatert</string>
+
+    <string name="NTF.DELETE.ADDRESS">%1$s: Adresseinformasjon oppdatert</string>
+    <string name="NTF.DELETE.BOOKING">%1$s: Booking fjernet</string>
+    <string name="NTF.DELETE.BOOKINGREF">%1$s: Booking-referanse fjernet</string>
+    <string name="NTF.DELETE.HOTEL">%1$s: Hotellreservasjon fjernet</string>
+    <string name="NTF.DELETE.ITINERARY">%1$s: Reiserute oppdatert</string>
+    <string name="NTF.DELETE.TRIP">%1$s: Reise oppdatert</string>
+    <string name="NTF.DELETE.USERPROFILE">Brukerprofil oppdatert</string>
+
 </resources>

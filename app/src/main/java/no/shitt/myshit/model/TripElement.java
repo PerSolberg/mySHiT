@@ -28,8 +28,8 @@ public class TripElement implements JSONable {
     public List<Map<String,String>> references;
 
     public String tripCode;
-    public int    tripId;
-    JSONObject serverData;
+    private int    tripId;
+    private JSONObject serverData;
 
     public static final String REFTAG_REF_NO       = "refNo";
     public static final String REFTAG_TYPE         = "type";
@@ -142,6 +142,8 @@ public class TripElement implements JSONable {
             elem = new GenericTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("ACM")) {
             elem = new Hotel(tripId, tripCode, elementData);
+        } else if (elemType.equals("EVT")) {
+            elem = new Event(tripId, tripCode, elementData);
         } else {
             elem = null;
         }

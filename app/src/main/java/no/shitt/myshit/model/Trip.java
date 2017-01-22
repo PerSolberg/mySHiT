@@ -12,10 +12,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.text.DateFormat;
+//import java.text.DateFormat;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -40,10 +42,11 @@ import no.shitt.myshit.helper.StringUtil;
 
 public class Trip implements ServerAPIListener, JSONable {
     public int id;
-    public String startDateText;  // Hold original value for saving in archive
-    public Date startDate;
-    public String endDateText;    // Hold original value for saving in archive
-    public Date endDate;
+    private int itineraryId;
+    private String startDateText;  // Hold original value for saving in archive
+    private Date startDate;
+    private String endDateText;    // Hold original value for saving in archive
+    private Date endDate;
     public String tripDescription;
     public String code;
     public String name;
@@ -57,14 +60,14 @@ public class Trip implements ServerAPIListener, JSONable {
         return startDate;
     }
 
-    public String getStartTimeZone() {
+    private String getStartTimeZone() {
         if (elements != null && elements.size() > 0) {
             return elements.get(0).tripElement.getStartTimeZone();
         }
         return null;
     }
 
-    public Date getEndTime() {
+    private Date getEndTime() {
         return endDate;
     }
 
@@ -156,7 +159,7 @@ public class Trip implements ServerAPIListener, JSONable {
 
 
     // MARK: Factory
-    public static Trip createFromDictionary( JSONObject elementData, boolean fromServer ) {
+    private static Trip createFromDictionary( JSONObject elementData, boolean fromServer ) {
         //let tripType = elementData["type"] as? String ?? ""
 
         return new Trip(elementData, fromServer);
@@ -168,6 +171,7 @@ public class Trip implements ServerAPIListener, JSONable {
         JSONObject jo = new JSONObject();
 
         jo.put(Constants.JSON.TRIP_ID, id);
+        jo.put(Constants.JSON.TRIP_ITINERARY_ID, itineraryId);
         jo.putOpt(Constants.JSON.TRIP_START_DATE, startDateText);
         jo.putOpt(Constants.JSON.TRIP_END_DATE, endDateText);
         jo.putOpt(Constants.JSON.TRIP_DESCRIPTION, tripDescription);
@@ -191,6 +195,7 @@ public class Trip implements ServerAPIListener, JSONable {
     Trip(JSONObject elementData, boolean fromServer) {
         super();
         id = elementData.optInt(Constants.JSON.TRIP_ID, -1);
+        itineraryId = elementData.optInt(Constants.JSON.TRIP_ITINERARY_ID, -1);
         startDateText = elementData.isNull(Constants.JSON.TRIP_START_DATE) ? null : elementData.optString(Constants.JSON.TRIP_START_DATE);
         startDate = ServerDate.convertServerDate(startDateText, null);
         endDateText = elementData.isNull(Constants.JSON.TRIP_END_DATE) ? null : elementData.optString(Constants.JSON.TRIP_END_DATE);
@@ -217,10 +222,11 @@ public class Trip implements ServerAPIListener, JSONable {
         }
 
         setNotification();
+        registerForPushNotifications();
     }
 
     // MARK: Methods
-    public boolean isEqual(Object otherObject) {
+    boolean isEqual(Object otherObject) {
         //print("Comparing objects: self.class = \(object_getClassName(self)), object.class = \(object_getClassName(object!))")
         //print("Comparing objects: self.class = \(_stdlib_getDemangledTypeName(self)), object.class = \(_stdlib_getDemangledTypeName(object!))")
         if (this.getClass() != otherObject.getClass()) {
@@ -229,6 +235,7 @@ public class Trip implements ServerAPIListener, JSONable {
         try {
             Trip otherTrip = (Trip) otherObject;
             if (this.id              != otherTrip.id                              ) { return false; }
+            if (this.itineraryId     != otherTrip.itineraryId                     ) { return false; }
             if (!ServerDate.equal(this.startDate, otherTrip.startDate)            ) { return false; }
             if (!ServerDate.equal(this.endDate, otherTrip.endDate)                ) { return false; }
             if (!StringUtil.equal(this.tripDescription, otherTrip.tripDescription)) { return false; }
@@ -254,7 +261,7 @@ public class Trip implements ServerAPIListener, JSONable {
         return true;
     }
 
-    public void compareTripElements(Trip otherTrip) {
+    void compareTripElements(Trip otherTrip) {
         if (elements == null || otherTrip.elements == null || elements.size() == 0 || otherTrip.elements.size() == 0) {
             //Log.d("Trip", "compareTripElements: Empty element list in one or both trips");
             return;
@@ -320,7 +327,7 @@ public class Trip implements ServerAPIListener, JSONable {
     }
 
 
-    public void setNotification() {
+    private void setNotification() {
         Context ctx = SHiTApplication.getContext();
         // TO DO...
         if (getStartTime() == null) {
@@ -397,6 +404,7 @@ public class Trip implements ServerAPIListener, JSONable {
                 newTrip.compareTripElements(this);
                 //Log.d("Trip", "Updating trip");
                 this.id              = newTrip.id;
+                this.itineraryId     = newTrip.itineraryId;
                 this.startDate       = newTrip.startDate;
                 this.endDate         = newTrip.endDate;
                 this.tripDescription = newTrip.tripDescription;
@@ -428,10 +436,38 @@ public class Trip implements ServerAPIListener, JSONable {
     }
 
 
-    public void refreshNotifications() {
+    void refreshNotifications() {
         setNotification();
-        for (int i = 0; i < elements.size(); i++) {
-            elements.get(i).tripElement.setNotification();
+        if (elements != null) {
+            for (int i = 0; i < elements.size(); i++) {
+                elements.get(i).tripElement.setNotification();
+            }
+        }
+    }
+
+    private void registerForPushNotifications() {
+        String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
+        //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicTrip);
+        FirebaseMessaging.getInstance().subscribeToTopic(topicTrip);
+
+        // TO DO
+        if (itineraryId > 0) {
+            String topicItinerary = Constants.PushNotification.TOPIC_ROOT_ITINERARY + itineraryId;
+            //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicItinerary);
+            FirebaseMessaging.getInstance().subscribeToTopic(topicItinerary);
+        }
+    }
+
+    public void deregisterFromPushNotifications() {
+        String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
+        //Log.d("Trip", "registerForPushNotifications: Deregister from topic " + topicTrip);
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topicTrip);
+
+        // TO DO
+        if (itineraryId > 0) {
+            String topicItinerary = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
+            //Log.d("Trip", "registerForPushNotifications: Deregister from topic " + topicItinerary);
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(topicItinerary);
         }
     }
 

@@ -3,8 +3,8 @@ package no.shitt.myshit.model;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-import android.widget.ListAdapter;
+//import android.util.Log;
+//import android.widget.ListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,7 +73,7 @@ public class TripList implements ServerAPIListener, JSONable {
 
     // Copy data received from server to memory structure
     //
-    public void copyServerData(JSONArray jsonData, boolean fromServer) {
+    private void copyServerData(JSONArray jsonData, boolean fromServer) {
         // Clear current data and repopulate from server data
         List<AnnotatedTrip> newTripList = new ArrayList<>();
 
@@ -108,8 +108,21 @@ public class TripList implements ServerAPIListener, JSONable {
                     newTrip.trip.compareTripElements(oldTrip.trip);
                     if (!newTrip.trip.isEqual(oldTrip.trip)) {
                         newTrip.modified = ChangeState.CHANGED;
+                    } /*else {
+                        // Keep modification flag from old version
+                        newTrip.modified = oldTrip.modified;
+                    }*/
+                }
+            }
+            
+            // Identify old trips no longer present
+            oldTripLoop: for (AnnotatedTrip oldTrip: trips) {
+                for (AnnotatedTrip newTrip: newTripList) {
+                    if (newTrip.trip.id == oldTrip.trip.id) {
+                        continue oldTripLoop;
                     }
                 }
+                oldTrip.trip.deregisterFromPushNotifications();
             }
         }
 

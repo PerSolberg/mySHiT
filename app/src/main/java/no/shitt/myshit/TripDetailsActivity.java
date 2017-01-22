@@ -119,6 +119,8 @@ public class TripDetailsActivity extends AppCompatActivity {
                     i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
                 } else if ("ACM".equals(element.type) && "HTL".equals(element.subType)) {
                     i = new Intent(getApplicationContext(), HotelActivity.class);
+                } else if ("EVT".equals(element.type)) {
+                    i = new Intent(getApplicationContext(), EventActivity.class);
                 } else {
                     //Log.e("TripDetailsActivity", "ChildItemClick: Unsupported element type");
                     return false;
@@ -164,12 +166,16 @@ public class TripDetailsActivity extends AppCompatActivity {
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIPS_LOADED));
     }
 
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Constants.Notification.TRIP_DETAILS_LOADED)) {
+                serverCallComplete();
+            } else if (intent.getAction().equals(Constants.Notification.TRIPS_LOADED)) {
+                annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
                 serverCallComplete();
             } else if (intent.getAction().equals(Constants.Notification.COMMUNICATION_FAILED)) {
                 serverCallFailed();
@@ -216,6 +222,15 @@ public class TripDetailsActivity extends AppCompatActivity {
         inflater.inflate(R.menu.trip_list_menu, menu);
         return true;
     }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Log.d("TripDetailsActivity", "onResume Starting, action = " + getIntent().getAction() + ", Selector = " + getIntent().getSelector());
+        TripList.getSharedList().getFromServer();
+    }
+
 
     private void updateListView() {
         runOnUiThread(new Runnable() {
