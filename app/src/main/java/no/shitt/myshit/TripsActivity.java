@@ -327,7 +327,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     private void loadTrips(boolean refresh) {
         //Log.d("TripsActivity", "loadTrips");
         if ( ! refresh ) {
-            pDialog = new ProgressDialog(TripsActivity.this);
+            pDialog = new ProgressDialog( /*TripsActivity.*/ this);
             pDialog.setMessage("Loading SHiT Trips ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
