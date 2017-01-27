@@ -228,7 +228,9 @@ public class TripDetailsActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         //Log.d("TripDetailsActivity", "onResume Starting, action = " + getIntent().getAction() + ", Selector = " + getIntent().getSelector());
-        TripList.getSharedList().getFromServer();
+        // Or maybe not...
+        //TripList.getSharedList().getFromServer();
+        updateListView();
     }
 
 

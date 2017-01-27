@@ -13,8 +13,9 @@
         android:layout_gravity="center_vertical"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
+        android:paddingStart="2sp"
         android:paddingEnd="2sp"
-        android:foreground="@mipmap/icon_group_collapsed"
+        android:src="@mipmap/icon_group_collapsed"
         />
 
     <TextView

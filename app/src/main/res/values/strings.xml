@@ -184,6 +184,7 @@
     <string name="NTF.INSERT.ADDRESS">%1$s: Address information updated</string>
     <string name="NTF.INSERT.BOOKING">%1$s: New booking added</string>
     <string name="NTF.INSERT.BOOKINGREF">%1$s: New booking reference added</string>
+    <string name="NTF.INSERT.EVENT">%1$s: New event added</string>
     <string name="NTF.INSERT.HOTEL">%1$s: New hotel booking added</string>
     <string name="NTF.INSERT.ITINERARY">%1$s: Itinerary updated</string>
     <string name="NTF.INSERT.TRIP">%1$s: New trip added</string>
@@ -192,6 +193,7 @@
     <string name="NTF.UPDATE.ADDRESS">%1$s: Address information updated</string>
     <string name="NTF.UPDATE.BOOKING">%1$s: Booking updated</string>
     <string name="NTF.UPDATE.BOOKINGREF">%1$s: Booking reference updated</string>
+    <string name="NTF.UPDATE.EVENT">%1$s: Event updated</string>
     <string name="NTF.UPDATE.HOTEL">%1$s: Hotel booking updated</string>
     <string name="NTF.UPDATE.ITINERARY">%1$s: Itinerary updated</string>
     <string name="NTF.UPDATE.TRIP">%1$s: Trip updated</string>
@@ -200,6 +202,7 @@
     <string name="NTF.DELETE.ADDRESS">%1$s: Address information updated</string>
     <string name="NTF.DELETE.BOOKING">%1$s: Booking removed</string>
     <string name="NTF.DELETE.BOOKINGREF">%1$s: Booking reference removed</string>
+    <string name="NTF.DELETE.EVENT">%1$s: Event cancelled</string>
     <string name="NTF.DELETE.HOTEL">%1$s: Hotel booking removed</string>
     <string name="NTF.DELETE.ITINERARY">%1$s: Itinerary updated</string>
     <string name="NTF.DELETE.TRIP">%1$s: Trip updated</string>

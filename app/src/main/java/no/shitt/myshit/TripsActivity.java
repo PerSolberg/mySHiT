@@ -234,13 +234,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    /*
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("TripsActivity", "Returning from trip details or logon: " + data.getAction() );
-    }
-    */
-
     @Override
     public void onResume() {
         super.onResume();
@@ -257,7 +250,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
             tripCode = null;
         } else {
             // Otherwise refresh data
-            TripList.getSharedList().getFromServer();
+            updateListView();
         }
 
         // If we've viewed trip details, reset modification flag if all element changes have been reviewed
@@ -282,27 +275,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         }
     }
 
-    /*
-    @Override
-    public void onWindowFocusChanged (boolean hasFocus)
-    {
-        Log.d("TripsActivity", "Got focus");
-        super.onWindowFocusChanged(hasFocus);
-    }
-    */
-
-    /*
-    @Override
-    public void onNewIntent(Intent intent) {
-        Log.d("TripActivity", "onNewIntent Starting, action = " + getIntent().getAction() + ", Selector = " + getIntent().getSelector());
-        if (getIntent().getAction() == "NTF.OPEN") {
-            Log.d("TripActivity", "Launched from notification");
-            TripList.getSharedList().getFromServer();
-        }
-    }
-    */
-
-
     private void updateListView() {
         //Log.d("TripsActivity", "updateListView");
         runOnUiThread(new Runnable() {
@@ -318,7 +290,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Log.d("TripsAct.HandleNotif", "onReceive");
+            //Log.d("TripsActivity", "HandleNotification onReceive, intent action = " + intent.getAction());
             if (intent.getAction().equals(Constants.Notification.LOGON_SUCCEEDED)) {
                 loadTrips(false);
             } else if (intent.getAction().equals(Constants.Notification.TRIPS_LOADED)) {

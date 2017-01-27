@@ -64,7 +64,7 @@
     <string name="label_hotel_transfer_info">Transfer-information</string>
 
     <!-- Event details screen -->
-    <string name="title_event_details">Arrangemangsdetaljer</string>
+    <string name="title_event_details">Evenemangsdetaljer</string>
     <string name="title_event_details_rstdnr">Restaurangdetaljer</string>
     <string name="label_event_venue">Plats</string>
     <string name="label_event_start">Start</string>
@@ -184,6 +184,7 @@
     <string name="NTF.INSERT.ADDRESS">%1$s: Adressinformation uppdaterad</string>
     <string name="NTF.INSERT.BOOKING">%1$s: Ny bokning lagd till</string>
     <string name="NTF.INSERT.BOOKINGREF">%1$s: Ny bokningsreferens lagd till</string>
+    <string name="NTF.INSERT.EVENT">%1$s: Nytt evenemang lagd till</string>
     <string name="NTF.INSERT.HOTEL">%1$s: Ny hotellbokning lagd till</string>
     <string name="NTF.INSERT.ITINERARY">%1$s: Resrutt uppdaterad</string>
     <string name="NTF.INSERT.TRIP">%1$s: Ny resa lagd till</string>
@@ -192,6 +193,7 @@
     <string name="NTF.UPDATE.ADDRESS">%1$s: Adressinformation uppdaterad</string>
     <string name="NTF.UPDATE.BOOKING">%1$s: Bokning uppdaterad</string>
     <string name="NTF.UPDATE.BOOKINGREF">%1$s: Bokningsreferens uppdaterad</string>
+    <string name="NTF.UPDATE.EVENT">%1$s: Evenemang uppdaterad</string>
     <string name="NTF.UPDATE.HOTEL">%1$s: Hotellbokning uppdaterad</string>
     <string name="NTF.UPDATE.ITINERARY">%1$s: Resrutt uppdaterad</string>
     <string name="NTF.UPDATE.TRIP">%1$s: Resa uppdaterad</string>
@@ -200,6 +202,7 @@
     <string name="NTF.DELETE.ADDRESS">%1$s: Adressinformation uppdaterad</string>
     <string name="NTF.DELETE.BOOKING">%1$s: Bokning borttagen</string>
     <string name="NTF.DELETE.BOOKINGREF">%1$s: Bokningsreferens borttagen</string>
+    <string name="NTF.DELETE.EVENT">%1$s: Evenemang inställd</string>
     <string name="NTF.DELETE.HOTEL">%1$s: Hotellbokning borttagen</string>
     <string name="NTF.DELETE.ITINERARY">%1$s: Resrutt uppdaterad</string>
     <string name="NTF.DELETE.TRIP">%1$s: Resa uppdaterad</string>
