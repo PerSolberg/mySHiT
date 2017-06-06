@@ -3,7 +3,8 @@ package no.shitt.myshit.model;
 public enum Tense {
     PAST    ("past"),
     PRESENT ("present"),
-    FUTURE  ("future");
+    FUTURE  ("future"),
+    UNKNOWN ("unknown");
 
     private final String rawValue;
     Tense(String rawValue) {

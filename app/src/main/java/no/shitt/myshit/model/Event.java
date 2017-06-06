@@ -184,60 +184,34 @@ public class Event extends TripElement {
 
     @Override
     public void setNotification() {
-        if (getStartTime() == null) {
-            return;
-        } else if (getTense() != Tense.FUTURE) {
-            return;
-        }
+        // New, simplified version
+        // First delete any existing notifications for this trip element (not needed in Android?)
+        //cancelNotifications();
 
-        //String code = tripCode; //trip.trip.code;
-        //Log.d("GenericTransport", "Setting notification for trip element " + tripCode + ":" + Integer.toString(id));
+        // Set notification (if we have a start time)
+        if (getTense() == Tense.FUTURE) {
+            Context ctx = SHiTApplication.getContext();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-        Context ctx = SHiTApplication.getContext();
-
-        // Get lead time from preferences
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-
-        int leadTimeEventMinutes;
-        try {
-            String leadTimeDeparture = sharedPref.getString("pref_alertLeadTime_event", "");
-            leadTimeEventMinutes = Integer.valueOf(leadTimeDeparture);
-        }
-        catch (Exception e) {
-            leadTimeEventMinutes = -1;
-        }
-
-        // Set up information to be passed to AlarmReceiver/SchedulingService
-        Bundle extras = new Bundle();
-        extras.putString(SchedulingService.KEY_TRIP_CODE, tripCode);
-        extras.putInt(SchedulingService.KEY_ELEMENT_ID, id);
-        extras.putString(SchedulingService.KEY_TITLE, getTitle());
-
-        //AlarmReceiver alarm = new AlarmReceiver();
-        Calendar now = Calendar.getInstance();
-        //alarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://test.shitt.no/element/" + tripCode + "/" + Integer.toString(id)), extras);
-
-        if (leadTimeEventMinutes > 0) {
-            Calendar alarmTime = Calendar.getInstance();
-            alarmTime.setTime(getStartTime());
-            alarmTime.add(Calendar.MINUTE, -leadTimeEventMinutes);
-
-            if (travelTime != TRAVEL_TIME_UNKNOWN) {
-                alarmTime.add(Calendar.MINUTE, -travelTime);
+            int leadTimeEventMinutes = sharedPref.getInt(Constants.Setting.ALERT_LEAD_TIME_EVENT, LEAD_TIME_MISSING);
+            /*
+            try {
+                String leadTimeDeparture = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_EVENT, "");
+                leadTimeEventMinutes = Integer.valueOf(leadTimeDeparture);
             }
+            catch (Exception e) {
+                leadTimeEventMinutes = -1;
+            } */
 
-            // If we're already past the warning time, set a notification for right now instead
-            if (alarmTime.before(now)) {
-                alarmTime = now;
+            if (leadTimeEventMinutes != LEAD_TIME_MISSING) {
+                if (travelTime > 0) {
+                    leadTimeEventMinutes += travelTime;
+                }
+
+                //setNotification(notificationType: Constant.Settings.eventLeadTime, leadTime: eventLeadtime, alertMessage: genericAlertMessage, userInfo: nil)
+                setNotification(Constants.Setting.ALERT_LEAD_TIME_EVENT, leadTimeEventMinutes, R.string.alert_msg_event, null);
             }
-
-            //int actualLeadTime = alarmTime.compareTo(now);
-            long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
-            String leadTimeText = ServerDate.formatInterval(actualLeadTime);
-            extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_event, leadTimeText, startTime(null, DateFormat.SHORT)));
-
-            AlarmReceiver departureAlarm = new AlarmReceiver();
-            departureAlarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/event/" + tripCode + "/" + Integer.toString(id)), extras);
         }
     }
+
 }

@@ -28,6 +28,7 @@
     <!--string name="error_invalid_password">This password is too short</string-->
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_unauthorised">Username or password is incorrect.</string>
 
     <!-- Flight details screen -->
     <string name="title_flight_details">Flight details</string>

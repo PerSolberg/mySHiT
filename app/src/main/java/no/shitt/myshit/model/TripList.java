@@ -112,6 +112,7 @@ public class TripList implements ServerAPIListener, JSONable {
                         // Keep modification flag from old version
                         newTrip.modified = oldTrip.modified;
                     }*/
+                    newTrip.trip.copyState(oldTrip.trip);
                 }
             }
             

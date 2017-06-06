@@ -61,6 +61,17 @@ public class ServerDate {
         }
     }
 
+    public static String convertServerDate (Date localDate, String timeZoneName) {
+        if (timeZoneName != null) {
+            TimeZone timezone = TimeZone.getTimeZone(timeZoneName);
+            dateFormatter.setTimeZone(timezone);
+        }
+        //let locale = Locale(identifier: "en_US_POSIX");
+        dateFormatter.applyPattern("yyyy-MM-dd HH:mm:ss");
+        //dateFormatter.locale = locale;
+        return dateFormatter.format(localDate);
+    }
+
     public static String formatInterval(long intervalInMillis) {
         long days = intervalInMillis / DateUtils.DAY_IN_MILLIS;
         long hours = (intervalInMillis % DateUtils.DAY_IN_MILLIS) / DateUtils.HOUR_IN_MILLIS;

@@ -1,12 +1,17 @@
 package no.shitt.myshit.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,9 +21,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.JSONable;
+import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
 public class TripElement implements JSONable {
@@ -26,6 +35,9 @@ public class TripElement implements JSONable {
     public String subType;
     public int id;
     public List<Map<String,String>> references;
+
+    // Notifications created for this element (used to avoid recreating notifications after they have been triggered)
+    private Map<String,NotificationInfo> notifications;
 
     public String tripCode;
     private int    tripId;
@@ -36,6 +48,10 @@ public class TripElement implements JSONable {
     public static final String REFTAG_LOOKUP_URL   = "urlLookup";
 
     private static final String iconBaseName = "icon_tripelement_";
+
+    // Minutes between notifications for same trip element (in milliseconds)
+    private static final int MINIMUM_NOTIFICATION_SEPARATION = 10 * 60 * 1000;
+    protected static final int LEAD_TIME_MISSING = -1;
 
     public Date getStartTime() {
         return null;
@@ -83,7 +99,7 @@ public class TripElement implements JSONable {
                 return Tense.PRESENT;
             }
         } else {
-            return Tense.FUTURE;
+            return null; // Tense.FUTURE;
         }
     }
 
@@ -137,6 +153,8 @@ public class TripElement implements JSONable {
         if (elemType.equals("TRA") && elemSubType.equals("AIR")) {
             elem = new Flight(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA") && elemSubType.equals("BUS")) {
+            elem = new ScheduledTransport(tripId, tripCode, elementData);
+        } else if (elemType.equals("TRA") && elemSubType.equals("TRN")) {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA")) {
             elem = new GenericTransport(tripId, tripCode, elementData);
@@ -262,4 +280,84 @@ public class TripElement implements JSONable {
         // Subclasses that support notifications must override this method
     }
 
+    void setNotification(String notificationType, int leadTime, int alertMessageId, /*Map<String,Object>*/ Bundle userInfo) {
+        // Logic starts here
+        NotificationInfo oldInfo = notifications.get(notificationType);  //TODO: Check what happens if key doesn't exist
+        NotificationInfo newInfo = new NotificationInfo(getStartTime(), leadTime);
+
+        if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {
+            boolean combined = false;
+
+            Log.d("TripElement", "Setting " + notificationType + " notification for trip element " + id + " at " + newInfo.getNotificationDate());
+
+            Bundle extras = new Bundle();
+            //Map<String,Object> actualUserInfo = new HashMap<>();
+            if (userInfo != null) {
+                extras.putAll(userInfo);
+            }
+            extras.putString(Constants.NotificationUserInfo.LEAD_TIME_TYPE, notificationType);
+            extras.putInt(Constants.NotificationUserInfo.TRIP_ELEMENT_ID, id);
+            if (getStartTimeZone() != null) {
+                extras.putString(Constants.NotificationUserInfo.TIMEZONE, getStartTimeZone());
+            }
+
+            for (String nType : notifications.keySet()) {
+                if (!nType.equals(notificationType)) {
+                    NotificationInfo n = notifications.get(nType);
+                    if (n.getNotificationDate().before(newInfo.getNotificationDate())
+                            && (newInfo.getNotificationDate().getTime() - n.getNotificationDate().getTime()) < TripElement.MINIMUM_NOTIFICATION_SEPARATION) {
+                        newInfo.combine(n);
+                        combined = true;
+                    }
+                }
+            }
+
+            if (!combined) {
+                // iOS
+                // notification.soundName = UILocalNotificationDefaultSoundName
+                // notification.userInfo = actualUserInfo
+
+                Context ctx = SHiTApplication.getContext();
+                Calendar alarmTime = Calendar.getInstance();
+                alarmTime.setTime(newInfo.getNotificationDate());
+
+                // Set up information to be passed to AlarmReceiver/SchedulingService
+                extras.putString(SchedulingService.KEY_TRIP_CODE, tripCode);
+                extras.putInt(SchedulingService.KEY_ELEMENT_ID, id);
+                extras.putString(SchedulingService.KEY_TITLE, getTitle());
+                //extras.putAll(actualUserInfo);
+
+                long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
+                String leadTimeText = ServerDate.formatInterval(actualLeadTime);
+
+                // Set up message based on alertMessage parameter
+                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(null, DateFormat.SHORT)));
+
+                AlarmReceiver alarm = new AlarmReceiver();
+                alarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/" + notificationType + "/" + tripCode + "/" + Integer.toString(id)), extras);
+            } else {
+                Log.d("TripElement", "Not setting " + notificationType + " notification for trip element " + id + " combined with other notification");
+            }
+
+            notifications.put(notificationType, newInfo);
+        } else {
+            Log.d("TripElement", "Not refreshing " + notificationType + " notification for trip element " + id + ", already triggered");
+        }
+
+    }
+
+
+    /* Don't need to cancel notifications on Android (I think...)
+    void cancelNotifications() {
+        for notification in UIApplication.shared.scheduledLocalNotifications! as [UILocalNotification] {
+            if (notification.userInfo![Constant.notificationUserInfo.tripElementId] as? Int == id) {
+                UIApplication.shared.cancelLocalNotification(notification)
+            }
+        }
+    }
+    */
+
+    void copyState(TripElement fromElement) {
+        this.notifications = fromElement.notifications;
+    }
 }

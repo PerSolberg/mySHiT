@@ -1,16 +1,19 @@
 package no.shitt.myshit.model;
 
 
+import android.accounts.AuthenticatorException;
 import android.content.Context;
 import android.content.Intent;
 //import android.content.SharedPreferences;
 //import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 //import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
 //import org.json.JSONException;
+import org.apache.http.auth.AuthenticationException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -24,6 +27,7 @@ import java.net.URLEncoder;
 //import java.util.regex.Pattern;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerAPI;
 import no.shitt.myshit.helper.ServerAPIListener;
@@ -38,6 +42,8 @@ public class User implements ServerAPIListener {
     private String password;
     private String srvCommonName;
     private String srvFullName;
+    private String srvInitials;
+    private String srvShortName;
     private int id = USER_ID_UNKNOWN;
 
     // Saving parameters, so user name and password can be retrieved when service call completes
@@ -49,6 +55,8 @@ public class User implements ServerAPIListener {
     //public static final String JSON_USER_LAST_NAME = "lastName";
     private static final String JSON_USER_FULL_NAME = "fullName";
     private static final String JSON_USER_COMMON_NAME = "commonName";
+    private static final String JSON_USER_SHORT_NAME = "shortName";
+    private static final String JSON_USER_INITIALS = "initials";
     private static final String JSON_USER_ID = "userId";
     //public static final String JSON_USER_FILE_SUFFIX = "fileSuffix";
     //public static final String JSON_USER_DATA_VER_ID = "dataVersionId";
@@ -106,32 +114,19 @@ public class User implements ServerAPIListener {
     private void setUserName(String newName) {
         userName = newName;
         if (newName == null) {
-            //try {
-                SHiTApplication.getContext().deleteFile(Constants.CRED_U_FILE);
-            //}
+            srvShortName = null;
+            srvCommonName = null;
+            srvFullName = null;
+            srvInitials = null;
+            SHiTApplication.getContext().deleteFile(Constants.CRED_U_FILE);
         } else {
             saveUserName();
-            /*
-            try {
-                FileOutputStream fos = SHiTApplication.getContext().openFileOutput(Constants.CRED_U_FILE, Context.MODE_PRIVATE);
-                String fileData = Integer.toString(id) + ID_USER_SEP + newName;
-                Log.d("User", "Saved user data '" + fileData + "'");
-                fos.write(fileData.getBytes());
-                fos.close();
-
-                //Log.d("User", "U saved to file");
-            } catch (IOException ioe) {
-                //Log.e("User", "Failed to save U due to IO error...");
-            }
-            */
         }
     }
 
     private void saveUserName() {
         if (userName == null) {
-            //try {
             SHiTApplication.getContext().deleteFile(Constants.CRED_U_FILE);
-            //}
         } else {
             try {
                 FileOutputStream fos = SHiTApplication.getContext().openFileOutput(Constants.CRED_U_FILE, Context.MODE_PRIVATE);
@@ -194,12 +189,22 @@ public class User implements ServerAPIListener {
         }
     }
 
+    public int getId() { return id; }
+
     public String getCommonName() {
         return srvCommonName;
     }
 
     public String getFullName() {
         return srvFullName;
+    }
+
+    public String getInitials() {
+        return srvInitials;
+    }
+
+    public String getShortName() {
+        return srvShortName;
     }
 
     public boolean hasCredentials() {
@@ -220,12 +225,14 @@ public class User implements ServerAPIListener {
     }
 
     public void logon(String userName, String password) {
+        /*
         try {
            String urlSafePassword = URLEncoder.encode(password, Constants.URL_ENCODE_CHARSET);
         }
         catch (UnsupportedEncodingException uee) {
             throw new RuntimeException(uee.getMessage());
         }
+        */
 
         serverParams = new ServerAPIParams(ServerAPI.URL_USER_VERIFY);
         serverParams.addParameter(ServerAPI.PARAM_USER_NAME, userName);
@@ -242,6 +249,8 @@ public class User implements ServerAPIListener {
 
             srvCommonName = response.isNull(User.JSON_USER_COMMON_NAME) ? null : response.optString(User.JSON_USER_COMMON_NAME);
             srvFullName = response.isNull(User.JSON_USER_FULL_NAME) ? null : response.optString(User.JSON_USER_FULL_NAME);
+            srvShortName = response.isNull(User.JSON_USER_SHORT_NAME) ? null : response.optString(User.JSON_USER_SHORT_NAME);
+            srvInitials = response.isNull(User.JSON_USER_INITIALS) ? null : response.optString(User.JSON_USER_INITIALS);
             id = response.isNull(User.JSON_USER_ID) ? USER_ID_UNKNOWN : response.optInt(User.JSON_USER_ID);
 
             saveUserName();
@@ -253,10 +262,14 @@ public class User implements ServerAPIListener {
             //intent.putExtra("message", "SHiT trips loaded");
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
         } else {
+            //TODO: Remove this
+            Log.d("User","Old authentication failure invoked - FIX!");
+            /*
             //Log.d("User", "User authentication failed");
             Intent intent = new Intent(Constants.Notification.LOGON_UNAUTHORISED);
             intent.putExtra("message", response.optString(User.JSON_ERROR));
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+            */
         }
     }
 
@@ -269,10 +282,18 @@ public class User implements ServerAPIListener {
 
 
     public void onRemoteCallFailed(Exception e) {
-        //Log.d("User", "User authentication call failed with exception");
-        Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
-        intent.putExtra("message", e.getMessage());
-        LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+        if (e instanceof AuthenticatorException) {
+            //Log.d("User", "User authentication failed");
+            Context ctx = SHiTApplication.getContext();
+            Intent intent = new Intent(Constants.Notification.LOGON_UNAUTHORISED);
+            intent.putExtra("message", ctx.getString(R.string.error_unauthorised));
+            LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+        } else {
+            //Log.d("User", "User authentication call failed with exception");
+            Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
+            intent.putExtra("message", e.getMessage());
+            LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+        }
     }
 
     private void registerForPushNotifications() {

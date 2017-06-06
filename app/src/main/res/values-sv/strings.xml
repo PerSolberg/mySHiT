@@ -28,6 +28,7 @@
     <!--string name="error_invalid_password">This password is too short</string-->
     <string name="error_incorrect_password">Lösenordet är fel</string>
     <string name="error_field_required">Fältet är obligatoriskt</string>
+    <string name="error_unauthorised">E-post eller lösenord är fel.</string>
 
     <!-- Flight details screen -->
     <string name="title_flight_details">Flight-detaljer</string>

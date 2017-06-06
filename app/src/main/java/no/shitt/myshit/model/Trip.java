@@ -14,15 +14,18 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 //import java.text.DateFormat;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,8 +55,16 @@ public class Trip implements ServerAPIListener, JSONable {
     public String name;
     public String type;
     public List<AnnotatedTripElement> elements;
+    //TODO: Chat support
+    //var chatThread:ChatThread!
+
+    // Notifications created for this element (used to avoid recreating notifications after they have been triggered)
+    private Map<String,NotificationInfo> notifications;
 
     private final static String iconBaseName = "icon_trip_";
+    // Minutes between notifications for same trip element (in milliseconds)
+    private static final int MINIMUM_NOTIFICATION_SEPARATION = 10 * 60 * 1000;
+    private static final int LEAD_TIME_MISSING = -1;
 
 
     public Date getStartTime() {
@@ -77,12 +88,7 @@ public class Trip implements ServerAPIListener, JSONable {
 
     public String getDateInfo() {
         Context ctx = SHiTApplication.getContext();
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
-        //dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-        //dateFormatter.timeStyle = NSDateFormatterStyle.NoStyle
-
         return DateUtils.formatDateRange(ctx, startDate.getTime(), endDate.getTime(), DateUtils.FORMAT_SHOW_DATE + DateUtils.FORMAT_ABBREV_MONTH);
-        //return dateFormatter.format(startDate) + " - " + dateFormatter.format(endDate);
     }
 
     public String getDetailInfo() {
@@ -160,8 +166,6 @@ public class Trip implements ServerAPIListener, JSONable {
 
     // MARK: Factory
     private static Trip createFromDictionary( JSONObject elementData, boolean fromServer ) {
-        //let tripType = elementData["type"] as? String ?? ""
-
         return new Trip(elementData, fromServer);
     }
 
@@ -181,13 +185,27 @@ public class Trip implements ServerAPIListener, JSONable {
 
         JSONArray jate = new JSONArray();
         if (elements != null) {
-            Iterator i = elements.iterator();
+            for (AnnotatedTripElement ate : elements) {
+                jate.put(ate.toJSON());
+            }
+            /* Iterator i = elements.iterator();
             while (i.hasNext()) {
                 AnnotatedTripElement ate = (AnnotatedTripElement) i.next();
                 jate.put(ate.toJSON());
-            }
+            } */
         }
         jo.put(Constants.JSON.TRIP_ELEMENTS, jate);
+
+        JSONObject jani = new JSONObject();
+        if (notifications != null) {
+            for (String niKey : notifications.keySet()) {
+                NotificationInfo ni = (NotificationInfo) notifications.get(niKey);
+                jani.put(niKey, ni.toJSON());
+            }
+        }
+        jo.put(Constants.JSON.TRIP_NOTIFICATIONS, jani);
+
+        //TODO: Chat support
 
         return jo;
     }
@@ -221,6 +239,18 @@ public class Trip implements ServerAPIListener, JSONable {
             }
         }
 
+        JSONObject tripNotifications = elementData.optJSONObject(Constants.JSON.TRIP_NOTIFICATIONS);
+        if (tripNotifications != null) {
+            notifications = new HashMap<>();
+            for (Iterator<String> ntfTypes = tripNotifications.keys(); ntfTypes.hasNext();) {
+                String ntfType = ntfTypes.next();
+                JSONObject ntfJSON = tripNotifications.optJSONObject(ntfType);
+                NotificationInfo ntf = new NotificationInfo(ntfJSON);
+                notifications.put(ntfType, ntf);
+            }
+        }
+
+        //TODO: Chat support
         setNotification();
         registerForPushNotifications();
     }
@@ -326,70 +356,93 @@ public class Trip implements ServerAPIListener, JSONable {
             return null;
     }
 
+    private void setNotification(String notificationType, int leadTime, int alertMessageId, /*Map<String,Object>*/ Bundle userInfo) {
+        // Logic starts here
+        NotificationInfo oldInfo = notifications.get(notificationType);  //TODO: Check what happens if key doesn't exist
+        NotificationInfo newInfo = new NotificationInfo(getStartTime(), leadTime);
 
-    private void setNotification() {
-        Context ctx = SHiTApplication.getContext();
-        // TO DO...
-        if (getStartTime() == null) {
-            //Log.d("Trip", "Not setting notification for trip " + code + " without start time");
-            return;
-        } else if (getTense() != Tense.FUTURE) {
-            //Log.d("Trip", "Not setting notification for historic (or started) trip " + code);
-            return;
-        }
-        //Log.d("Trip", "Setting notification for trip " + code);
+        if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {
+            boolean combined = false;
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-        int leadTimeTripHours;
-        try {
-            String leadTimeTrip = sharedPref.getString("pref_alertLeadTime_trip" /*SettingsActivity.KEY_PREF_SYNC_CONN*/, "");
-            leadTimeTripHours = Integer.valueOf(leadTimeTrip);
-        }
-        catch (Exception e) {
-            leadTimeTripHours = -1;
-        }
+            Log.d("Trip", "Setting " + notificationType + " notification for trip " + id + " at " + newInfo.getNotificationDate());
 
-        // For testing...
-        //alarmcounter++;
-        //Date alarmTime = new Date();
-        //calendar.setTimeInMillis(System.currentTimeMillis());
-        //alarmTime.add(Calendar.SECOND, (alarmcounter % 10) * 20);
-
-        Bundle extras = new Bundle();
-        extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_trip, "?? minutes", startTime(DateUtils.FORMAT_SHOW_TIME)));
-        extras.putString(SchedulingService.KEY_TRIP_CODE, code);
-        extras.putString(SchedulingService.KEY_TITLE, getTitle());
-
-        //AlarmReceiver alarm = new AlarmReceiver();
-        //alarm.setAlarm(calendar.getTime(), Uri.parse("alarm://test.shitt.no/trip/" + code), extras);
-
-        Calendar now = Calendar.getInstance();
-
-        if (leadTimeTripHours > 0) {
-            Calendar alarmTime = Calendar.getInstance();
-            alarmTime.setTime(getStartTime());
-            alarmTime.add(Calendar.HOUR, -leadTimeTripHours);
-
-            // If we're already past the warning time, set a notification for right now instead
-            if (alarmTime.before(now)) {
-                alarmTime = now;
+            Bundle extras = new Bundle();
+            //Map<String,Object> actualUserInfo = new HashMap<>();
+            if (userInfo != null) {
+                extras.putAll(userInfo);
+            }
+            extras.putString(Constants.NotificationUserInfo.LEAD_TIME_TYPE, notificationType);
+            extras.putInt(Constants.NotificationUserInfo.TRIP_ID, id);
+            if (getStartTimeZone() != null) {
+                extras.putString(Constants.NotificationUserInfo.TIMEZONE, getStartTimeZone());
             }
 
-            long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis(); // alarmTime.compareTo(now);
-            String leadTimeText = ServerDate.formatInterval(actualLeadTime);
-            extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(R.string.alert_msg_travel, leadTimeText, startTime(DateUtils.FORMAT_SHOW_TIME)));
+            for (String nType : notifications.keySet()) {
+                if (!nType.equals(notificationType)) {
+                    NotificationInfo n = notifications.get(nType);
+                    if (n.getNotificationDate().before(newInfo.getNotificationDate())
+                            && (newInfo.getNotificationDate().getTime() - n.getNotificationDate().getTime()) < Trip.MINIMUM_NOTIFICATION_SEPARATION) {
+                        newInfo.combine(n);
+                        combined = true;
+                    }
+                }
+            }
 
-            AlarmReceiver tripAlarm = new AlarmReceiver();
-            tripAlarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/trip/" + code), extras);
+            if (!combined) {
+                // iOS
+                // notification.soundName = UILocalNotificationDefaultSoundName
+                // notification.userInfo = actualUserInfo
+
+                Context ctx = SHiTApplication.getContext();
+                Calendar alarmTime = Calendar.getInstance();
+                alarmTime.setTime(newInfo.getNotificationDate());
+
+                // Set up information to be passed to AlarmReceiver/SchedulingService
+                extras.putString(SchedulingService.KEY_TRIP_CODE, code);
+                extras.putString(SchedulingService.KEY_TITLE, getTitle());
+
+                //extras.putAll(actualUserInfo);
+
+                long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
+                //String leadTimeText = ServerDate.formatInterval(actualLeadTime);
+
+                // Set up message based on alertMessage parameter
+                // TripElement:extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(null, DateFormat.SHORT)));
+                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, "?? minutes", startTime(DateUtils.FORMAT_SHOW_TIME)));
+
+                AlarmReceiver alarm = new AlarmReceiver();
+                alarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/" + notificationType + "/" + code + "/" + Integer.toString(id)), extras);
+            } else {
+                Log.d("Trip", "Not setting " + notificationType + " notification for trip " + id + " combined with other notification");
+            }
+
+            notifications.put(notificationType, newInfo);
+        } else {
+            Log.d("Trip", "Not refreshing " + notificationType + " notification for trip  " + id + ", already triggered");
+        }
+    }
+
+    public void setNotification() {
+        // First delete any existing notifications for this trip element (either one or two)
+        //cancelNotifications();
+
+        // Set notification(s) (if we have a start date)
+        if (getTense() == Tense.FUTURE) {
+            Context ctx = SHiTApplication.getContext();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+
+            int leadTimeTripHours = sharedPref.getInt(Constants.Setting.ALERT_LEAR_TIME_TRIP, LEAD_TIME_MISSING);
+
+            if (leadTimeTripHours != LEAD_TIME_MISSING) {
+                setNotification(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, leadTimeTripHours * 60, R.string.alert_msg_travel, null);
+            }
         }
     }
 
     public void onRemoteCallComplete(JSONObject response) {
         //Log.d("Trip", "Trip details retrieved");
         int count = response.optInt(Constants.JSON.QUERY_COUNT, -1);
-        if (count != 1) {
-            //Log.e("Trip", "loadDetails returned " + Integer.toString(count) + " elements, expected 1.");
-        } else {
+        if (count == 1) {
             JSONArray results = response.optJSONArray(Constants.JSON.QUERY_RESULTS);
             JSONObject serverData = null;
             Trip newTrip = null;
@@ -445,6 +498,11 @@ public class Trip implements ServerAPIListener, JSONable {
         }
     }
 
+    //TODO: Chat support
+    //func refreshMessages() {
+    //    chatThread.refresh(mode:.full)
+    //}
+
     private void registerForPushNotifications() {
         String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
         //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicTrip);
@@ -478,5 +536,20 @@ public class Trip implements ServerAPIListener, JSONable {
         params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
 
         new ServerAPI(this).execute(params);
+    }
+
+    void copyState(Trip fromTrip) {
+        this.notifications = fromTrip.notifications;
+        //chatThread = from.chatThread
+
+        // Copy state for all elements
+        if (this.elements != null && fromTrip.elements != null) {
+            for (AnnotatedTripElement newElement: elements) {
+                AnnotatedTripElement oldElement = fromTrip.elementById(newElement.tripElement.id);
+                if (oldElement != null) {
+                    newElement.tripElement.copyState(oldElement.tripElement);
+                }
+            }
+        }
     }
 }

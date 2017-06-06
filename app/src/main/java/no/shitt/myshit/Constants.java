@@ -8,6 +8,7 @@ public class Constants {
     public static final String LOCAL_ARCHIVE_FILE = "SHiT-trips.json";
 
     public static final String URL_ENCODE_CHARSET = "utf-8";
+    public static final String DEVICE_TYPE        = "Android";
 
     public class Notification {
         public static final String LOGON_FAILED           = "logonFailed";
@@ -16,15 +17,30 @@ public class Constants {
 
         public static final String TRIPS_LOADED           = "tripsLoaded";
         public static final String TRIP_DETAILS_LOADED    = "tripDetailsLoaded";
+        public static final String CHAT_UPDATED           = "chatUpdated";
         public static final String COMMUNICATION_FAILED   = "communicationError";
+    }
+
+    public class NotificationUserInfo {
+        public static final String TRIP_ID = "TripID";
+        public static final String TRIP_ELEMENT_ID = "TripElementID";
+        public static final String TIMEZONE = "TimeZone";
+        public static final String LEAD_TIME_TYPE = "leadTimeType";
     }
 
     public class PushNotification {
         //private static final String TOPIC_ROOT             = "/topics";
-        public  static final String TOPIC_ROOT_USER        = "U-";
-        public  static final String TOPIC_ROOT_ITINERARY   = "I-";
-        public  static final String TOPIC_ROOT_TRIP        = "T-";
-        public  static final String TOPIC_GLOBAL           = "GLOBAL";
+        public static final String TOPIC_ROOT_USER        = "U-";
+        public static final String TOPIC_ROOT_ITINERARY   = "I-";
+        public static final String TOPIC_ROOT_TRIP        = "T-";
+        public static final String TOPIC_GLOBAL           = "GLOBAL";
+    }
+
+    public class Setting {
+        public static final String ALERT_LEAD_TIME_DEPARTURE     = "pref_alertLeadTime_departure";
+        public static final String ALERT_LEAD_TIME_CONNECTION    = "pref_alertLeadTime_connection";
+        public static final String ALERT_LEAD_TIME_EVENT         = "pref_alertLeadTime_event";
+        public static final String ALERT_LEAR_TIME_TRIP          = "pref_alertLeadTime_trip";
     }
 
     public class IntentExtra {
@@ -60,6 +76,7 @@ public class Constants {
         public static final String TRIP_SECTION            = "section";
         public static final String TRIP_TYPE               = "type";
         public static final String TRIP_ELEMENTS           = "elements";
+        public static final String TRIP_NOTIFICATIONS      = "notifications";
 
         public static final String ELEM_TYPE               = "type";
         public static final String ELEM_SUB_TYPE           = "subType";
@@ -107,6 +124,23 @@ public class Constants {
         public static final String ELEM_EVENT_VENUE_POST_CODE  = "venuePostCode";
         public static final String ELEM_EVENT_VENUE_PHONE      = "venuePhone";
         public static final String ELEM_EVENT_ACCESS_INFO      = "accessInfo";
+
+        public static final String CHAT_MESSAGES               = "messages";
+
+        public static final String CHATMSG_ID                  = "id";
+        public static final String CHATMSG_USER_ID             = "userId";
+        public static final String CHATMSG_USER_NAME           = "userName";
+        public static final String CHATMSG_USER_INIT           = "userInitials";
+        public static final String CHATMSG_DEVICE_TYPE         = "deviceType";
+        public static final String CHATMSG_DEVICE_ID           = "deviceId";
+        public static final String CHATMSG_LOCAL_ID            = "localId";
+        public static final String CHATMSG_MESSAGE_TEXT        = "messageText";
+        public static final String CHATMSG_STORED_TS           = "storedTimestamp";
+        public static final String CHATMSG_CREATED_TS          = "createdTimestamp";
+
+        public static final String NTFINFO_BASE_DATE           = "baseDate";
+        public static final String NTFINFO_NOTIFICATION_DATE   = "notificationDate";
+        public static final String NTFINFO_LEAD_TIME           = "leadTime";
 
     }
 }
