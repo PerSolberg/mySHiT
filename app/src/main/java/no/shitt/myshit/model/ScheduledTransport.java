@@ -76,7 +76,7 @@ public class ScheduledTransport extends GenericTransport {
             Context ctx = SHiTApplication.getContext();
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-            int leadTimeDepartureMinutes = sharedPref.getInt(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, LEAD_TIME_MISSING);
+            int leadTimeDepartureMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, LEAD_TIME_MISSING);
             /* try {
                 String leadTimeDeparture = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, "");
                 leadTimeDepartureMinutes = Integer.valueOf(leadTimeDeparture);
@@ -85,7 +85,7 @@ public class ScheduledTransport extends GenericTransport {
                 leadTimeDepartureMinutes = -1;
             } */
 
-            int leadTimeConnectionMinutes = sharedPref.getInt(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, LEAD_TIME_MISSING);
+            int leadTimeConnectionMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, LEAD_TIME_MISSING);
             /* try {
                 String leadtimeConnection = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, "");
                 leadTimeConnectionMinutes = Integer.valueOf(leadtimeConnection);

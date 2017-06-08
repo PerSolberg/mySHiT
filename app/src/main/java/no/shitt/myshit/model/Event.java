@@ -193,7 +193,7 @@ public class Event extends TripElement {
             Context ctx = SHiTApplication.getContext();
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-            int leadTimeEventMinutes = sharedPref.getInt(Constants.Setting.ALERT_LEAD_TIME_EVENT, LEAD_TIME_MISSING);
+            int leadTimeEventMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_EVENT, LEAD_TIME_MISSING);
             /*
             try {
                 String leadTimeDeparture = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_EVENT, "");

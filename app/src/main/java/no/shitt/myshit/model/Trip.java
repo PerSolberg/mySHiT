@@ -239,9 +239,9 @@ public class Trip implements ServerAPIListener, JSONable {
             }
         }
 
+        notifications = new HashMap<>();
         JSONObject tripNotifications = elementData.optJSONObject(Constants.JSON.TRIP_NOTIFICATIONS);
         if (tripNotifications != null) {
-            notifications = new HashMap<>();
             for (Iterator<String> ntfTypes = tripNotifications.keys(); ntfTypes.hasNext();) {
                 String ntfType = ntfTypes.next();
                 JSONObject ntfJSON = tripNotifications.optJSONObject(ntfType);
@@ -431,7 +431,7 @@ public class Trip implements ServerAPIListener, JSONable {
             Context ctx = SHiTApplication.getContext();
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-            int leadTimeTripHours = sharedPref.getInt(Constants.Setting.ALERT_LEAR_TIME_TRIP, LEAD_TIME_MISSING);
+            int leadTimeTripHours = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAR_TIME_TRIP, LEAD_TIME_MISSING);
 
             if (leadTimeTripHours != LEAD_TIME_MISSING) {
                 setNotification(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, leadTimeTripHours * 60, R.string.alert_msg_travel, null);

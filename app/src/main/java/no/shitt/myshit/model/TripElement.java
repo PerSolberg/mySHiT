@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -14,12 +15,14 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
@@ -200,6 +203,7 @@ public class TripElement implements JSONable {
         this.type = type;
         this.subType = subType;
         this.references = references;
+        this.notifications = new HashMap<>();
     }
 
     TripElement(int tripId, String tripCode, JSONObject elementData) {
@@ -227,7 +231,7 @@ public class TripElement implements JSONable {
                 references.add(refData);
             }
         }
-
+        notifications = new HashMap<>();
         serverData = elementData;
     }
 
@@ -282,7 +286,7 @@ public class TripElement implements JSONable {
 
     void setNotification(String notificationType, int leadTime, int alertMessageId, /*Map<String,Object>*/ Bundle userInfo) {
         // Logic starts here
-        NotificationInfo oldInfo = notifications.get(notificationType);  //TODO: Check what happens if key doesn't exist
+        NotificationInfo oldInfo = notifications == null ? null : notifications.get(notificationType);  //TODO: Check what happens if key doesn't exist
         NotificationInfo newInfo = new NotificationInfo(getStartTime(), leadTime);
 
         if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {

@@ -22,11 +22,18 @@ public class ServerDate {
     static final Map<String,String> dateFormats;
     static final SimpleDateFormat dateFormatter = new SimpleDateFormat();
 
+    public static final String ISO_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     static {
         Map<String, String> initMap = new HashMap<>();
         initMap.put("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "yyyy-MM-dd");
         initMap.put("^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$", "yyyy-MM-dd HH:mm:ss");
         initMap.put("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$", "yyyy-MM-dd'T'HH:mm:ss");
+
+        // Shouldn't be necessary but needed to recover from errors due to missing conversion
+        //Mon Jul 03 17:00:00 GMT+02:00 2017
+        initMap.put("^[A-Za-z]{3} [A-Za-z]{3} [0-9]{2}:[0-9]{2}:[0-9]{2} GMT[+-][0-9]{2}:[0-9]{2} [0-9]{4}$", "EEE MMM dd HH:mm:ss z yyyy");
+
         dateFormats = Collections.unmodifiableMap(initMap);
     }
 
@@ -67,7 +74,7 @@ public class ServerDate {
             dateFormatter.setTimeZone(timezone);
         }
         //let locale = Locale(identifier: "en_US_POSIX");
-        dateFormatter.applyPattern("yyyy-MM-dd HH:mm:ss");
+        dateFormatter.applyPattern(ISO_FORMAT);
         //dateFormatter.locale = locale;
         return dateFormatter.format(localDate);
     }

@@ -56,8 +56,8 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //Log.d("TripActivity", "onCreate starting");
-        //Log.d("TripActivity", "onCreate Intent action = " + getIntent().getAction());
+        Log.d("TripActivity", "onCreate starting");
+        Log.d("TripActivity", "onCreate Intent action = " + getIntent().getAction());
 
         if (Constants.DEVELOPER_MODE) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()

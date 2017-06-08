@@ -57,7 +57,7 @@ public class NotificationInfo {
         JSONObject jo = new JSONObject(); // super.toJSON();
 
         jo.putOpt(Constants.JSON.NTFINFO_BASE_DATE, baseDate);
-        jo.putOpt(Constants.JSON.NTFINFO_NOTIFICATION_DATE, notificationDate);
+        jo.putOpt(Constants.JSON.NTFINFO_NOTIFICATION_DATE, ServerDate.convertServerDate(notificationDate, TIMEZONE));
         jo.putOpt(Constants.JSON.NTFINFO_LEAD_TIME, leadTime);
 
         return jo;
