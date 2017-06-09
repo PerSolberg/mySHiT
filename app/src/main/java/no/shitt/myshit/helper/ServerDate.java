@@ -32,7 +32,7 @@ public class ServerDate {
 
         // Shouldn't be necessary but needed to recover from errors due to missing conversion
         //Mon Jul 03 17:00:00 GMT+02:00 2017
-        initMap.put("^[A-Za-z]{3} [A-Za-z]{3} [0-9]{2}:[0-9]{2}:[0-9]{2} GMT[+-][0-9]{2}:[0-9]{2} [0-9]{4}$", "EEE MMM dd HH:mm:ss z yyyy");
+        initMap.put("^[A-Za-z]{3} [A-Za-z]{3} [0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} GMT[-+][0-9]{2}:[0-9]{2} [0-9]{4}$", "EEE MMM dd HH:mm:ss z yyyy");
 
         dateFormats = Collections.unmodifiableMap(initMap);
     }

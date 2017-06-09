@@ -159,6 +159,8 @@ public class TripElement implements JSONable {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA") && elemSubType.equals("TRN")) {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
+        } else if (elemType.equals("TRA") && elemSubType.equals("BOAT")) {
+            elem = new ScheduledTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA")) {
             elem = new GenericTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("ACM")) {

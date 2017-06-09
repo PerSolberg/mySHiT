@@ -110,7 +110,7 @@ public class ScheduledTransportActivity extends AppCompatActivity {
                 }
             }
             catch (Exception e) {
-                //Log.e("SchedTransportAct/get", "Unexpected error: " + e.toString());
+                Log.e("SchedTransportAct/get", "Unexpected error: " + e.toString());
             }
             return null;
         }

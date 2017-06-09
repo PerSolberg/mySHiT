@@ -117,6 +117,10 @@ public class TripDetailsActivity extends AppCompatActivity {
                     i = new Intent(getApplicationContext(), PrivateTransportActivity.class);
                 } else if ("TRA".equals(element.type) && "BUS".equals(element.subType)) {
                     i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
+                } else if ("TRA".equals(element.type) && "TRN".equals(element.subType)) {
+                    i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
+                } else if ("TRA".equals(element.type) && "BOAT".equals(element.subType)) {
+                    i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
                 } else if ("ACM".equals(element.type) && "HTL".equals(element.subType)) {
                     i = new Intent(getApplicationContext(), HotelActivity.class);
                 } else if ("EVT".equals(element.type)) {
