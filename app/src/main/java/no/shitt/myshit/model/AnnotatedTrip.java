@@ -1,20 +1,13 @@
 package no.shitt.myshit.model;
 
-import android.util.Log;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.helper.ServerDate;
 
 public class AnnotatedTrip /* NSObject, NSCoding */ {
-    public TripListSection section;
-    public Trip trip;
+    //private TripListSection section;
+    public final Trip trip;
     public ChangeState modified;
 
     AnnotatedTrip(JSONObject jsonData) {
@@ -37,7 +30,7 @@ public class AnnotatedTrip /* NSObject, NSCoding */ {
         super();
         // Initialize stored properties.
         this.modified = modified;
-        this.section = section;
+        //this.section = section;
         this.trip = trip;
     }
 }

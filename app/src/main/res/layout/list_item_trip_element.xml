@@ -25,6 +25,7 @@
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
+        android:contentDescription="@string/content_element_icon"
         />
 
     <ImageView
@@ -33,6 +34,7 @@
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
+        android:contentDescription="@null"
         />
 
     <!-- Element Title -->

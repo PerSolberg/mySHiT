@@ -1,7 +1,5 @@
 package no.shitt.myshit.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public enum ChangeState {
     NEW("N"),

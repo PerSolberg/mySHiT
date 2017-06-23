@@ -4,7 +4,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="#ffffff">
+    >
+<!--    android:background="#ffffff"
+-->
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/trip_details_toolbar"
@@ -15,6 +17,11 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
+    <android.support.design.widget.TabLayout
+        android:id="@+id/trip_details_tabbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:tabMode="fixed" />
     <!--android.support.design.widget.TabLayout
         android:id="@+id/trip_details_tabbar"
         android:layout_width="match_parent"
@@ -23,7 +30,14 @@
         android:theme="@style/ThemeOverlay.AppCompat.TabBar"
         /-->
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/trip_content"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:background="@android:color/white" />
+
+    <!--android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/trip_details_list_container"
@@ -38,6 +52,6 @@
             android:dividerHeight="1dp"
             android:cacheColorHint="#00000000"/>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.v4.widget.SwipeRefreshLayout-->
 
 </LinearLayout>

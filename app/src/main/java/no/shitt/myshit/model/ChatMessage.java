@@ -1,12 +1,15 @@
 package no.shitt.myshit.model;
 
-/**
- * Created by persolberg on 2017-05-30.
+/*
+ *  ChatMessage
+ *  ---------------------------------------------------------------------------
+ *  Chat message, managed by ChatThread.
+ *
+ *  Created by Per Solberg on 2017-05-30.
  */
 
 import android.content.Intent;
 import android.os.Process;
-import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,38 +27,98 @@ import java.util.List;
 import no.shitt.myshit.BuildConfig;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
-import no.shitt.myshit.helper.ServerAPIListener;
-import no.shitt.myshit.helper.ServerAPIParams;
 import no.shitt.myshit.helper.ServerDate;
 
 
-public class ChatMessage {
-    static class LocalId {
+public class ChatMessage implements JSONable {
+
+    static class LocalId implements JSONable {
         String deviceType;
         String deviceId;
         String localId;
+
+        LocalId () {
+            deviceType = null;
+            deviceId = null;
+            localId = null;
+        }
+
+        LocalId (JSONObject elementData) {
+            this();
+            if (elementData != null) {
+                deviceType = elementData.optString(Constants.JSON.CHATMSG_DEVICE_TYPE);
+                deviceId = elementData.optString(Constants.JSON.CHATMSG_DEVICE_ID);
+                localId = elementData.optString(Constants.JSON.CHATMSG_LOCAL_ID);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null)
+                return false;
+
+            /*
+            if (getClass() != o.getClass())
+                return false;
+
+            LocalId otherId = (LocalId) o;
+            return (this.deviceType.equals(otherId.deviceType)
+                    && this.deviceId.equals(otherId.deviceId)
+                    && this.localId.equals(otherId.localId));
+            */
+            if (getClass() == o.getClass()) {
+                LocalId otherId = (LocalId) o;
+                return (this.deviceType.equals(otherId.deviceType)
+                        && this.deviceId.equals(otherId.deviceId)
+                        && this.localId.equals(otherId.localId));
+            } else if (o.getClass() == ChatMessage.class) {
+                ChatMessage msg = (ChatMessage) o;
+                return equals(msg.localId);
+            }
+            return false;
+        }
+
+        public JSONObject toJSON() throws JSONException {
+            JSONObject jo = new JSONObject();
+
+            jo.putOpt(Constants.JSON.CHATMSG_DEVICE_TYPE, deviceType);
+            jo.putOpt(Constants.JSON.CHATMSG_DEVICE_ID, deviceId);
+            jo.putOpt(Constants.JSON.CHATMSG_LOCAL_ID, localId);
+
+            return jo;
+        }
     }
-    static private String TIMEZONE = "UTC";
-    static private int    ID_NONE  = -1;
+
+    static private final String TIMEZONE = "UTC";
+    static         final int    ID_NONE  = -1;
 
 
     // MARK: Properties
     int     id;
-    int     userId;
-    String  userName;
-    String  userInitials;
-    LocalId localId;
-    String  messageText;
-    Date    storedTimestamp;
-    Date    createdTimestamp;
+    final int     userId;
+    private final String  userName;
+    private final String  userInitials;
+    final LocalId localId;
+    final private String  messageText;
+    private Date    storedTimestamp;
+    private Date    createdTimestamp;
 
     List<String> lastSeenBy;
 
-    private class SaveResponseHandler implements ServerAPIListener {
+    private class SaveResponseHandler implements ServerAPI.Listener {
+        ServerAPI.Listener parentResponseHandler = null;
+
+        SaveResponseHandler(ServerAPI.Listener parentResponseHandler) {
+            this.parentResponseHandler = parentResponseHandler;
+        }
+
         public void onRemoteCallComplete(JSONObject response) {
             //Log.d("ChatMessage.Save", "Message saved");
-            if (response.isNull(Constants.JSON.CHATMSG_ID) || response.isNull(Constants.JSON.CHATMSG_STORED_TS)) {
+            if (!response.isNull(Constants.JSON.CHATMSG_ID) && !response.isNull(Constants.JSON.CHATMSG_STORED_TS)) {
                 id = response.optInt(Constants.JSON.CHATMSG_ID);
 
                 String storedTimestampText = response.isNull(Constants.JSON.CHATMSG_STORED_TS) ? null : response.optString(Constants.JSON.CHATMSG_STORED_TS);
@@ -68,6 +131,10 @@ public class ChatMessage {
             } else {
                 Log.e("ChatMessage.Save", "Incorrect response: " + response.toString());
             }
+
+            if (parentResponseHandler != null) {
+                parentResponseHandler.onRemoteCallComplete(response);
+            }
         }
 
         public void onRemoteCallFailed() {
@@ -75,6 +142,9 @@ public class ChatMessage {
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             //intent.putExtra("message", "SHiT trips loaded");
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+            if (parentResponseHandler != null) {
+                parentResponseHandler.onRemoteCallFailed();
+            }
         }
 
         public void onRemoteCallFailed(Exception e) {
@@ -82,12 +152,24 @@ public class ChatMessage {
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             intent.putExtra("message", e.getMessage());
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+            if (parentResponseHandler != null) {
+                parentResponseHandler.onRemoteCallFailed(e);
+            }
         }
     }
 
-    private class ReadResponseHandler implements ServerAPIListener {
+    private class ReadResponseHandler implements ServerAPI.Listener {
+        ServerAPI.Listener parentResponseHandler = null;
+
+        ReadResponseHandler(ServerAPI.Listener parentResponseHandler) {
+            this.parentResponseHandler = parentResponseHandler;
+        }
+
         public void onRemoteCallComplete(JSONObject response) {
             Log.d("ChatMessage.Read", "Message read status updated");
+            if (parentResponseHandler != null) {
+                parentResponseHandler.onRemoteCallComplete(response);
+            }
         }
 
         public void onRemoteCallFailed() {
@@ -95,6 +177,9 @@ public class ChatMessage {
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             //intent.putExtra("message", "SHiT trips loaded");
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+            if (parentResponseHandler != null) {
+                parentResponseHandler.onRemoteCallFailed();
+            }
         }
 
         public void onRemoteCallFailed(Exception e) {
@@ -102,10 +187,18 @@ public class ChatMessage {
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             intent.putExtra("message", e.getMessage());
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+            if (parentResponseHandler != null) {
+                parentResponseHandler.onRemoteCallFailed(e);
+            }
         }
     }
 
-    public Boolean isStored() {
+    public int getId() { return id; }
+    public int getUserId() { return userId; }
+    public String getUserInitials() { return userInitials; }
+    public String getMessageText() { return messageText; }
+    public List<String> getLastSeenBy() { return lastSeenBy; }
+    Boolean isStored() {
         return id > 0;
     }
 
@@ -138,8 +231,33 @@ public class ChatMessage {
         return jo;
     }
 
-    boolean isEqual(ChatMessage otherMsg) {
-        return this.localId == otherMsg.localId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        /*
+        if (getClass() != o.getClass())
+            return false;
+
+        ChatMessage otherMsg = (ChatMessage) o;
+        return this.localId.equals(otherMsg.localId);
+        */
+        if (getClass() == o.getClass()) {
+            ChatMessage otherMsg = (ChatMessage) o;
+            return this.localId.equals(otherMsg.localId);
+        } else if (o.getClass() == LocalId.class) {
+            // Can be compared directly to LocalId
+            LocalId otherId = (LocalId) o;
+            return this.localId.equals(otherId);
+        } else if (o.getClass() == Integer.class) {
+            // Can be compared directly to id
+            Integer otherId = (Integer) o;
+            return this.id == otherId && this.id != ID_NONE;
+        }
+
+        return false;
     }
 
     static /* synchronized */ private String generateLocalId() {
@@ -172,7 +290,7 @@ public class ChatMessage {
         }
     }
 
-    ChatMessage(String message) {
+    public ChatMessage(String message) {
         id = ID_NONE;
         userId = User.sharedUser.getId();
         userName = User.sharedUser.getShortName();
@@ -188,24 +306,24 @@ public class ChatMessage {
     }
 
     // MARK: Functions
-    void save(int tripId /*, responseHandler parentResponseHandler: @escaping (URLResponse?, NSDictionary?, Error?) -> Void*/) {
+    void save(int tripId, ServerAPI.Listener parentResponseHandler) {
         JSONObject payload = new JSONObject(this.savePayload());
-        ServerAPIParams params = new ServerAPIParams(ServerAPI.URL_BASE, ServerAPI.RESOURCE_CHAT, Integer.toString(tripId), null, null);
+        ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_BASE, ServerAPI.RESOURCE_CHAT, Integer.toString(tripId), null, null);
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
         params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
         params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
         params.setPayload(payload);
 
-        new ServerAPI(ServerAPI.Method.PUT, new SaveResponseHandler()).execute(params);
+        new ServerAPI(ServerAPI.Method.PUT, new SaveResponseHandler(parentResponseHandler)).execute(params);
     }
 
-    void read(int tripId /* responseHandler parentResponseHandler: @escaping (URLResponse?, NSDictionary?, Error?)  -> Void */) {
+    void read(int tripId, ServerAPI.Listener parentResponseHandler) {
         if (BuildConfig.DEBUG && tripId != ID_NONE) {
             throw new AssertionError("Cannot read messages for unknown trip");
         }
 
         //JSONObject payload = new JSONObject(this.savePayload());
-        ServerAPIParams params = new ServerAPIParams( ServerAPI.URL_BASE
+        ServerAPI.Params params = new ServerAPI.Params( ServerAPI.URL_BASE
                                                     , ServerAPI.RESOURCE_CHAT, Integer.toString(tripId)
                                                     , ServerAPI.VERB_MSG_READ, Integer.toString(id));
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
@@ -213,6 +331,6 @@ public class ChatMessage {
         //params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
         //params.setPayload(payload);
 
-        new ServerAPI(ServerAPI.Method.POST, new ReadResponseHandler()).execute(params);
+        new ServerAPI(ServerAPI.Method.POST, new ReadResponseHandler(parentResponseHandler)).execute(params);
     }
 }

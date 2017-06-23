@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+
+    <!--  Dummy placeholder (User initials) to align TextView without messing up 9-patch background -->
+    <TextView
+        android:id="@+id/chatmsg_who"
+        android:text="@null"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:paddingStart="3dp"
+        android:paddingTop="2sp"
+        android:paddingBottom="2sp"
+        />
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/chatmsg_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/placeholder_medium"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/chatmsg_who"
+        android:background="@drawable/chatmsg_own"
+        android:textColor="#202020"
+        />
+
+    <!--
+        android:paddingBottom="2dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="3dp"
+        android:paddingTop="2dp"
+    -->
+
+    <!-- Seen by users info -->
+    <TextView
+        android:id="@+id/chatmsg_seen_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/chatmsg_text"
+        android:paddingStart="3dip"
+        android:paddingEnd="3dip"
+        android:text="@string/placeholder_medium"
+        android:textColor="#0000F0"
+        android:textAlignment="textEnd"
+        />
+
+</RelativeLayout>

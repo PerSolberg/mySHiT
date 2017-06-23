@@ -3,11 +3,14 @@ package no.shitt.myshit;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 
 public class SHiTApplication extends Application {
 
     private static Application sApplication;
+    private static final Handler mHandler = new Handler();
 
     public static Application getApplication() {
         return sApplication;
@@ -15,6 +18,14 @@ public class SHiTApplication extends Application {
 
     public static Context getContext() {
         return getApplication().getApplicationContext();
+    }
+
+    public static final void runOnUiThread(Runnable runnable) {
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            runnable.run();
+        } else {
+            mHandler.post(runnable);
+        }
     }
 
     public static int getPreferenceInt(String prefName, int defaultValue) {

@@ -1,0 +1,69 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.ChatThreadFragment"
+    >
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/trip_chat_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="start"
+        >
+
+        <ListView
+            android:id="@+id/trip_chat_message_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="0dp"
+            android:divider="@null"
+            android:cacheColorHint="#00000000"
+            />
+            <!--android:divider="#b5b5b5"-->
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:id="@+id/chatmsg_entry_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dip"
+        android:paddingStart="10dip"
+        android:paddingEnd="10dip"
+        android:paddingTop="5dip"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:background="@color/colorEntryPanel"
+        >
+
+        <EditText
+            android:id="@+id/chatmsg_entry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorEntryFieldBackground"
+            android:paddingBottom="5dip"
+            android:paddingStart="3dip"
+            android:paddingEnd="3dip"
+            android:paddingTop="5dip"
+            android:layout_weight="1"
+            android:hint="@string/hint_chat_message"
+            android:textColor="#202020"
+            android:inputType="textMultiLine|textCapSentences"
+            />
+
+        <ImageButton
+            android:id="@+id/chat_send_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dip"
+            android:src="@mipmap/icon_chat"
+            android:contentDescription="@string/action_send_message"
+            android:onClick="sendMessage"
+            android:enabled="false"
+            />
+    </LinearLayout>
+
+</LinearLayout>

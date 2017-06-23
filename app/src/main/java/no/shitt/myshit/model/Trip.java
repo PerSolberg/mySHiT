@@ -4,17 +4,16 @@ package no.shitt.myshit.model;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+//import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,25 +37,22 @@ import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
-import no.shitt.myshit.helper.ServerAPIListener;
-import no.shitt.myshit.helper.ServerAPIParams;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
-public class Trip implements ServerAPIListener, JSONable {
+public class Trip implements ServerAPI.Listener, JSONable {
     public int id;
     private int itineraryId;
-    private String startDateText;  // Hold original value for saving in archive
+    private final String startDateText;  // Hold original value for saving in archive
     private Date startDate;
-    private String endDateText;    // Hold original value for saving in archive
+    private final String endDateText;    // Hold original value for saving in archive
     private Date endDate;
     public String tripDescription;
     public String code;
     public String name;
     public String type;
     public List<AnnotatedTripElement> elements;
-    //TODO: Chat support
-    //var chatThread:ChatThread!
+    public ChatThread chatThread;
 
     // Notifications created for this element (used to avoid recreating notifications after they have been triggered)
     private Map<String,NotificationInfo> notifications;
@@ -199,13 +195,12 @@ public class Trip implements ServerAPIListener, JSONable {
         JSONObject jani = new JSONObject();
         if (notifications != null) {
             for (String niKey : notifications.keySet()) {
-                NotificationInfo ni = (NotificationInfo) notifications.get(niKey);
+                NotificationInfo ni = notifications.get(niKey);
                 jani.put(niKey, ni.toJSON());
             }
         }
         jo.put(Constants.JSON.TRIP_NOTIFICATIONS, jani);
-
-        //TODO: Chat support
+        jo.put(Constants.JSON.TRIP_CHAT, chatThread.toJSON());
 
         return jo;
     }
@@ -250,15 +245,18 @@ public class Trip implements ServerAPIListener, JSONable {
             }
         }
 
-        //TODO: Chat support
+        if (elementData.has(Constants.JSON.TRIP_CHAT) && elementData.optJSONObject(Constants.JSON.TRIP_CHAT) != null) {
+            chatThread = new ChatThread(elementData.optJSONObject(Constants.JSON.TRIP_CHAT));
+        } else {
+            chatThread = new ChatThread(id);
+        }
+
         setNotification();
         registerForPushNotifications();
     }
 
     // MARK: Methods
     boolean isEqual(Object otherObject) {
-        //print("Comparing objects: self.class = \(object_getClassName(self)), object.class = \(object_getClassName(object!))")
-        //print("Comparing objects: self.class = \(_stdlib_getDemangledTypeName(self)), object.class = \(_stdlib_getDemangledTypeName(object!))")
         if (this.getClass() != otherObject.getClass()) {
             return false;
         }
@@ -403,7 +401,7 @@ public class Trip implements ServerAPIListener, JSONable {
 
                 //extras.putAll(actualUserInfo);
 
-                long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
+                //long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
                 //String leadTimeText = ServerDate.formatInterval(actualLeadTime);
 
                 // Set up message based on alertMessage parameter
@@ -422,14 +420,14 @@ public class Trip implements ServerAPIListener, JSONable {
         }
     }
 
-    public void setNotification() {
+    private void setNotification() {
         // First delete any existing notifications for this trip element (either one or two)
         //cancelNotifications();
 
         // Set notification(s) (if we have a start date)
         if (getTense() == Tense.FUTURE) {
-            Context ctx = SHiTApplication.getContext();
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+            //Context ctx = SHiTApplication.getContext();
+            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
             int leadTimeTripHours = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAR_TIME_TRIP, LEAD_TIME_MISSING);
 
@@ -498,17 +496,16 @@ public class Trip implements ServerAPIListener, JSONable {
         }
     }
 
-    //TODO: Chat support
-    //func refreshMessages() {
-    //    chatThread.refresh(mode:.full)
-    //}
+    void refreshMessages() {
+        chatThread.refresh(ChatThread.RefreshMode.FULL);
+    }
 
     private void registerForPushNotifications() {
         String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
         //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicTrip);
         FirebaseMessaging.getInstance().subscribeToTopic(topicTrip);
 
-        // TO DO
+        // TODO: Or not?
         if (itineraryId > 0) {
             String topicItinerary = Constants.PushNotification.TOPIC_ROOT_ITINERARY + itineraryId;
             //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicItinerary);
@@ -516,12 +513,12 @@ public class Trip implements ServerAPIListener, JSONable {
         }
     }
 
-    public void deregisterFromPushNotifications() {
+    void deregisterFromPushNotifications() {
         String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
         //Log.d("Trip", "registerForPushNotifications: Deregister from topic " + topicTrip);
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topicTrip);
 
-        // TO DO
+        // TODO: Or not?
         if (itineraryId > 0) {
             String topicItinerary = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
             //Log.d("Trip", "registerForPushNotifications: Deregister from topic " + topicItinerary);
@@ -530,7 +527,8 @@ public class Trip implements ServerAPIListener, JSONable {
     }
 
     public void loadDetails() {
-        ServerAPIParams params = new ServerAPIParams(ServerAPI.URL_TRIP_INFO, "code", code);
+        //ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_TRIP_INFO, "code", code);
+        ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_BASE, ServerAPI.RESOURCE_TRIP, code, null, null);
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
         params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
         params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
@@ -540,7 +538,7 @@ public class Trip implements ServerAPIListener, JSONable {
 
     void copyState(Trip fromTrip) {
         this.notifications = fromTrip.notifications;
-        //chatThread = from.chatThread
+        chatThread = fromTrip.chatThread;
 
         // Copy state for all elements
         if (this.elements != null && fromTrip.elements != null) {

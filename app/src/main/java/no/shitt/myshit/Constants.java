@@ -36,6 +36,21 @@ public class Constants {
         public static final String TOPIC_GLOBAL           = "GLOBAL";
     }
 
+    public class PushNotificationKeys {
+        public static final String CHANGE_TYPE            = "changeType";
+        public static final String CHANGE_OPERATION       = "changeOperation";
+        public static final String TRIP_ID                = "tripId";
+        public static final String TRIP_NAME              = "tripName";
+        public static final String LAST_SEEN_INFO         = "lastSeenInfo";
+    }
+
+    public class PushNotificationData {
+        public static final String TYPE_CHAT_MESSAGE      = "CHATMESSAGE";
+        public static final String OP_INSERT              = "INSERT";
+        public static final String OP_DELETE              = "DELETE";
+        public static final String OP_UPDATE              = "UPDATE";
+    }
+
     public class Setting {
         public static final String ALERT_LEAD_TIME_DEPARTURE     = "pref_alertLeadTime_departure";
         public static final String ALERT_LEAD_TIME_CONNECTION    = "pref_alertLeadTime_connection";
@@ -77,6 +92,7 @@ public class Constants {
         public static final String TRIP_TYPE               = "type";
         public static final String TRIP_ELEMENTS           = "elements";
         public static final String TRIP_NOTIFICATIONS      = "notifications";
+        public static final String TRIP_CHAT               = "chatThread";
 
         public static final String ELEM_TYPE               = "type";
         public static final String ELEM_SUB_TYPE           = "subType";
@@ -128,15 +144,27 @@ public class Constants {
         public static final String CHAT_MESSAGES               = "messages";
 
         public static final String CHATMSG_ID                  = "id";
+        public static final String CHATMSG_TRIP_ID             = "tripId";
         public static final String CHATMSG_USER_ID             = "userId";
         public static final String CHATMSG_USER_NAME           = "userName";
         public static final String CHATMSG_USER_INIT           = "userInitials";
         public static final String CHATMSG_DEVICE_TYPE         = "deviceType";
         public static final String CHATMSG_DEVICE_ID           = "deviceId";
         public static final String CHATMSG_LOCAL_ID            = "localId";
-        public static final String CHATMSG_MESSAGE_TEXT        = "messageText";
-        public static final String CHATMSG_STORED_TS           = "storedTimestamp";
-        public static final String CHATMSG_CREATED_TS          = "createdTimestamp";
+        public static final String CHATMSG_MESSAGE_TEXT        = "message";
+        public static final String CHATMSG_STORED_TS           = "storedTS";
+        public static final String CHATMSG_CREATED_TS          = "createdTS";
+
+        public static final String CHATTHREAD_TRIP_ID              = "tripId";
+        public static final String CHATTHREAD_LAST_DISPLAYED_ID    = "lastDisplayedId";
+        public static final String CHATTHREAD_LAST_SEEN_USER_LOCAL = "lastSeenByUserLocal";
+        public static final String CHATTHREAD_LAST_SEEN_USER_SRV   = "lastSeenByUserServer";
+        public static final String CHATTHREAD_LAST_SEEN_OTHERS     = "lastSeenByOthers";
+        public static final String CHATTHREAD_MSG_VERSION          = "messageVersion";
+        //public static final String CHATTHREAD_LAST_DISPLAYED_POS   = "lastDisplayedPosition";
+        public static final String CHATTHREAD_LAST_SEEN_VERSION    = "lastSeenVersion";
+        public static final String CHATTHREAD_MESSAGES             = "messages";
+        public static final String CHATTHREAD_LAST_SEEN_BY_ME      = "lastSeenByMe";
 
         public static final String NTFINFO_BASE_DATE           = "baseDate";
         public static final String NTFINFO_NOTIFICATION_DATE   = "notificationDate";

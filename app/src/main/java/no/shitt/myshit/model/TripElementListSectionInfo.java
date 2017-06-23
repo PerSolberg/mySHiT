@@ -1,9 +1,9 @@
 package no.shitt.myshit.model;
 
 public class TripElementListSectionInfo /* NSObject, NSCoding */ {
-    boolean visible;
-    String title;
-    int firstTripElement;
+    private final boolean visible;
+    private final String title;
+    private final int firstTripElement;
 
     /* Identifiers for keyed archive (iOS only?)
     struct PropertyKey {

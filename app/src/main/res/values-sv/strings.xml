@@ -7,6 +7,7 @@
     <string name="placeholder_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
     <string name="placeholder_multiline_2">Eksempeltekst\nAndra rad av eksempeltekst</string>
     <string name="placeholder_multiline_3">Eksempeltekst\nAndra rad av eksempeltekst\nTredje tekstrad</string>
+    <string name="placeholder_initials">TGr</string>
 
     <!-- Trip List -->
     <string name="group_title_future">Framtidiga</string>
@@ -16,6 +17,8 @@
 
     <!-- Trip Details List -->
     <string name="title_trip_details">Resedetaljer</string>
+    <string name="trip_page_itinerary">Reserutt</string>
+    <string name="trip_page_messages">Meddelanden</string>
 
     <!-- Login screen-->
     <string name="title_activity_login">Logga in</string>
@@ -74,10 +77,16 @@
     <string name="label_event_venue_phone">Telefon</string>
     <string name="label_event_access_info">Ytterligare information</string>
 
+    <!-- Chat -->
+    <string name="chat_seen_by_one">Läst av %1$s</string>
+    <string name="chat_seen_by_many">Läst av %1$s och %2$s</string>
+    <string name="chat_seen_by_all">Läst av alla</string>
+
     <!-- Menu actions -->
     <string name="action_settings">Inställningar</string>
     <string name="action_refresh">Uppdatera</string>
     <string name="action_logout">Logga ut</string>
+    <string name="action_send_message">Skicka meddelande</string>
 
     <!-- Alerts -->
     <string name="alert_title_trip">Resestart</string>
@@ -190,6 +199,7 @@
     <string name="NTF.INSERT.ITINERARY">%1$s: Resrutt uppdaterad</string>
     <string name="NTF.INSERT.TRIP">%1$s: Ny resa lagd till</string>
     <string name="NTF.INSERT.USERPROFILE">Användarprofil uppdaterad</string>
+    <string name="NTF.INSERT.CHATMESSAGE">%1$s till %2$s: %3$s</string>
 
     <string name="NTF.UPDATE.ADDRESS">%1$s: Adressinformation uppdaterad</string>
     <string name="NTF.UPDATE.BOOKING">%1$s: Bokning uppdaterad</string>
@@ -208,4 +218,12 @@
     <string name="NTF.DELETE.ITINERARY">%1$s: Resrutt uppdaterad</string>
     <string name="NTF.DELETE.TRIP">%1$s: Resa uppdaterad</string>
     <string name="NTF.DELETE.USERPROFILE">Användarprofil uppdaterad</string>
+
+    <!-- Entry field hints -->
+    <string name="hint_chat_message">Skriv meddelande</string>
+
+    <!-- Content descriptions -->
+    <string name="content_collapsible_group">Ekspanderbar grupp, klicka för att kollapsa eller ekspandera</string>
+    <string name="content_trip_icon">SHiT-resa</string>
+    <string name="content_element_icon">Element (flight, tog, buss, etc.)</string>
 </resources>

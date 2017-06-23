@@ -2,7 +2,7 @@ package no.shitt.myshit.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
+//import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +23,15 @@ import no.shitt.myshit.model.AnnotatedTripElement;
 import no.shitt.myshit.model.Tense;
 
 public class TripElementListAdapter extends BaseExpandableListAdapter {
-    Context context;
-    AnnotatedTrip annotatedTrip;
+    private final Context context;
+    private final AnnotatedTrip annotatedTrip;
 
-    List<ElementSectionInfo> sections;
+    private List<ElementSectionInfo> sections;
 
     private class ElementSectionInfo {
         protected String   title;
-        protected int      firstElement;
-        protected boolean  expandedByDefault;
+        int      firstElement;
+        boolean  expandedByDefault;
     }
     /*private view holder class*/
     private class ChildViewHolder {

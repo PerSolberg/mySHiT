@@ -1,29 +1,18 @@
 package no.shitt.myshit.model;
 
-//import android.content.Context;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
-//import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
@@ -36,17 +25,17 @@ public class Event extends TripElement {
 
 
     // MARK: Properties
-    public String venueName;
-    public String venueAddress;
-    public String venuePostCode;
-    public String venueCity;
-    public String venuePhone;
-    private String startTimeText;  // Hold original value for saving in archive
+    public final String venueName;
+    public final String venueAddress;
+    public final String venuePostCode;
+    public final String venueCity;
+    public final String venuePhone;
+    private final String startTimeText;  // Hold original value for saving in archive
     private Date startTime;
-    private int    travelTime;
-    public String accessInfo;
+    private final int    travelTime;
+    public final String accessInfo;
     //public String reference;
-    private String timezone;
+    private final String timezone;
 
 
     @Override
@@ -190,8 +179,8 @@ public class Event extends TripElement {
 
         // Set notification (if we have a start time)
         if (getTense() == Tense.FUTURE) {
-            Context ctx = SHiTApplication.getContext();
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+            //Context ctx = SHiTApplication.getContext();
+            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
             int leadTimeEventMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_EVENT, LEAD_TIME_MISSING);
             /*
@@ -208,7 +197,6 @@ public class Event extends TripElement {
                     leadTimeEventMinutes += travelTime;
                 }
 
-                //setNotification(notificationType: Constant.Settings.eventLeadTime, leadTime: eventLeadtime, alertMessage: genericAlertMessage, userInfo: nil)
                 setNotification(Constants.Setting.ALERT_LEAD_TIME_EVENT, leadTimeEventMinutes, R.string.alert_msg_event, null);
             }
         }

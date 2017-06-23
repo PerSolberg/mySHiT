@@ -18,18 +18,17 @@ import no.shitt.myshit.helper.StringUtil;
 
 public class Hotel extends TripElement {
     // MARK: Properties
-    String checkInDateText;  // Hold original value for saving in archive
-    String checkOutDateText; // Hold original value for saving in archive
-    Date checkInDate;
-    Date checkOutDate;
-    public String hotelName;
-    public String address;
-    public String postCode;
-    public String city;
-    public String phone;
-    public String transferInfo;
-    String timezone;
-
+    private final String checkInDateText;  // Hold original value for saving in archive
+    private final String checkOutDateText; // Hold original value for saving in archive
+    private Date checkInDate;
+    private Date checkOutDate;
+    public final String hotelName;
+    public final String address;
+    public final String postCode;
+    public final String city;
+    public final String phone;
+    public final String transferInfo;
+    private String timezone;
 
 
     @Override

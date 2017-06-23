@@ -1,9 +1,9 @@
 package no.shitt.myshit.model;
 
 public class TripListSectionInfo /* NSObject, NSCoding */ {
-    boolean visible;
-    TripListSection type;
-    int firstTrip;
+    private final boolean visible;
+    private final TripListSection type;
+    private final int firstTrip;
 
     /* Identifiers for keyed archive (iOS only?)
     struct PropertyKey {

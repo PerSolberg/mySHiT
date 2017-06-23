@@ -39,7 +39,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     ConnectionDetector cd;
 
     // Alert dialog manager
-    AlertDialogueManager alert = new AlertDialogueManager();
+    final AlertDialogueManager alert = new AlertDialogueManager();
 
     // Progress Dialog
     private ProgressDialog pDialog;

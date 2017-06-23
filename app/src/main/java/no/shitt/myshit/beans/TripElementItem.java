@@ -1,6 +1,6 @@
 package no.shitt.myshit.beans;
 
-public class TripElementItem {
+class TripElementItem {
     private int trip_id;
     private int id;
     private int imageId;

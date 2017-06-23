@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +24,14 @@ import no.shitt.myshit.model.Tense;
 import no.shitt.myshit.model.TripList;
 
 public class TripListAdapter extends BaseExpandableListAdapter {
-    Context context;
-    List<TripSectionInfo> sections;
+    private final Context context;
+    private List<TripSectionInfo> sections;
 
     private class TripSectionInfo {
-        protected int      titleId;
+        int      titleId;
         protected String   title;
-        protected int      firstElement;
-        protected boolean  expanded;
+        int      firstElement;
+        boolean  expanded;
     }
 
     /*private view holder class*/

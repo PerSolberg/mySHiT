@@ -1,11 +1,8 @@
 package no.shitt.myshit.model;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -15,18 +12,15 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.JSONable;
@@ -43,7 +37,7 @@ public class TripElement implements JSONable {
     private Map<String,NotificationInfo> notifications;
 
     public String tripCode;
-    private int    tripId;
+    //private int    tripId;
     private JSONObject serverData;
 
     public static final String REFTAG_REF_NO       = "refNo";
@@ -54,7 +48,7 @@ public class TripElement implements JSONable {
 
     // Minutes between notifications for same trip element (in milliseconds)
     private static final int MINIMUM_NOTIFICATION_SEPARATION = 10 * 60 * 1000;
-    protected static final int LEAD_TIME_MISSING = -1;
+    static final int LEAD_TIME_MISSING = -1;
 
     public Date getStartTime() {
         return null;
@@ -213,7 +207,7 @@ public class TripElement implements JSONable {
         type = elementData.isNull("type") ? null : elementData.optString("type");
         subType = elementData.isNull("subType") ? null : elementData.optString("subType");
 
-        this.tripId = tripId;
+        //this.tripId = tripId;
         this.tripCode = tripCode;
 
         JSONArray serverRefs = elementData.optJSONArray("references");
@@ -253,21 +247,16 @@ public class TripElement implements JSONable {
 
             if (this.references != null && otherTripElement.references != null) {
                 if (this.references.size() != otherTripElement.references.size()) {
-                    //Log.d("TripElement", "Changed reference count");
                     return false;
                 }
 
-                boolean match = this.references.containsAll(otherTripElement.references) && otherTripElement.references.containsAll(this.references);
-                //Log.d("TripElement", "Reference match = " + match);
-                return match;
+                return this.references.containsAll(otherTripElement.references) && otherTripElement.references.containsAll(this.references);
             } else if (this.references != null || otherTripElement.references != null) {
-                //Log.d("TripElement", "Changed references");
                 return false;
             }
 
             return true;
         } catch (Exception e) {
-            //Log.e("TripElement", "Comparison failed with exception");
             return false;
         }
     }

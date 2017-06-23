@@ -1,24 +1,25 @@
 package no.shitt.myshit;
 
-import no.shitt.myshit.adapters.TripElementListAdapter;
-import no.shitt.myshit.helper.AlertDialogueManager;
-import no.shitt.myshit.helper.ConnectionDetector;
+import no.shitt.myshit.adapters.TripPagerAdapter;
 import no.shitt.myshit.model.AnnotatedTrip;
-import no.shitt.myshit.model.AnnotatedTripElement;
-import no.shitt.myshit.model.ChangeState;
-import no.shitt.myshit.model.TripElement;
+import no.shitt.myshit.model.ChatMessage;
 import no.shitt.myshit.model.TripList;
 import no.shitt.myshit.model.User;
+import no.shitt.myshit.ui.ChatThreadFragment;
+import no.shitt.myshit.ui.TripDetailsFragment;
 
-//import android.app.ActionBar;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
+//import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
@@ -28,28 +29,92 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
-public class TripDetailsActivity extends AppCompatActivity {
-    // Connection detector
-    ConnectionDetector cd;
-
-    // Alert dialog manager
-    AlertDialogueManager alert = new AlertDialogueManager();
-
-    // List view
-    ExpandableListView listView;
-
-    // Progress Dialog
+public class TripDetailsActivity extends AppCompatActivity
+        implements TripDetailsFragment.OnFragmentInteractionListener
+                 , ChatThreadFragment.OnFragmentInteractionListener
+{
+    //ConnectionDetector cd;
+    //AlertDialogueManager alert = new AlertDialogueManager();
     private ProgressDialog pDialog;
 
     private AnnotatedTrip annotatedTrip;
 
-    // Trip ids
     String trip_code;
-    String trip_name;
+    //String trip_name;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        if (Constants.DEVELOPER_MODE) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    //.penaltyDeath()
+                    .build());
+        }
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_trip_details);
+
+        // Get trip code
+        Intent i = getIntent();
+        trip_code = i.getStringExtra(Constants.IntentExtra.TRIP_CODE);
+
+        annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
+
+        // Get the ViewPager and set its PagerAdapter so that it can display items
+        ViewPager viewPager = (ViewPager) findViewById(R.id.trip_content);
+        viewPager.setAdapter(new TripPagerAdapter(getSupportFragmentManager(),
+                TripDetailsActivity.this, annotatedTrip.trip.id, trip_code));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                View view = getCurrentFocus(); //getView().getRootView();
+                if (view != null) {
+                    Log.d("TripDetailsActivity", "Closing keyboard");
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                } else {
+                    Log.d("TripDetailsActivity", "Unable to close keyboard");
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        // Set up toolbar and enable Up button
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_details_toolbar);
+        //myToolbar.setLogo(R.mipmap.ic_launcher);
+        setSupportActionBar(myToolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setTitle(annotatedTrip.trip.name);
+
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.trip_details_tabbar);
+        tabLayout.setupWithViewPager(viewPager);
+    }
+
+    /*
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (Constants.DEVELOPER_MODE) {
@@ -85,13 +150,13 @@ public class TripDetailsActivity extends AppCompatActivity {
         annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
         ab.setTitle(annotatedTrip.trip.name);
 
-        // get listview
+        // get list view
         //ListView lv = getListView();
         listView = (ExpandableListView) findViewById(R.id.trip_details_list);
 
         /**
-         * Listview on item click listener
-         * */
+         * List view on item click listener
+         * * /
         listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id)
@@ -172,7 +237,9 @@ public class TripDetailsActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
         LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIPS_LOADED));
     }
+    */
 
+    /*
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -186,6 +253,7 @@ public class TripDetailsActivity extends AppCompatActivity {
             }
         }
     }
+    */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -227,13 +295,15 @@ public class TripDetailsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onPause() {
+        TripList.getSharedList().saveToArchive();
+        super.onPause();
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-        //Log.d("TripDetailsActivity", "onResume Starting, action = " + getIntent().getAction() + ", Selector = " + getIntent().getSelector());
-        // Or maybe not...
-        //TripList.getSharedList().getFromServer();
         updateListView();
     }
 
@@ -241,14 +311,18 @@ public class TripDetailsActivity extends AppCompatActivity {
     private void updateListView() {
         runOnUiThread(new Runnable() {
             public void run() {
+                // Moved to fragment
+                /*
                 TripElementListAdapter adapter = new TripElementListAdapter(TripDetailsActivity.this, annotatedTrip);
                 //setListAdapter(adapter);
                 listView.setAdapter(adapter);
                 adapter.applyDefaultCollapse(listView);
+                */
             }
         });
     }
 
+    /*
     public void serverCallComplete() {
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
         swipeLayout.setRefreshing(false);
@@ -271,11 +345,11 @@ public class TripDetailsActivity extends AppCompatActivity {
         }
         //Log.d("TripDetailsActivity", "Server REST call failed.");
     }
-
+    */
 
     private void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
-            pDialog = new ProgressDialog(TripDetailsActivity.this);
+            pDialog = new ProgressDialog(/*TripDetailsActivity.*/this);
             pDialog.setMessage("Loading trip details ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
@@ -285,4 +359,53 @@ public class TripDetailsActivity extends AppCompatActivity {
         annotatedTrip.trip.loadDetails();
     }
 
+    public void onFragmentInteraction(Uri uri) {
+        Log.d("TripDetailsActivity", "Trip Details fragment interaction detected");
+    }
+
+    public void onChatFragmentInteraction(Uri uri) {
+        Log.d("TripDetailsActivity", "Chat fragment interaction detected");
+    }
+
+    public void sendMessage(View v) {
+        Log.d("TripDetailsActivity", "Send message icon clicked");
+        EditText textField = (EditText) findViewById(R.id.chatmsg_entry);
+        String msgText = textField.getText().toString();
+        ChatMessage msg = new ChatMessage(msgText);
+
+        annotatedTrip.trip.chatThread.append(msg);
+        textField.getText().clear();
+        controlSendButton();
+
+        // Hide keyboard
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            view.clearFocus();
+            InputMethodManager imm = (InputMethodManager)getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0 /*InputMethodManager.HIDE_IMPLICIT_ONLY*/);
+        }
+    }
+
+    public void controlSendButton() {
+        EditText textField = (EditText) findViewById(R.id.chatmsg_entry);
+        ImageButton button = (ImageButton) findViewById(R.id.chat_send_button);
+        if (textField != null && button != null) {
+            boolean enabled = textField.getText().length() != 0;
+            button.setEnabled(enabled);
+
+            //Drawable originalIcon = SHiTApplication.getContext().getResources().getDrawable(R.mipmap.icon_chat);
+            Drawable originalIcon = SHiTApplication.getContext().getDrawable(R.mipmap.icon_chat);
+            Drawable icon = enabled ? originalIcon : convertDrawableToGrayScale(originalIcon);
+            button.setImageDrawable(icon);
+        }
+    }
+
+    private static Drawable convertDrawableToGrayScale(Drawable drawable) {
+        if (drawable == null) {
+            return null;
+        }
+        Drawable res = drawable.mutate();
+        res.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
+        return res;
+    }
 }

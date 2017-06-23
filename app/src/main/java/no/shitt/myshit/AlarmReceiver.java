@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Log;
 
 import java.util.Date;
 
@@ -44,9 +43,9 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     /**
      * Sets an alarm for a specific time
-     * @param alertTime
-     * @param data
-     * @param extras
+     * @param alertTime Time when user should be notified
+     * @param data      Unique URI for the notification; if notification with the same URI exists, Android will replace it
+     * @param extras    Additional information (text to display to user)
      */
     public void setAlarm(Date alertTime, Uri data, Bundle extras) {
         //Log.d("AlarmReceiver", "Setting alarm for " + data.toString() + " at " + alertTime.toString());

@@ -1,57 +1,43 @@
 package no.shitt.myshit.model;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.R;
-import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
 public class GenericTransport extends TripElement {
     // MARK: Properties
-    int segmentId;
-    String segmentCode;
-    int legNo;
-    String departureTimeText;  // Hold original value for saving in archive
-    Date   departureTime;
-    public String departureLocation;
-    public String departureStop;
-    public String departureAddress;
-    String departureTimeZone;
-    String departureCoordinates;
-    String departureTerminalCode;
-    public String departureTerminalName;
-    String arrivalTimeText; // Hold original value for saving in archive
-    Date   arrivalTime;
-    public String arrivalLocation;
-    public String arrivalStop;
-    public String arrivalAddress;
-    String arrivalTimeZone;
-    String arrivalCoordinates;
-    String arrivalTerminalCode;
-    public String arrivalTerminalName;
-    public String routeNo;
-    public String companyName;
-    public String companyPhone;
-
-    //private static int alarmcounter = 0;
+    private final int segmentId;
+    private final String segmentCode;
+    final int legNo;
+    private final String departureTimeText;  // Hold original value for saving in archive
+    private Date   departureTime;
+    public final String departureLocation;
+    public final String departureStop;
+    public final String departureAddress;
+    private final String departureTimeZone;
+    private final String departureCoordinates;
+    final String departureTerminalCode;
+    public final String departureTerminalName;
+    private final String arrivalTimeText; // Hold original value for saving in archive
+    private Date   arrivalTime;
+    public final String arrivalLocation;
+    public final String arrivalStop;
+    public final String arrivalAddress;
+    private final String arrivalTimeZone;
+    private final String arrivalCoordinates;
+    final String arrivalTerminalCode;
+    public final String arrivalTerminalName;
+    public final String routeNo;
+    public final String companyName;
+    public final String companyPhone;
 
     @Override
     public Date getStartTime() {

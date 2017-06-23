@@ -14,7 +14,7 @@ def getVersionName = { ->
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.2'
 
     useLibrary 'org.apache.http.legacy'
 
@@ -43,6 +43,7 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.google.firebase:firebase-messaging:10.2.6'
     compile 'com.google.android.gms:play-services-iid:10.2.6'
+    compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
 }
 

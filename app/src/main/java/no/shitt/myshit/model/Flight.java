@@ -1,8 +1,5 @@
 package no.shitt.myshit.model;
 
-import android.content.Context;
-import android.text.format.DateUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,12 +7,11 @@ import java.text.DateFormat;
 import java.util.Map;
 
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.StringUtil;
 
 public class Flight extends ScheduledTransport {
     // MARK: Properties
-    public String airlineCode;
+    public final String airlineCode;
 
     @Override
     public String getTitle() {

@@ -7,8 +7,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -17,14 +15,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 import no.shitt.myshit.helper.StringUtil;
-//import no.shitt.myshit.model.GenericTransport;
 import no.shitt.myshit.model.Hotel;
 import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
 
 public class HotelActivity extends AppCompatActivity {
-    String trip_code;
+    private String trip_code;
     String element_id;
 
     private Hotel hotel;

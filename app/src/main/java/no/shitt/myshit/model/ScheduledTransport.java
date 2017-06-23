@@ -1,9 +1,5 @@
 package no.shitt.myshit.model;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import org.json.JSONObject;
 
 import java.text.DateFormat;
@@ -73,8 +69,8 @@ public class ScheduledTransport extends GenericTransport {
 
         // Set notification(s) (if we have a start date)
         if (getTense() == Tense.FUTURE) {
-            Context ctx = SHiTApplication.getContext();
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+            //Context ctx = SHiTApplication.getContext();
+            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
             int leadTimeDepartureMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, LEAD_TIME_MISSING);
             /* try {

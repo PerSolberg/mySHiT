@@ -16,13 +16,10 @@ import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 
 public class ServerDate {
-    //iOS feature
-    //typealias DayHourMinute = (days:Int, hours:Int, minutes:Int)
+    private static final Map<String,String> dateFormats;
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat();
 
-    static final Map<String,String> dateFormats;
-    static final SimpleDateFormat dateFormatter = new SimpleDateFormat();
-
-    public static final String ISO_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String ISO_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     static {
         Map<String, String> initMap = new HashMap<>();
@@ -37,7 +34,7 @@ public class ServerDate {
         dateFormats = Collections.unmodifiableMap(initMap);
     }
 
-    static String findFormatString (String serverDateString) {
+    private static String findFormatString (String serverDateString) {
         for (Map.Entry<String,String> entry : dateFormats.entrySet()) {
             if (Pattern.matches(entry.getKey(), serverDateString)) {
                 return entry.getValue();

@@ -18,9 +18,9 @@ import no.shitt.myshit.model.TripElement;
 
 
 public class ReferenceListAdapter extends BaseAdapter {
-    Context context;
+    private final Context context;
 
-    public List<Map<String,String>> referenceList;
+    private final List<Map<String,String>> referenceList;
 
 
     public ReferenceListAdapter(Context context, List<Map<String,String>> referenceList) {

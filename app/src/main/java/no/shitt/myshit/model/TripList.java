@@ -3,6 +3,7 @@ package no.shitt.myshit.model;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 //import android.util.Log;
 //import android.widget.ListAdapter;
 
@@ -16,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -25,11 +25,9 @@ import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
-import no.shitt.myshit.helper.ServerAPIListener;
-import no.shitt.myshit.helper.ServerAPIParams;
 
-public class TripList implements ServerAPIListener, JSONable {
-    private static TripList sharedList = new TripList();
+public class TripList implements ServerAPI.Listener, JSONable {
+    private static final TripList sharedList = new TripList();
 
     private List<AnnotatedTrip> trips = new ArrayList<>();
 
@@ -43,10 +41,14 @@ public class TripList implements ServerAPIListener, JSONable {
         int count = 0;
 
         JSONArray jat = new JSONArray();
-        Iterator i = trips.iterator();
-        while (i.hasNext()) {
+//        Iterator i = trips.iterator();
+//        while (i.hasNext()) {
+//            count++;
+//            AnnotatedTrip at = (AnnotatedTrip) i.next();
+//            jat.put(at.toJSON());
+//        }
+        for (AnnotatedTrip at: trips) {
             count++;
-            AnnotatedTrip at = (AnnotatedTrip) i.next();
             jat.put(at.toJSON());
         }
         jo.put(Constants.JSON.QUERY_COUNT, count);
@@ -62,7 +64,7 @@ public class TripList implements ServerAPIListener, JSONable {
 
     public void getFromServer(/*ServerAPIListener responseHandler*/) {
         //Send request
-        ServerAPIParams params = new ServerAPIParams(ServerAPI.URL_TRIP_INFO);
+        ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_TRIP_INFO);
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
         params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
         params.addParameter(ServerAPI.PARAM_DETAILS_TYPE, "non-historic");
@@ -196,7 +198,7 @@ public class TripList implements ServerAPIListener, JSONable {
             fos.write(jsonString.getBytes());
             fos.close();
 
-            //Log.d("TripList", "Trips saved to JSON file");
+            Log.d("TripList", "Trips saved to JSON file");
         }
         catch (JSONException je) {
             //Log.e("TripList", "Failed to save trips due to JSON error...");

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-//import com.example.androidhive.R;
 import no.shitt.myshit.R;
 
 public class AlertDialogueManager {

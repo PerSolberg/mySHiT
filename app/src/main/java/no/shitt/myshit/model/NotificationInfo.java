@@ -9,17 +9,22 @@ import java.util.Date;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.helper.ServerDate;
 
-/**
- * Created by persolberg on 2017-05-31.
+/*
+ *  NotificationInfo
+ *  ---------------------------------------------------------------------------
+ *  Lightweight notification object to keep track of which notifications have
+ *  been set, so we don't set a notification that has already fired.
+ *
+ *  Created by Per Solberg on 2017-05-31.
  */
 
-public class NotificationInfo {
+class NotificationInfo {
     private static final String TIMEZONE         = "UTC";
     private static final int    LEADTIME_UNKNOWN = -1;
 
     private Date baseDate;
     private Date notificationDate;
-    private int leadTime;
+    private final int leadTime;
 
     // MARK: Constructors
     NotificationInfo(JSONObject elementData) {
@@ -64,14 +69,14 @@ public class NotificationInfo {
     }
 
     // MARK: Methods
-    boolean needsRefresh(Date baseDate, Date notificationDate, int leadTime) {
+    private boolean needsRefresh(Date baseDate, Date notificationDate, int leadTime) {
         Date now = new Date();
 
         Calendar newNotificationTime = Calendar.getInstance();
         newNotificationTime.setTime(baseDate);
         newNotificationTime.add(Calendar.MINUTE, -leadTime);
         if (this.notificationDate.after(now)) {
-            // Not notfied yet, we may just refresh
+            // Not notified yet, we may just refresh
             return true;
         } else if (newNotificationTime.getTime().after(now)) {
             // New notification is in the future, probably because event time or lead time changed - refresh

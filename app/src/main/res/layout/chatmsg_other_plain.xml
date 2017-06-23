@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <!-- User initials -->
+    <TextView
+        android:id="@+id/chatmsg_who"
+        android:text="@string/placeholder_initials"
+        android:layout_width="45dp"
+        android:layout_height="30dp"
+        android:paddingStart="3dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="2sp"
+        android:textColor="@color/colorPrimaryDark"
+        />
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/chatmsg_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chatmsg_other"
+        android:text="@string/placeholder_short"
+        android:textColor="#202020"
+        android:layout_toEndOf="@+id/chatmsg_who"
+        />
+
+<!--     android:textSize="16sp"
+    android:textStyle="bold"
+-->
+
+</RelativeLayout>

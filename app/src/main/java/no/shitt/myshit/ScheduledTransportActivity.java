@@ -7,7 +7,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -63,7 +62,7 @@ public class ScheduledTransportActivity extends AppCompatActivity {
 
     private void fillScreen() {
         ((TextView) findViewById(R.id.scheduled_transport_company)).setText(StringUtil.stringWithDefault(transport.companyName, ""));
-        ((TextView) findViewById(R.id.scheduled_transport_route_no)).setText(StringUtil.stringWithDefault(transport.companyName, ""));
+        ((TextView) findViewById(R.id.scheduled_transport_route_no)).setText(StringUtil.stringWithDefault(transport.routeNo, ""));
         ((TextView) findViewById(R.id.scheduled_transport_departure)).setText(departureInfo.toString());
         ((TextView) findViewById(R.id.scheduled_transport_arrival)).setText(arrivalInfo.toString());
         ((TextView) findViewById(R.id.scheduled_transport_phone)).setText(StringUtil.stringWithDefault(transport.companyPhone, ""));

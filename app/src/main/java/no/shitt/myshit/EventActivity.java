@@ -4,19 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-//import android.support.design.widget.FloatingActionButton;
-//import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-//import android.view.Menu;
 import android.view.MenuItem;
-//import android.view.View;
 import android.widget.TextView;
 
-//import android.text.format.DateUtils;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.util.Iterator;
@@ -53,16 +47,6 @@ public class EventActivity extends AppCompatActivity {
             //Log.e("EventActivity", "Unexpected NullPointerException when setting up toolbar");
         }
 
-        /* From generated code, probably don't need
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
 
         // Get trip code and element ID
         intent = getIntent();
@@ -115,7 +99,7 @@ public class EventActivity extends AppCompatActivity {
                 // Set title
                 //Toolbar myToolbar = (Toolbar) findViewById(R.id.event_toolbar);
                 //setSupportActionBar(myToolbar);
-                ActionBar ab = getSupportActionBar();
+                //ActionBar ab = getSupportActionBar();
                 int titleId = getTitleId();
                 if (titleId != 0) {
                     //Log.d("EventActivity", "Setting title id " + Integer.toString(titleId));
@@ -141,9 +125,7 @@ public class EventActivity extends AppCompatActivity {
             String titleName;
 
             titleName = titleBaseName + "_" + event.subType;
-            int titleId = ctx.getResources().getIdentifier(titleName.toLowerCase(), "string", ctx.getPackageName());
-            //Log.d("EventActivity", "Checking string resource '" + titleName + "', id = " + Integer.toString(titleId));
-            return titleId;
+            return ctx.getResources().getIdentifier(titleName.toLowerCase(), "string", ctx.getPackageName());
         } else {
             return 0;
         }

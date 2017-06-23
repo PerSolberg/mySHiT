@@ -1,14 +1,12 @@
 package no.shitt.myshit.model;
 
-import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import no.shitt.myshit.Constants;
 
 public class AnnotatedTripElement /* NSObject, NSCoding */ {
-    public TripElement tripElement;
+    public final TripElement tripElement;
     public ChangeState modified;
 
     AnnotatedTripElement(int tripId, String tripCode, JSONObject jsonData) {

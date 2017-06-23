@@ -3,7 +3,6 @@ package no.shitt.myshit;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,7 +11,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.AnnotatedTripElement;
@@ -47,8 +45,6 @@ public class SchedulingService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // BEGIN_INCLUDE(service_onhandle)
-
         //Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
 
         //String msg = intent.getStringExtra("msg");
@@ -56,7 +52,6 @@ public class SchedulingService extends IntentService {
 
         // Release the wake lock provided by the BroadcastReceiver.
         AlarmReceiver.completeWakefulIntent(intent);
-        // END_INCLUDE(service_onhandle)
     }
 
     // Post a notification indicating whether a doodle was found.
@@ -65,7 +60,7 @@ public class SchedulingService extends IntentService {
         String tripCode = extras.getString(KEY_TRIP_CODE);
         int elementId = extras.getInt(KEY_ELEMENT_ID, -1);
 
-        //Log.d("SchedulingService", "sendNotification for " + tripCode + ":" + elementId);
+        //Log.d("SchedulingService", "sendNotification for tag " + tag + ", trip " + tripCode + ", element " + elementId);
 
         AnnotatedTrip trip = TripList.getSharedList().tripByCode(tripCode);
         if (trip == null) {
@@ -104,8 +99,7 @@ public class SchedulingService extends IntentService {
                         .setPriority(Notification.PRIORITY_HIGH)
                         .setCategory(Notification.CATEGORY_EVENT)
                         .setContentTitle(title)
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(msg))
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
                         .setContentText(msg);
 
         //mBuilder.setContentIntent(contentIntent);

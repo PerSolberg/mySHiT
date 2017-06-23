@@ -23,7 +23,9 @@
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
-        android:paddingEnd="2sp"/>
+        android:paddingEnd="2sp"
+        android:contentDescription="@string/content_trip_icon"
+        />
 
     <ImageView
         android:id="@+id/trip_icon_overlay"
@@ -32,7 +34,9 @@
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
         android:src="@mipmap/ic_launcher"
-        android:paddingEnd="2sp"/>
+        android:paddingEnd="2sp"
+        android:contentDescription="@null"
+        />
 
     <!-- Trip Name -->
     <TextView

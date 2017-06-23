@@ -4,16 +4,11 @@ package no.shitt.myshit.model;
 import android.accounts.AuthenticatorException;
 import android.content.Context;
 import android.content.Intent;
-//import android.content.SharedPreferences;
-//import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-//import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
-//import org.json.JSONException;
-import org.apache.http.auth.AuthenticationException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -22,20 +17,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-//import java.util.regex.Pattern;
 
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerAPI;
-import no.shitt.myshit.helper.ServerAPIListener;
-import no.shitt.myshit.helper.ServerAPIParams;
 
-public class User implements ServerAPIListener {
+public class User implements ServerAPI.Listener {
     // Class members
-    public static User sharedUser = new User();
+    public static final User sharedUser = new User();
 
     // Instance members
     private String userName;
@@ -47,7 +37,7 @@ public class User implements ServerAPIListener {
     private int id = USER_ID_UNKNOWN;
 
     // Saving parameters, so user name and password can be retrieved when service call completes
-    private ServerAPIParams serverParams;
+    private ServerAPI.Params serverParams;
 
     // JSON tags
     //public static final String JSON_USER_FIRST_NAME = "firstName";
@@ -172,7 +162,7 @@ public class User implements ServerAPIListener {
         return password;
     }
 
-    void setPassword(String newPassword) {
+    private void setPassword(String newPassword) {
         password = newPassword;
         if (newPassword == null) {
             SHiTApplication.getContext().deleteFile(Constants.CRED_P_FILE);
@@ -199,19 +189,16 @@ public class User implements ServerAPIListener {
         return srvFullName;
     }
 
-    public String getInitials() {
+    String getInitials() {
         return srvInitials;
     }
 
-    public String getShortName() {
+    String getShortName() {
         return srvShortName;
     }
 
-    public boolean hasCredentials() {
-        if ( getUserName() == null || getUserName().isEmpty() || getPassword() == null || getPassword().isEmpty() ) {
-            return false;
-        }
-        return true;
+    boolean hasCredentials() {
+        return getUserName() != null && !getUserName().isEmpty() && getPassword() != null && !getPassword().isEmpty();
     }
 
     public void logout() {
@@ -234,7 +221,7 @@ public class User implements ServerAPIListener {
         }
         */
 
-        serverParams = new ServerAPIParams(ServerAPI.URL_USER_VERIFY);
+        serverParams = new ServerAPI.Params(ServerAPI.URL_USER_VERIFY);
         serverParams.addParameter(ServerAPI.PARAM_USER_NAME, userName);
         serverParams.addParameter(ServerAPI.PARAM_PASSWORD, password);
 

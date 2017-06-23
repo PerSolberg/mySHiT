@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorAppIconBackgroundLight">#FFFFFF</color>
+
+    <color name="colorEntryPanel">#BBBBBB</color>
+    <color name="colorEntryFieldBackground">#FFFFFF</color>
 </resources>
