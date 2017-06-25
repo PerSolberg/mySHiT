@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 public class TripDetailsActivity extends AppCompatActivity
         implements TripDetailsFragment.OnFragmentInteractionListener
@@ -384,6 +385,9 @@ public class TripDetailsActivity extends AppCompatActivity
             InputMethodManager imm = (InputMethodManager)getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0 /*InputMethodManager.HIDE_IMPLICIT_ONLY*/);
         }
+
+        ListView listView = (ListView) findViewById(R.id.trip_chat_message_list);
+        listView.setSelection(annotatedTrip.trip.chatThread.count());
     }
 
     public void controlSendButton() {

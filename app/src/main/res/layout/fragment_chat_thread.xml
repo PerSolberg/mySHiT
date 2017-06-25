@@ -36,14 +36,14 @@
         android:paddingTop="5dip"
         android:orientation="horizontal"
         android:layout_gravity="bottom"
-        android:background="@color/colorEntryPanel"
+        android:background="@color/chatEntryPanel"
         >
 
         <EditText
             android:id="@+id/chatmsg_entry"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorEntryFieldBackground"
+            android:background="@color/chatEntryFieldBackground"
             android:paddingBottom="5dip"
             android:paddingStart="3dip"
             android:paddingEnd="3dip"
@@ -61,6 +61,7 @@
             android:layout_marginStart="10dip"
             android:src="@mipmap/icon_chat"
             android:contentDescription="@string/action_send_message"
+            android:background="@null"
             android:onClick="sendMessage"
             android:enabled="false"
             />

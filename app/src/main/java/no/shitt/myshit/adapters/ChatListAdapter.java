@@ -37,6 +37,7 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
         OTHERS_SEEN_INFO(1),
         OWN_PLAIN(2),
         OWN_SEEN_INFO(3),
+        OWN_UNSAVED(4)
         ;
 
         private final int rawValue;
@@ -65,7 +66,6 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
             @Override
             public void onChanged() {
                 super.onChanged();
-                Log.d(LOG_TAG, "Context class = " + ChatListAdapter.this.context.getClass().getName());
                 SHiTApplication.runOnUiThread(new Runnable() {
                     public void run() {
                         notifyDataSetChanged();
@@ -118,7 +118,9 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
     public int getItemViewType(int itemPosition) {
         ChatMessage msg = chatThread.get(itemPosition);
 
-        if ( msg.getUserId() == User.sharedUser.getId() && msg.getLastSeenBy() == null) {
+        if ( !msg.isStored() ) {
+            return ViewTypes.OWN_UNSAVED.rawValue;
+        } else if ( msg.getUserId() == User.sharedUser.getId() && msg.getLastSeenBy() == null) {
             return ViewTypes.OWN_PLAIN.rawValue;
         } else if ( msg.getUserId() == User.sharedUser.getId() ) {
             return ViewTypes.OWN_SEEN_INFO.rawValue;
@@ -144,9 +146,14 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
                 holder.txtSeenInfo      = null;
             } else if (viewType == ViewTypes.OTHERS_SEEN_INFO.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_other_seeninfo, parent, false);
-                holder.txtUserInitials  = (TextView) convertView.findViewById(R.id.chatmsg_who);
+                holder.txtUserInitials = (TextView) convertView.findViewById(R.id.chatmsg_who);
+                holder.txtMessage = (TextView) convertView.findViewById(R.id.chatmsg_text);
+                holder.txtSeenInfo = (TextView) convertView.findViewById(R.id.chatmsg_seen_info);
+            } else if (viewType == ViewTypes.OWN_UNSAVED.rawValue) {
+                convertView = mInflater.inflate(R.layout.chatmsg_own_unsaved, parent, false);
+                holder.txtUserInitials  = null;
                 holder.txtMessage       = (TextView) convertView.findViewById(R.id.chatmsg_text);
-                holder.txtSeenInfo      = (TextView) convertView.findViewById(R.id.chatmsg_seen_info);
+                holder.txtSeenInfo      = null;
             } else if (viewType == ViewTypes.OWN_PLAIN.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_own_plain, parent, false);
                 holder.txtUserInitials  = null;
@@ -168,7 +175,6 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
 
         ChatMessage msg = (ChatMessage) getItem(itemPosition);
 
-        Log.d("ChatListAdapter", "Message [" + msg.getUserInitials() + "]: " + msg.getMessageText());
         holder.txtMessage.setText(msg.getMessageText());
         if (holder.txtUserInitials != null) {
             holder.txtUserInitials.setText(msg.getUserInitials());

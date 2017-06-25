@@ -2,18 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:paddingStart="48dp"
+    android:paddingEnd="0dp"
     >
 
     <!-- Dummy placeholder (User initials) to align TextView without messing up 9-patch background -->
-    <TextView
+    <!--TextView
         android:id="@+id/chatmsg_who"
         android:text="@null"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:paddingStart="3dp"
+        android:paddingEnd="3dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
-        />
+        android:layout_toStartOf="@+id/chatmsg_text"
+        /-->
 
     <!-- Message -->
     <TextView
@@ -23,7 +27,6 @@
         android:layout_alignParentEnd="true"
         android:text="@string/placeholder_medium"
         android:background="@drawable/chatmsg_own"
-        android:layout_toEndOf="@+id/chatmsg_who"
         android:textColor="#202020"
         />
 

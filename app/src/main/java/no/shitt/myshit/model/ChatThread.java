@@ -545,7 +545,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
         rwl.writeLock().lock();
 
         if (lastSeenVersion <= this.lastSeenVersion) {
-            rwl.writeLock().lock();
+            rwl.writeLock().unlock();
             return;
         }
 

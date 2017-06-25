@@ -149,7 +149,7 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
             urlConnection.setReadTimeout(10000);
             urlConnection.setRequestMethod(method.rawValue);
 
-            if (method == Method.POST || method == Method.PUT) {
+            if ( (method == Method.POST || method == Method.PUT) && params[0].getPayload() != null ) {
                 OutputStream out = urlConnection.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(out, "UTF-8"));

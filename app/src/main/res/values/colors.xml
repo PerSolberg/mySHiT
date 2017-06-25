@@ -5,6 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorAppIconBackgroundLight">#FFFFFF</color>
 
-    <color name="colorEntryPanel">#BBBBBB</color>
-    <color name="colorEntryFieldBackground">#FFFFFF</color>
+    <color name="chatEntryPanel">#BBBBBB</color>
+    <color name="chatEntryFieldBackground">#FFFFFF</color>
+    <color name="chatSeenInfo">#CCCCCC</color>
+    <color name="chatMessageText">#202020</color>
 </resources>

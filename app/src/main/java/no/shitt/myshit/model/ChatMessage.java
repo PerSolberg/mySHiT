@@ -198,7 +198,7 @@ public class ChatMessage implements JSONable {
     public String getUserInitials() { return userInitials; }
     public String getMessageText() { return messageText; }
     public List<String> getLastSeenBy() { return lastSeenBy; }
-    Boolean isStored() {
+    public Boolean isStored() {
         return id > 0;
     }
 
@@ -318,7 +318,7 @@ public class ChatMessage implements JSONable {
     }
 
     void read(int tripId, ServerAPI.Listener parentResponseHandler) {
-        if (BuildConfig.DEBUG && tripId != ID_NONE) {
+        if (BuildConfig.DEBUG && tripId == ID_NONE) {
             throw new AssertionError("Cannot read messages for unknown trip");
         }
 
