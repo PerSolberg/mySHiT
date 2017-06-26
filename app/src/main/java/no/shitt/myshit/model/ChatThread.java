@@ -91,7 +91,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
             final String userName;
 
             LastSeenUser(JSONObject elementData) {
-                Log.d("ChatThread.LastSeenInfo", "Decoding");
+                //Log.d("ChatThread.LastSeenInfo", "Decoding");
                 userId = elementData.optInt("id");
                 userName = elementData.optString("name");
             }
@@ -118,13 +118,15 @@ public class ChatThread extends DataSetObservable implements JSONable {
     private int messageVersion;
     private LastSeenInfo lastSeenByOthers;
     private ChatMessage.LocalId lastDisplayedId;
-    private int lastSeenByUserLocal;
+    private int lastSeenByUserLocal = ITEM_NONE;
     private int lastSeenByUserServer;
     private int lastSeenVersion;
     private int tripId;
 
     private int retryCount = 0;
     private final ScheduledThreadPoolExecutor mNetworkThreadPool;
+
+    private ChatMessage.LocalId savedPosition;
 
     // MARK: Properties
     public int count() {
@@ -161,40 +163,45 @@ public class ChatThread extends DataSetObservable implements JSONable {
         return count;
     }
 
+    public void savePosition() {
+        int pos = lastDisplayedItem();
+
+        if (pos != ITEM_NONE) {
+            savedPosition = messages.get(pos).localId;
+        }
+    }
+
+    public boolean restorePosition() {
+        if (savedPosition != null) {
+            lastDisplayedId = savedPosition;
+            savedPosition = null;
+            return true;
+        }
+        return false;
+    }
+
     public int lastDisplayedItem() {
         int item = ITEM_NONE;
 
         rwl.readLock().lock();
         if (lastDisplayedId != null) {
             item = messages.indexOf(lastDisplayedId);
-            /*
-            for (int i = 0; i < messages.size(); i++) {
-                if (messages.get(i).localId.equals(lastDisplayedId)) {
-                    item = i;
-                    break;
-                }
-            }
-            */
         } else if (lastSeenByUserLocal != ChatMessage.ID_NONE) {
-            item = messages.indexOf(lastSeenByUserLocal);
-            /*
+            //item = messages.indexOf(lastSeenByUserLocal);  Doesn't work because index of uses .equals on the parameter not the array elements
             for (int i = 0; i < messages.size(); i++) {
                 if (messages.get(i).id == lastSeenByUserLocal) {
                     item = i;
                     break;
                 }
             }
-            */
         } else if (lastSeenByUserServer != ChatMessage.ID_NONE) {
-            item = messages.indexOf(lastSeenByUserServer);
-            /*
+            //item = messages.indexOf(lastSeenByUserServer);
             for (int i = 0; i < messages.size(); i++) {
                 if (messages.get(i).id == lastSeenByUserServer) {
                     item = i;
                     break;
                 }
             }
-            */
         }
         rwl.readLock().unlock();
 

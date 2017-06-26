@@ -22,7 +22,7 @@ android {
         applicationId "no.shitt.myshit"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 6
+        versionCode 7
         versionName getVersionName()
         multiDexEnabled true
     }

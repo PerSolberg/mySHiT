@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import no.shitt.myshit.Constants;

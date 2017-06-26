@@ -50,7 +50,7 @@
             android:paddingTop="5dip"
             android:layout_weight="1"
             android:hint="@string/hint_chat_message"
-            android:textColor="#202020"
+            android:textColor="@color/chatMessageText"
             android:inputType="textMultiLine|textCapSentences"
             />
 
@@ -62,7 +62,6 @@
             android:src="@mipmap/icon_chat"
             android:contentDescription="@string/action_send_message"
             android:background="@null"
-            android:onClick="sendMessage"
             android:enabled="false"
             />
     </LinearLayout>

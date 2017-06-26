@@ -115,147 +115,6 @@ public class TripDetailsActivity extends AppCompatActivity
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    /*
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        if (Constants.DEVELOPER_MODE) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectDiskReads()
-                    .detectDiskWrites()
-                    .detectNetwork()   // or .detectAll() for all detectable problems
-                    .penaltyLog()
-                    .penaltyFlashScreen()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectLeakedSqlLiteObjects()
-                    .detectLeakedClosableObjects()
-                    .penaltyLog()
-                            //.penaltyDeath()
-                    .build());
-        }
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trip_details);
-
-        // Set up toolbar and enable Up button
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_details_toolbar);
-        //myToolbar.setLogo(R.mipmap.ic_launcher);
-        setSupportActionBar(myToolbar);
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-
-        // Get trip code
-        Intent i = getIntent();
-        trip_code = i.getStringExtra(Constants.IntentExtra.TRIP_CODE);
-
-        annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
-        ab.setTitle(annotatedTrip.trip.name);
-
-        // get list view
-        //ListView lv = getListView();
-        listView = (ExpandableListView) findViewById(R.id.trip_details_list);
-
-        /**
-         * List view on item click listener
-         * * /
-        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id)
-            {
-                String trip_code = ((TextView) view.findViewById(R.id.element_trip_code)).getText().toString();
-                String element_id = ((TextView) view.findViewById(R.id.element_id)).getText().toString();
-                AnnotatedTripElement annotatedElement = TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id));
-                TripElement element = annotatedElement.tripElement;
-
-                // Reset modification flag when user views data
-                if (annotatedElement.modified != ChangeState.UNCHANGED) {
-                    annotatedElement.modified = ChangeState.UNCHANGED;
-                    TripList.getSharedList().saveToArchive();
-                    updateListView();
-                }
-
-                Intent i;
-                if ("TRA".equals(element.type) && "AIR".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), FlightActivity.class);
-                } else if ("TRA".equals(element.type) && "PBUS".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), PrivateTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "LIMO".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), PrivateTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "BUS".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "TRN".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "BOAT".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), ScheduledTransportActivity.class);
-                } else if ("ACM".equals(element.type) && "HTL".equals(element.subType)) {
-                    i = new Intent(getApplicationContext(), HotelActivity.class);
-                } else if ("EVT".equals(element.type)) {
-                    i = new Intent(getApplicationContext(), EventActivity.class);
-                } else {
-                    //Log.e("TripDetailsActivity", "ChildItemClick: Unsupported element type");
-                    return false;
-                }
-
-                // Pass trip id and element id to details view
-                i.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);
-                i.putExtra(Constants.IntentExtra.ELEMENT_ID, element_id);
-
-                startActivity(i);
-                return true;
-            }
-        });
-
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
-        swipeLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        //Log.i("TripDetailsActivity", "onRefresh called from SwipeRefreshLayout");
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        loadTripDetails(true);
-                    }
-                }
-        );
-
-        if (annotatedTrip == null) {
-            //Log.e("TripDetailsActivity", "Invalid trip!");
-        } else if (annotatedTrip.trip.elementCount() == 0) {
-            // Check if Internet present
-            cd = new ConnectionDetector(getApplicationContext());
-            if (!cd.isConnectingToInternet()) {
-                // Internet Connection is not present
-                alert.showAlertDialogue(TripDetailsActivity.this, "Internet Connection Error",
-                        "Please connect to working Internet connection", false);
-                // stop executing code by return
-            } else {
-                loadTripDetails(false);
-            }
-        } else {
-            updateListView();
-        }
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIPS_LOADED));
-    }
-    */
-
-    /*
-    private class HandleNotification extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Constants.Notification.TRIP_DETAILS_LOADED)) {
-                serverCallComplete();
-            } else if (intent.getAction().equals(Constants.Notification.TRIPS_LOADED)) {
-                annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
-                serverCallComplete();
-            } else if (intent.getAction().equals(Constants.Notification.COMMUNICATION_FAILED)) {
-                serverCallFailed();
-            }
-        }
-    }
-    */
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -288,7 +147,6 @@ public class TripDetailsActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -305,48 +163,9 @@ public class TripDetailsActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        updateListView();
+        //updateListView();
     }
 
-
-    private void updateListView() {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                // Moved to fragment
-                /*
-                TripElementListAdapter adapter = new TripElementListAdapter(TripDetailsActivity.this, annotatedTrip);
-                //setListAdapter(adapter);
-                listView.setAdapter(adapter);
-                adapter.applyDefaultCollapse(listView);
-                */
-            }
-        });
-    }
-
-    /*
-    public void serverCallComplete() {
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
-        swipeLayout.setRefreshing(false);
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-        //Log.d("TripDetailsActivity", "Server call succeeded");
-        TripList.getSharedList().saveToArchive();
-
-        updateListView();
-    }
-
-    public void serverCallFailed() {
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
-        swipeLayout.setRefreshing(false);
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-        //Log.d("TripDetailsActivity", "Server REST call failed.");
-    }
-    */
 
     private void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
@@ -368,48 +187,4 @@ public class TripDetailsActivity extends AppCompatActivity
         Log.d("TripDetailsActivity", "Chat fragment interaction detected");
     }
 
-    public void sendMessage(View v) {
-        Log.d("TripDetailsActivity", "Send message icon clicked");
-        EditText textField = (EditText) findViewById(R.id.chatmsg_entry);
-        String msgText = textField.getText().toString();
-        ChatMessage msg = new ChatMessage(msgText);
-
-        annotatedTrip.trip.chatThread.append(msg);
-        textField.getText().clear();
-        controlSendButton();
-
-        // Hide keyboard
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            view.clearFocus();
-            InputMethodManager imm = (InputMethodManager)getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0 /*InputMethodManager.HIDE_IMPLICIT_ONLY*/);
-        }
-
-        ListView listView = (ListView) findViewById(R.id.trip_chat_message_list);
-        listView.setSelection(annotatedTrip.trip.chatThread.count());
-    }
-
-    public void controlSendButton() {
-        EditText textField = (EditText) findViewById(R.id.chatmsg_entry);
-        ImageButton button = (ImageButton) findViewById(R.id.chat_send_button);
-        if (textField != null && button != null) {
-            boolean enabled = textField.getText().length() != 0;
-            button.setEnabled(enabled);
-
-            //Drawable originalIcon = SHiTApplication.getContext().getResources().getDrawable(R.mipmap.icon_chat);
-            Drawable originalIcon = SHiTApplication.getContext().getDrawable(R.mipmap.icon_chat);
-            Drawable icon = enabled ? originalIcon : convertDrawableToGrayScale(originalIcon);
-            button.setImageDrawable(icon);
-        }
-    }
-
-    private static Drawable convertDrawableToGrayScale(Drawable drawable) {
-        if (drawable == null) {
-            return null;
-        }
-        Drawable res = drawable.mutate();
-        res.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
-        return res;
-    }
 }

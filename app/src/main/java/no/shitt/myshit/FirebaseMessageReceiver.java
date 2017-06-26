@@ -1,5 +1,7 @@
 package no.shitt.myshit;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -46,6 +48,10 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 AnnotatedTrip aTrip = TripList.getSharedList().tripById(tripId);
                 if (aTrip != null && aTrip.trip.chatThread != null) {
                     if (insert) {
+                        MediaPlayer mPlayer = MediaPlayer.create(SHiTApplication.getContext(), R.raw.chat_new_message);
+                        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        mPlayer.start();
+
                         aTrip.trip.chatThread.refresh(ChatThread.RefreshMode.INCREMENTAL);
                     } else {
                         String strLastSeenInfo = ntfData.get(Constants.PushNotificationKeys.LAST_SEEN_INFO);

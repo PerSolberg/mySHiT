@@ -72,7 +72,11 @@ public class ChatMessage implements JSONable {
             */
             if (getClass() == o.getClass()) {
                 LocalId otherId = (LocalId) o;
-                return (this.deviceType.equals(otherId.deviceType)
+
+                return (this.deviceType != null
+                        && this.deviceId != null
+                        && this.localId != null
+                        && this.deviceType.equals(otherId.deviceType)
                         && this.deviceId.equals(otherId.deviceId)
                         && this.localId.equals(otherId.localId));
             } else if (o.getClass() == ChatMessage.class) {

@@ -261,7 +261,7 @@ public class User implements ServerAPI.Listener {
     }
 
     public void onRemoteCallFailed() {
-        //Log.d("User", "User authentication call failed");
+        Log.d("User", "User authentication call failed with unknown exception");
         Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
         //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
@@ -270,13 +270,13 @@ public class User implements ServerAPI.Listener {
 
     public void onRemoteCallFailed(Exception e) {
         if (e instanceof AuthenticatorException) {
-            //Log.d("User", "User authentication failed");
+            Log.d("User", "User authentication failed");
             Context ctx = SHiTApplication.getContext();
             Intent intent = new Intent(Constants.Notification.LOGON_UNAUTHORISED);
-            intent.putExtra("message", ctx.getString(R.string.error_unauthorised));
-            LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+            //intent.putExtra("message", ctx.getString(R.string.error_unauthorised));
+            LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
         } else {
-            //Log.d("User", "User authentication call failed with exception");
+            Log.d("User", "User authentication call failed with exception");
             Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
             intent.putExtra("message", e.getMessage());
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);

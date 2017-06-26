@@ -92,6 +92,7 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
         mProgressView = findViewById(R.id.login_progress);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_UNAUTHORISED));
         LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_FAILED));
     }
 
@@ -103,7 +104,7 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
             if (intent.getAction().equals(Constants.Notification.LOGON_SUCCEEDED)) {
                 finish();
             } else if (intent.getAction().equals(Constants.Notification.LOGON_UNAUTHORISED)) {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.setError(getString(R.string.error_unauthorised));
                 mPasswordView.requestFocus();
             } else if (intent.getAction().equals(Constants.Notification.LOGON_FAILED)) {
                 alert.showAlertDialogue(LoginActivity.this, "Logon Error",
