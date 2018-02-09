@@ -3,6 +3,7 @@ package no.shitt.myshit;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +15,8 @@ import android.support.v4.app.NotificationCompat;
 
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.AnnotatedTripElement;
+import no.shitt.myshit.model.Trip;
+import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
 /**
@@ -46,29 +49,29 @@ public class SchedulingService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         //Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
-
-        //String msg = intent.getStringExtra("msg");
-        sendNotification(intent.getData().toString(), intent.getExtras());
+        sendNotification(intent);
 
         // Release the wake lock provided by the BroadcastReceiver.
         AlarmReceiver.completeWakefulIntent(intent);
     }
 
-    // Post a notification indicating whether a doodle was found.
-    //private void sendNotification(String tag, String msg) {
-    private void sendNotification(String tag, Bundle extras) {
-        String tripCode = extras.getString(KEY_TRIP_CODE);
-        int elementId = extras.getInt(KEY_ELEMENT_ID, -1);
+    // Post a notification
+    private void sendNotification(Intent intent) {
+        Bundle extras = intent.getExtras();
+        String tag = intent.getData().toString();
+        String actionName = intent.getAction();
 
-        //Log.d("SchedulingService", "sendNotification for tag " + tag + ", trip " + tripCode + ", element " + elementId);
+        String tripCode = extras.getString(KEY_TRIP_CODE);
+        boolean hasElementId = extras.containsKey(KEY_ELEMENT_ID);
+        int elementId = extras.getInt(KEY_ELEMENT_ID);
 
         AnnotatedTrip trip = TripList.getSharedList().tripByCode(tripCode);
         if (trip == null) {
             // If trip not found, it's probably a notification for a deleted trip - ignore
             return;
         }
-        AnnotatedTripElement tripElement;
-        if (elementId > 0) {
+        AnnotatedTripElement tripElement = null;
+        if (hasElementId) {
             tripElement = trip.trip.elementById(elementId);
             if (tripElement == null) {
                 // If element not found, it's probably a notification for a deleted element - ignore
@@ -82,15 +85,12 @@ public class SchedulingService extends IntentService {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        //PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-        //        new Intent(this, TripsActivity.class), 0);
-
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(SHiTApplication.getContext())
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setLargeIcon(largeIcon)
                         .setVisibility(Notification.VISIBILITY_PUBLIC)
@@ -102,7 +102,25 @@ public class SchedulingService extends IntentService {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
                         .setContentText(msg);
 
-        //mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(tag, NOTIFICATION_ID, mBuilder.build());
+        int notificationId = (hasElementId ? elementId : trip.trip.id);
+        if (actionName != null) {
+            Intent elementIntent;
+            if (tripElement == null) {
+                elementIntent = trip.trip.getActivityIntent(Trip.ActivityType.POPUP);
+            } else {
+                elementIntent = tripElement.tripElement.getActivityIntent(TripElement.ActivityType.POPUP);
+            }
+            elementIntent.setAction(actionName);
+            elementIntent.putExtra(Constants.IntentExtra.NOTIFICATION_TAG, tag);
+
+            PendingIntent clickIntent = PendingIntent.getActivity(SHiTApplication.getContext()
+                    , notificationId // NOTIFICATION_ID /*elementId*/
+                    , elementIntent
+                    , PendingIntent.FLAG_UPDATE_CURRENT
+                    , extras);
+            mBuilder.setContentIntent(clickIntent);
+        }
+        Notification ntf = mBuilder.build();
+        mNotificationManager.notify(tag, notificationId /*NOTIFICATION_ID*/, ntf);
     }
 }

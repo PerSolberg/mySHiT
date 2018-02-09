@@ -36,8 +36,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <!-- android:theme="@style/AppTheme" -->
-
+        <!-- Main screen -->
         <activity
             android:name=".TripsActivity"
             android:launchMode="singleTop">
@@ -46,90 +45,158 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!--
-            intent-filter>
-                <action android:name="NTF.OPEN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter
-            -->
         </activity>
+
+        <!-- Trip details -->
         <activity
             android:name=".TripDetailsActivity"
             android:label="@string/title_trip_details"
             android:parentActivityName=".TripsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-            <!-- android:theme="@style/AppTheme" -->
-            <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripsActivity" />
         </activity>
+        <activity
+            android:name=".TripDetailsPopupActivity"
+            android:label="@string/title_trip_details"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:finishOnTaskLaunch="true">
+
+            <!-- android:parentActivityName=".TripsActivity" -->
+
+            <intent-filter>
+                <action android:name="NTF.INSERT.ADDRESS" />
+                <action android:name="NTF.UPDATE.ADDRESS" />
+                <action android:name="NTF.INSERT.BOOKING" />
+                <action android:name="NTF.UPDATE.BOOKING" />
+                <action android:name="NTF.INSERT.EVENT" />
+                <action android:name="NTF.UPDATE.EVENT" />
+                <action android:name="NTF.INSERT.HOTEL" />
+                <action android:name="NTF.UPDATE.HOTEL" />
+                <action android:name="NTF.INSERT.ITINERARY" />
+                <action android:name="NTF.UPDATE.ITINERARY" />
+                <!--action android:name="NTF.INSERT.NONE" /-->
+                <!--action android:name="NTF.UPDATE.NONE" /-->
+                <action android:name="NTF.INSERT.TRIP" />
+                <action android:name="NTF.UPDATE.TRIP" />
+                <!--action android:name="NTF.INSERT.USERPROFILE" /-->
+                <!--action android:name="NTF.UPDATE.USERPROFILE" /-->
+                <action android:name="NTF.INSERT.CHATMESSAGE" />
+                <!--action android:name="NTF.UPDATE.CHATMESSAGE" /-->
+                <action android:name="no.shitt.myshit.TRIP" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Support screens -->
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
+
+        <!-- Trip element details -->
         <activity
             android:name=".FlightActivity"
             android:label="@string/title_flight_details"
             android:parentActivityName=".TripDetailsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-            <!-- android:theme="@style/AppTheme" -->
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripDetailsActivity" />
         </activity>
+        <activity
+            android:name=".FlightPopupActivity"
+            android:label="@string/title_flight_details"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:finishOnTaskLaunch="true">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.TRANSPORT.FLIGHT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".PrivateTransportActivity"
             android:label="@string/title_private_transport_details"
             android:parentActivityName=".TripDetailsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-            <!-- android:theme="@style/AppTheme" -->
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripDetailsActivity" />
         </activity>
+        <activity
+            android:name=".PrivateTransportPopupActivity"
+            android:label="@string/title_private_transport_details"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:finishOnTaskLaunch="true">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.TRANSPORT.PRIVATE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ScheduledTransportActivity"
             android:label="@string/title_scheduled_transport_details"
             android:parentActivityName=".TripDetailsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-            <!-- android:theme="@style/AppTheme" -->
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripDetailsActivity" />
         </activity>
+        <activity
+            android:name=".ScheduledTransportPopupActivity"
+            android:label="@string/title_scheduled_transport_details"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:finishOnTaskLaunch="true">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.TRANSPORT.SCHEDULED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".HotelActivity"
             android:label="@string/title_hotel_details"
-            android:parentActivityName=".HotelActivity"
+            android:parentActivityName=".TripDetailsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-            <!-- android:theme="@style/AppTheme" -->
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripDetailsActivity" />
         </activity>
         <activity
+            android:name=".HotelPopupActivity"
+            android:label="@string/title_hotel_details"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:finishOnTaskLaunch="true">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.ACCOM.HOTEL" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".EventActivity"
             android:label="@string/title_event_details"
+            android:parentActivityName=".TripDetailsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".TripDetailsActivity" />
+        </activity>
+        <activity
+            android:name=".EventPopupActivity"
+            android:label="@string/title_event_details"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:finishOnTaskLaunch="true">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.EVENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <!-- Components for notifications -->
@@ -147,6 +214,22 @@
         </receiver>
 
         <service android:name=".SchedulingService" />
+
+        <!-- SHiT Chat components -->
+        <receiver
+            android:name=".ChatMessageIgnoreReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.CHATMSG_IGNORE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ChatMessageReplyReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="no.shitt.myshit.CHATMSG_REPLY" />
+            </intent-filter>
+        </receiver>
 
         <!-- Firebase -->
         <!--
@@ -178,7 +261,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

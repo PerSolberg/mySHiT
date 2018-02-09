@@ -20,6 +20,9 @@ import no.shitt.myshit.ui.TripDetailsFragment;
 
 public class TripPagerAdapter extends FragmentPagerAdapter {
     private static final int PAGE_COUNT = 2;
+    public static final int TAB_TRIP_DETAILS = 0;
+    public static final int TAB_MESSAGES = 1;
+
     private final String mTripCode;
     private final int mTripId;
 
@@ -42,11 +45,11 @@ public class TripPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         Fragment f = null;
         switch (position) {
-            case 0:
+            case TAB_TRIP_DETAILS:
                 f = TripDetailsFragment.newInstance(mTripId, mTripCode);
                 break;
 
-            case 1:
+            case TAB_MESSAGES:
                 f = ChatThreadFragment.newInstance(mTripId, mTripCode);
                 break;
         }

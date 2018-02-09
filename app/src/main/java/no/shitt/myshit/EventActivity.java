@@ -21,7 +21,7 @@ import no.shitt.myshit.model.Event;
 import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
-public class EventActivity extends AppCompatActivity {
+public class EventActivity extends TripElementActivity /*AppCompatActivity*/ {
     String trip_code;
     String element_id;
 

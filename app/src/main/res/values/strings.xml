@@ -81,6 +81,7 @@
     <string name="chat_seen_by_one">Seen by %1$s</string>
     <string name="chat_seen_by_many">Seen by %1$s and %2$s</string>
     <string name="chat_seen_by_all">Seen by everyone</string>
+    <string name="chat_reply_error_unknown_trip">Unable to reply to unknown trip</string>
 
     <!-- Menu actions & other actions -->
     <string name="action_settings">Settings</string>
@@ -218,6 +219,15 @@
     <string name="NTF.DELETE.ITINERARY">%1$s: Itinerary updated</string>
     <string name="NTF.DELETE.TRIP">%1$s: Trip updated</string>
     <string name="NTF.DELETE.USERPROFILE">User profile updated</string>
+
+    <!-- Push notification categories -->
+    <string name="ntf_category_default">DEFAULT-NTF-CATEGORY</string>
+
+    <!-- Push notification actions -->
+    <string name="ntf_action_chat_reply">Reply</string>
+    <string name="ntf_action_chat_replied">Replied</string>
+    <string name="ntf_action_chat_ignore">Ignore</string>
+    <string name="ntf_action_chat_ignored">Ignored</string>
 
     <!-- Entry field hints -->
     <string name="hint_chat_message">Enter message</string>

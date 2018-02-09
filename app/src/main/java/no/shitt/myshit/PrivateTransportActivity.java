@@ -18,7 +18,7 @@ import no.shitt.myshit.model.GenericTransport;
 import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
-public class PrivateTransportActivity extends AppCompatActivity {
+public class PrivateTransportActivity extends TripElementActivity /*AppCompatActivity*/ {
     // Trip element info
     String trip_code;
     String element_id;

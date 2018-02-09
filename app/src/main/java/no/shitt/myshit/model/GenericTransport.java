@@ -1,5 +1,7 @@
 package no.shitt.myshit.model;
 
+import android.content.Intent;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,6 +11,11 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.FlightActivity;
+import no.shitt.myshit.FlightPopupActivity;
+import no.shitt.myshit.PrivateTransportActivity;
+import no.shitt.myshit.PrivateTransportPopupActivity;
+import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
@@ -232,5 +239,33 @@ public class GenericTransport extends TripElement {
             return dateFormatter.format(arrivalTime);
         }
         return null;
+    }
+
+    // TODO: Create new activity for GenericTransport
+    @Override
+    public Intent getActivityIntent(ActivityType activityType) {
+        Intent i = null;
+        switch (activityType) {
+            case REGULAR:
+                i = new Intent(SHiTApplication.getContext(), PrivateTransportActivity.class);
+                break;
+
+            case POPUP:
+                i = new Intent(SHiTApplication.getContext(), PrivateTransportPopupActivity.class);
+                break;
+
+            default:
+                return null;
+        }
+
+        i.putExtra(Constants.IntentExtra.TRIP_CODE, tripCode);
+        i.putExtra(Constants.IntentExtra.ELEMENT_ID, String.valueOf(id));
+
+        return i;
+    }
+
+    @Override
+    protected String getNotificationClickAction() {
+        return Constants.PushNotificationActions.PRIVATE_TRANSPORT_CLICK;
     }
 }

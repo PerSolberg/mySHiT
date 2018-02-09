@@ -42,6 +42,10 @@ public class Constants {
         public static final String TRIP_ID                = "tripId";
         public static final String TRIP_NAME              = "tripName";
         public static final String LAST_SEEN_INFO         = "lastSeenInfo";
+        public static final String LOC_ARGS               = "loc-args";
+        public static final String LOC_KEY                = "loc-key";
+        public static final String FROM_USER_ID           = "fromUserId";
+        public static final String MESSAGE_ID             = "id";
     }
 
     public class PushNotificationData {
@@ -51,16 +55,38 @@ public class Constants {
         public static final String OP_UPDATE              = "UPDATE";
     }
 
+    public class PushNotificationActions {
+        public static final String EVENT_CLICK                = "no.shitt.myshit.EVENT";
+        public static final String TRIP_CLICK                 = "no.shitt.myshit.TRIP";
+        public static final String HOTEL_CLICK                = "no.shitt.myshit.ACCOM.HOTEL";
+        public static final String FLIGHT_CLICK               = "no.shitt.myshit.TRANSPORT.FLIGHT";
+        public static final String PRIVATE_TRANSPORT_CLICK    = "no.shitt.myshit.TRANSPORT.PRIVATE";
+        public static final String SCHEDULED_TRANSPORT_CLICK  = "no.shitt.myshit.TRANSPORT.SCHEDULED";
+
+        /* Server-based click events */
+        public static final String CHATMSG_CLICK              = "NTF.INSERT.CHATMESSAGE";
+        public static final String CHATMSG_REPLY              = "NTF.ACTION.REPLY";
+        public static final String CHATMSG_IGNORE             = "NTF.ACTION.IGNORE";
+    }
+
     public class Setting {
         public static final String ALERT_LEAD_TIME_DEPARTURE     = "pref_alertLeadTime_departure";
         public static final String ALERT_LEAD_TIME_CONNECTION    = "pref_alertLeadTime_connection";
         public static final String ALERT_LEAD_TIME_EVENT         = "pref_alertLeadTime_event";
-        public static final String ALERT_LEAR_TIME_TRIP          = "pref_alertLeadTime_trip";
+        public static final String ALERT_LEAD_TIME_TRIP          = "pref_alertLeadTime_trip";
+    }
+
+    public class Intent {
+        public static final String CHATMSG_REPLY        = "no.shitt.myshit.CHATMSG_REPLY";
+        public static final String CHATMSG_IGNORE       = "no.shitt.myshit.CHATMSG_IGNORE";
     }
 
     public class IntentExtra {
         public static final String TRIP_CODE            = "trip_code";
+        public static final String TRIP_ID              = "trip_id";
         public static final String ELEMENT_ID           = "element_id";
+        public static final String MESSAGE_ID           = "message_id";
+        public static final String NOTIFICATION_TAG     = "ntf_tag";
     }
 
     public class UpcomingPreference {
@@ -90,6 +116,7 @@ public class Constants {
         public static final String TRIP_NAME               = "name";
         public static final String TRIP_SECTION            = "section";
         public static final String TRIP_TYPE               = "type";
+        public static final String TRIP_ELEMENT_COUNT      = "elementCount";
         public static final String TRIP_ELEMENTS           = "elements";
         public static final String TRIP_NOTIFICATIONS      = "notifications";
         public static final String TRIP_CHAT               = "chatThread";

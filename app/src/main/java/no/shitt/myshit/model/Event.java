@@ -1,5 +1,6 @@
 package no.shitt.myshit.model;
 
+import android.content.Intent;
 import android.text.format.DateUtils;
 
 import org.json.JSONException;
@@ -11,6 +12,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.EventActivity;
+import no.shitt.myshit.EventPopupActivity;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
@@ -183,23 +186,45 @@ public class Event extends TripElement {
             //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 
             int leadTimeEventMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_EVENT, LEAD_TIME_MISSING);
-            /*
-            try {
-                String leadTimeDeparture = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_EVENT, "");
-                leadTimeEventMinutes = Integer.valueOf(leadTimeDeparture);
-            }
-            catch (Exception e) {
-                leadTimeEventMinutes = -1;
-            } */
 
             if (leadTimeEventMinutes != LEAD_TIME_MISSING) {
                 if (travelTime > 0) {
                     leadTimeEventMinutes += travelTime;
                 }
 
-                setNotification(Constants.Setting.ALERT_LEAD_TIME_EVENT, leadTimeEventMinutes, R.string.alert_msg_event, null);
+                setNotification(Constants.Setting.ALERT_LEAD_TIME_EVENT
+                        , leadTimeEventMinutes
+                        , R.string.alert_msg_event
+                        , getNotificationClickAction()
+                        , null);
             }
         }
     }
 
+    @Override
+    public Intent getActivityIntent(ActivityType activityType) {
+        Intent i;
+        switch (activityType) {
+            case REGULAR:
+                i = new Intent(SHiTApplication.getContext(), EventActivity.class);
+                break;
+
+            case POPUP:
+                i = new Intent(SHiTApplication.getContext(), EventPopupActivity.class);
+                break;
+
+            default:
+                return null;
+        }
+
+        i.putExtra(Constants.IntentExtra.TRIP_CODE, tripCode);
+        i.putExtra(Constants.IntentExtra.ELEMENT_ID, String.valueOf(id));
+
+        return i;
+    }
+
+    @Override
+    protected String getNotificationClickAction() {
+        return Constants.PushNotificationActions.EVENT_CLICK;
+    }
 }

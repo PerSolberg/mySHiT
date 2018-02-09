@@ -30,7 +30,7 @@ class NotificationInfo {
     NotificationInfo(JSONObject elementData) {
         String baseDateText = elementData.isNull(Constants.JSON.NTFINFO_BASE_DATE) ? null : elementData.optString(Constants.JSON.NTFINFO_BASE_DATE);
         if (baseDateText != null) {
-            baseDate = ServerDate.convertServerDate(baseDateText, TIMEZONE);
+            baseDate = ServerDate.convertServerDate(baseDateText, null /*TIMEZONE*/);
         }
         String notificationDateText = elementData.isNull(Constants.JSON.NTFINFO_NOTIFICATION_DATE) ? null : elementData.optString(Constants.JSON.NTFINFO_NOTIFICATION_DATE);
         if (notificationDateText != null) {

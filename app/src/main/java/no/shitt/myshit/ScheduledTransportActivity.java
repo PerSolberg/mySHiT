@@ -20,7 +20,7 @@ import no.shitt.myshit.model.ScheduledTransport;
 import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
-public class ScheduledTransportActivity extends AppCompatActivity {
+public class ScheduledTransportActivity extends TripElementActivity /*AppCompatActivity*/ {
     // Trip element info
     String trip_code;
     String element_id;

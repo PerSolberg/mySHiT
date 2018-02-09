@@ -62,6 +62,9 @@ public class TripDetailsFragment extends Fragment {
     private AnnotatedTrip annotatedTrip;
 
     private OnFragmentInteractionListener mListener;
+    private final TripsUpdateHandler tripsUpdateHandler = new TripsUpdateHandler();
+    private final TripDetailsUpdateHandler tripDetailsUpdateHandler = new TripDetailsUpdateHandler();
+    private final CommErrorHandler  commErrorHandler = new CommErrorHandler();
 
     public TripDetailsFragment() {
         // Required empty public constructor
@@ -109,8 +112,10 @@ public class TripDetailsFragment extends Fragment {
         //setContentView(R.layout.activity_trip_details);
         annotatedTrip = TripList.getSharedList().tripByCode(sTripCode);
 
-        LocalBroadcastManager.getInstance(SHiTApplication.getContext()/*this*/).registerReceiver(new no.shitt.myshit.ui.TripDetailsFragment.HandleNotification(), new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
-        LocalBroadcastManager.getInstance(SHiTApplication.getContext()/*this*/).registerReceiver(new no.shitt.myshit.ui.TripDetailsFragment.HandleNotification(), new IntentFilter(Constants.Notification.TRIPS_LOADED));
+        //Context ctx = SHiTApplication.getContext();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(tripDetailsUpdateHandler, new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(tripsUpdateHandler, new IntentFilter(Constants.Notification.TRIPS_LOADED));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(commErrorHandler, new IntentFilter(Constants.Notification.COMMUNICATION_FAILED));
     }
 
 
@@ -138,6 +143,7 @@ public class TripDetailsFragment extends Fragment {
                 }
 
                 Intent i;
+                /*
                 if ("TRA".equals(element.type) && "AIR".equals(element.subType)) {
                     i = new Intent(SHiTApplication.getContext(), FlightActivity.class);
                 } else if ("TRA".equals(element.type) && "PBUS".equals(element.subType)) {
@@ -158,12 +164,20 @@ public class TripDetailsFragment extends Fragment {
                     //Log.e("TripDetailsActivity", "ChildItemClick: Unsupported element type");
                     return false;
                 }
+                */
+
+                Intent i2 = element.getActivityIntent(TripElement.ActivityType.REGULAR);
+                /*if (! i2.filterEquals(i)) {
+                    Log.e("TripDetailsActivity", "Old and new intents are different");
+                    Log.e("TripDetailsActivity", "Old = " + i.toString());
+                    Log.e("TripDetailsActivity", "New = " + i2.toString());
+                }*/
 
                 // Pass trip id and element id to details view
-                i.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);
-                i.putExtra(Constants.IntentExtra.ELEMENT_ID, element_id);
+                i2.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);
+                i2.putExtra(Constants.IntentExtra.ELEMENT_ID, element_id);
 
-                startActivity(i);
+                startActivity(i2);
                 return true;
             }
         });
@@ -222,8 +236,17 @@ public class TripDetailsFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        super.onDetach();
         mListener = null;
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(tripDetailsUpdateHandler);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(tripsUpdateHandler);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(commErrorHandler);
+
+        super.onDestroy();
     }
 
     /**
@@ -241,6 +264,29 @@ public class TripDetailsFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    private class CommErrorHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serverCallFailed();
+        }
+    }
+
+    private class TripsUpdateHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            annotatedTrip = TripList.getSharedList().tripByCode(sTripCode);
+            serverCallComplete();
+        }
+    }
+
+    private class TripDetailsUpdateHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serverCallComplete();
+        }
+    }
+
+    /*
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -254,6 +300,7 @@ public class TripDetailsFragment extends Fragment {
             }
         }
     }
+    */
 
     private void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
@@ -269,16 +316,21 @@ public class TripDetailsFragment extends Fragment {
 
     private void updateListView() {
         if (getActivity() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    if (listView != null) {
-                        TripElementListAdapter adapter = new TripElementListAdapter(SHiTApplication.getContext() /*no.shitt.myshit.ui.TripDetailsFragment.this*/, annotatedTrip);
-                        //setListAdapter(adapter);
-                        listView.setAdapter(adapter);
-                        adapter.applyDefaultCollapse(listView);
+            if (annotatedTrip.trip.hasElements() && !annotatedTrip.trip.elementsLoaded()) {
+                // Probably reloaded entire trip list, but details for this trip weren't included
+                annotatedTrip.trip.loadDetails();
+            } else {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (listView != null) {
+                            TripElementListAdapter adapter = new TripElementListAdapter(SHiTApplication.getContext() /*no.shitt.myshit.ui.TripDetailsFragment.this*/, annotatedTrip);
+                            //setListAdapter(adapter);
+                            listView.setAdapter(adapter);
+                            adapter.applyDefaultCollapse(listView);
+                        }
                     }
-                }
-            });
+                });
+            }
         } else {
             Log.i("TripDetailsFragment", "No activity found when updating trip details");
         }

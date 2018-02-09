@@ -35,12 +35,18 @@ import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.SchedulingService;
+import no.shitt.myshit.TripDetailsActivity;
+import no.shitt.myshit.TripDetailsPopupActivity;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
 public class Trip implements ServerAPI.Listener, JSONable {
+    public enum ActivityType {
+        REGULAR, POPUP
+    }
+
     public int id;
     private int itineraryId;
     private final String startDateText;  // Hold original value for saving in archive
@@ -51,6 +57,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
     public String code;
     public String name;
     public String type;
+    private int elementCount;
     public List<AnnotatedTripElement> elements;
     public ChatThread chatThread;
 
@@ -184,11 +191,6 @@ public class Trip implements ServerAPI.Listener, JSONable {
             for (AnnotatedTripElement ate : elements) {
                 jate.put(ate.toJSON());
             }
-            /* Iterator i = elements.iterator();
-            while (i.hasNext()) {
-                AnnotatedTripElement ate = (AnnotatedTripElement) i.next();
-                jate.put(ate.toJSON());
-            } */
         }
         jo.put(Constants.JSON.TRIP_ELEMENTS, jate);
 
@@ -217,6 +219,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
         code = elementData.isNull(Constants.JSON.TRIP_CODE) ? null : elementData.optString(Constants.JSON.TRIP_CODE);
         name = elementData.isNull(Constants.JSON.TRIP_NAME) ? null : elementData.optString(Constants.JSON.TRIP_NAME);
         type = elementData.isNull(Constants.JSON.TRIP_TYPE) ? null : elementData.optString(Constants.JSON.TRIP_TYPE);
+        elementCount = elementData.optInt(Constants.JSON.TRIP_ELEMENT_COUNT, -1);
         JSONArray tripElements = elementData.optJSONArray(Constants.JSON.TRIP_ELEMENTS);
         if (tripElements != null) {
             elements = new ArrayList<>();
@@ -224,11 +227,13 @@ public class Trip implements ServerAPI.Listener, JSONable {
                 JSONObject srvElement = tripElements.optJSONObject(i);
                 if (fromServer) {
                     TripElement tripElement = TripElement.createFromDictionary(id, code, srvElement);
-                    tripElement.setNotification();
+                    // Moving notification refresh
+                    // tripElement.setNotification();
                     elements.add( new AnnotatedTripElement(tripElement));
                 } else {
                     AnnotatedTripElement annotatedElement = new AnnotatedTripElement(id, code, srvElement);
-                    annotatedElement.tripElement.setNotification();
+                    // Moving notification refresh
+                    // annotatedElement.tripElement.setNotification();
                     elements.add(annotatedElement);
                 }
             }
@@ -251,7 +256,8 @@ public class Trip implements ServerAPI.Listener, JSONable {
             chatThread = new ChatThread(id);
         }
 
-        setNotification();
+        // Moving notification refresh
+        // setNotification();
         registerForPushNotifications();
     }
 
@@ -333,10 +339,21 @@ public class Trip implements ServerAPI.Listener, JSONable {
 
     public int elementCount() {
         if (elements == null)
+            //return elementCount;
             return 0;
         else
             return elements.size();
     }
+
+
+    public boolean hasElements() {
+        return ( (elements == null) ? elementCount : elements.size() ) > 0;
+    }
+
+    public boolean elementsLoaded() {
+        return (elements != null);
+    }
+
 
     public AnnotatedTripElement elementById(int elementId) {
         for (int i = 0; i < elements.size(); i++) {
@@ -354,7 +371,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
             return null;
     }
 
-    private void setNotification(String notificationType, int leadTime, int alertMessageId, /*Map<String,Object>*/ Bundle userInfo) {
+    private void setNotification(String notificationType, int leadTime, int alertMessageId, Bundle userInfo) {
         // Logic starts here
         NotificationInfo oldInfo = notifications.get(notificationType);  //TODO: Check what happens if key doesn't exist
         NotificationInfo newInfo = new NotificationInfo(getStartTime(), leadTime);
@@ -387,10 +404,6 @@ public class Trip implements ServerAPI.Listener, JSONable {
             }
 
             if (!combined) {
-                // iOS
-                // notification.soundName = UILocalNotificationDefaultSoundName
-                // notification.userInfo = actualUserInfo
-
                 Context ctx = SHiTApplication.getContext();
                 Calendar alarmTime = Calendar.getInstance();
                 alarmTime.setTime(newInfo.getNotificationDate());
@@ -400,16 +413,16 @@ public class Trip implements ServerAPI.Listener, JSONable {
                 extras.putString(SchedulingService.KEY_TITLE, getTitle());
 
                 //extras.putAll(actualUserInfo);
+                long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
+                String leadTimeText = ServerDate.formatInterval(actualLeadTime);
 
-                //long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
-                //String leadTimeText = ServerDate.formatInterval(actualLeadTime);
-
-                // Set up message based on alertMessage parameter
-                // TripElement:extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(null, DateFormat.SHORT)));
-                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, "?? minutes", startTime(DateUtils.FORMAT_SHOW_TIME)));
+                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(DateUtils.FORMAT_SHOW_TIME)));
 
                 AlarmReceiver alarm = new AlarmReceiver();
-                alarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/" + notificationType + "/" + code + "/" + Integer.toString(id)), extras);
+                alarm.setAlarm(alarmTime.getTime()
+                        , Uri.parse("alarm://shitt.no/" + notificationType + "/" + code + "/" + Integer.toString(id))
+                        , Constants.PushNotificationActions.TRIP_CLICK
+                        , extras);
             } else {
                 Log.d("Trip", "Not setting " + notificationType + " notification for trip " + id + " combined with other notification");
             }
@@ -426,13 +439,10 @@ public class Trip implements ServerAPI.Listener, JSONable {
 
         // Set notification(s) (if we have a start date)
         if (getTense() == Tense.FUTURE) {
-            //Context ctx = SHiTApplication.getContext();
-            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-
-            int leadTimeTripHours = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAR_TIME_TRIP, LEAD_TIME_MISSING);
+            int leadTimeTripHours = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_TRIP, LEAD_TIME_MISSING);
 
             if (leadTimeTripHours != LEAD_TIME_MISSING) {
-                setNotification(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, leadTimeTripHours * 60, R.string.alert_msg_travel, null);
+                setNotification(Constants.Setting.ALERT_LEAD_TIME_TRIP, leadTimeTripHours * 60, R.string.alert_msg_trip, null);
             }
         }
     }
@@ -451,9 +461,9 @@ public class Trip implements ServerAPI.Listener, JSONable {
                 newTrip = Trip.createFromDictionary(serverData, true);
             }
             if (newTrip != null) {
-                //Log.d("Trip", "Comparing new trip details to existing");
+                newTrip.copyState(this);
                 newTrip.compareTripElements(this);
-                //Log.d("Trip", "Updating trip");
+
                 this.id              = newTrip.id;
                 this.itineraryId     = newTrip.itineraryId;
                 this.startDate       = newTrip.startDate;
@@ -463,12 +473,12 @@ public class Trip implements ServerAPI.Listener, JSONable {
                 this.name            = newTrip.name;
                 this.type            = newTrip.type;
                 this.elements        = newTrip.elements;
+
+                refreshNotifications();
             }
         }
 
-        //Log.d("Trip", "Sending notification");
         Intent intent = new Intent(Constants.Notification.TRIP_DETAILS_LOADED);
-        //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
@@ -550,4 +560,28 @@ public class Trip implements ServerAPI.Listener, JSONable {
             }
         }
     }
+
+
+    public Intent getActivityIntent(ActivityType activityType) {
+        Intent i;
+        switch (activityType) {
+            case REGULAR:
+                i = new Intent(SHiTApplication.getContext(), TripDetailsActivity.class);
+                break;
+
+            case POPUP:
+                i = new Intent(SHiTApplication.getContext(), TripDetailsPopupActivity.class);
+                i.putExtra(Constants.PushNotificationKeys.TRIP_ID, String.valueOf(id));
+                break;
+
+            default:
+                return null;
+        }
+
+        i.putExtra(Constants.IntentExtra.TRIP_CODE, code);
+        i.putExtra(Constants.IntentExtra.TRIP_ID, String.valueOf(id));
+
+        return i;
+    }
+
 }

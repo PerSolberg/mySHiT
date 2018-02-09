@@ -129,15 +129,16 @@ public class TripList implements ServerAPI.Listener, JSONable {
             }
         }
 
-        trips =  newTripList;
+        trips = newTripList;
+
+        // Moving notification refresh here to avoid hyperactive notifications
+        refreshNotifications();
     }
 
     public void onRemoteCallComplete(JSONObject response) {
-        //Log.d("TripList", "Trip list retrieved - building model");
         copyServerData(response.optJSONArray(Constants.JSON.QUERY_RESULTS), true);
 
         Intent intent = new Intent(Constants.Notification.TRIPS_LOADED);
-        //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
@@ -153,7 +154,6 @@ public class TripList implements ServerAPI.Listener, JSONable {
     public void loadFromArchive() {
         String jsonString = "";
 
-        //Log.d("TripList", "Loading from local file");
         try {
             InputStream inputStream = SHiTApplication.getContext().openFileInput(Constants.LOCAL_ARCHIVE_FILE);
 
@@ -168,14 +168,8 @@ public class TripList implements ServerAPI.Listener, JSONable {
 
                 inputStream.close();
                 jsonString = stringBuilder.toString();
-                //Log.d("TripList", "File loaded");
             }
 
-            /*
-            for (int i = 0; i < jsonString.length(); i += 1000) {
-                Log.d("TripList JSON", jsonString.substring(i, Math.min(i + 1000, jsonString.length())));
-            }
-            */
             JSONObject jo = new JSONObject(jsonString);
             copyServerData(jo.optJSONArray(Constants.JSON.QUERY_RESULTS), false);
         }

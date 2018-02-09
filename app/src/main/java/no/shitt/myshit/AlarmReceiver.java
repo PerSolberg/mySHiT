@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Date;
 
@@ -24,21 +26,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("AlarmReceiver", "Broadcast received");
         /* Ensure intent extras are passed along to SchedulingService */
+        /* Toasts are not good enough */
         ComponentName comp = new ComponentName(context.getPackageName(), SchedulingService.class.getName());
-        startWakefulService(context, (intent.setComponent(comp)));
-
-        /* Alternative way of forwarding intent data */
-        /*
-        Intent service = new Intent(context, SchedulingService.class);
-        service.setData(intent.getData());
-        service.putExtras(intent.getExtras());
-        //Log.d("AlarmReceiver", "Received intent: " + intent.describeContents());
-        Log.d("AlarmReceiver", "Action: " + intent.getAction() + ", Data: " + intent.getData());
-
-        // Start the service, keeping the device awake while it is launching.
-        startWakefulService(context, service);
-        */
+        intent.setComponent(comp);
+        startWakefulService(context, intent);
     }
 
     /**
@@ -47,13 +40,16 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
      * @param data      Unique URI for the notification; if notification with the same URI exists, Android will replace it
      * @param extras    Additional information (text to display to user)
      */
-    public void setAlarm(Date alertTime, Uri data, Bundle extras) {
+    public void setAlarm(Date alertTime, Uri data, String actionName, Bundle extras) {
         //Log.d("AlarmReceiver", "Setting alarm for " + data.toString() + " at " + alertTime.toString());
         Context ctx = SHiTApplication.getContext();
         alarmMgr = (AlarmManager)ctx.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(ctx, AlarmReceiver.class);
         intent.setData(data);
         intent.putExtras(extras);
+        if (actionName != null) {
+            intent.setAction(actionName);
+        }
         alarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alertTime.getTime(), alarmIntent);
@@ -67,6 +63,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
     }
+
+    public void setAlarm(Date alertTime, Uri data, Bundle extras) {
+        setAlarm(alertTime, data, null, extras);
+    }
+
 
     /**
      * Cancels the alarm.

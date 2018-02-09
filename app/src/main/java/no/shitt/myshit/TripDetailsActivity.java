@@ -8,6 +8,7 @@ import no.shitt.myshit.model.User;
 import no.shitt.myshit.ui.ChatThreadFragment;
 import no.shitt.myshit.ui.TripDetailsFragment;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 //import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -70,9 +72,17 @@ public class TripDetailsActivity extends AppCompatActivity
 
         // Get trip code
         Intent i = getIntent();
-        trip_code = i.getStringExtra(Constants.IntentExtra.TRIP_CODE);
-
-        annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
+        String intentAction = i.getAction();
+        if (intentAction == null) {
+            trip_code = i.getStringExtra(Constants.IntentExtra.TRIP_CODE);
+            annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
+        } else {
+            Bundle extras = i.getExtras();
+            String extTripId = extras.getString(Constants.PushNotificationKeys.TRIP_ID);
+            int tripId = Integer.parseInt(extTripId);
+            annotatedTrip = TripList.getSharedList().tripById(tripId);
+            trip_code = annotatedTrip.trip.code;
+        }
 
         // Get the ViewPager and set its PagerAdapter so that it can display items
         ViewPager viewPager = (ViewPager) findViewById(R.id.trip_content);
@@ -167,7 +177,7 @@ public class TripDetailsActivity extends AppCompatActivity
     }
 
 
-    private void loadTripDetails(boolean refresh) {
+    protected void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
             pDialog = new ProgressDialog(/*TripDetailsActivity.*/this);
             pDialog.setMessage("Loading trip details ...");
@@ -187,4 +197,14 @@ public class TripDetailsActivity extends AppCompatActivity
         Log.d("TripDetailsActivity", "Chat fragment interaction detected");
     }
 
+    protected void cancelAlert() {
+        String strTripId = getIntent().getStringExtra(Constants.IntentExtra.TRIP_ID);
+        String notificationTag = getIntent().getStringExtra(Constants.IntentExtra.NOTIFICATION_TAG);
+        if (strTripId != null && notificationTag != null) {
+            int tripId = Integer.parseInt(strTripId);
+            NotificationManager notificationManager = (NotificationManager)
+                    this.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(notificationTag, tripId);
+        }
+    }
 }

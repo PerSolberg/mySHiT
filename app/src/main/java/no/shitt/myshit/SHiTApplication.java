@@ -28,6 +28,12 @@ public class SHiTApplication extends Application {
         }
     }
 
+    public static int getStringResourceIdByName(String aString) {
+        String packageName = getApplication().getPackageName();
+        int resId = getApplication().getResources().getIdentifier(aString, "string", packageName);
+        return resId;
+    }
+
     public static int getPreferenceInt(String prefName, int defaultValue) {
         Context ctx = getContext();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);

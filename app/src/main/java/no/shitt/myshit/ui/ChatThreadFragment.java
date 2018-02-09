@@ -30,7 +30,7 @@ import android.widget.ListView;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.TripDetailsActivity;
+//import no.shitt.myshit.TripDetailsActivity;
 import no.shitt.myshit.adapters.ChatListAdapter;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
@@ -69,6 +69,7 @@ public class ChatThreadFragment extends Fragment {
     final AlertDialogueManager alert = new AlertDialogueManager();
     private final ChatUpdateHandler chatUpdateHandler = new ChatUpdateHandler();
     private final CommErrorHandler  commErrorHandler = new CommErrorHandler();
+    private final MessageTextWatcher messageTextWatcher = new MessageTextWatcher();
 
     public ChatThreadFragment() {
         // Required empty public constructor
@@ -140,21 +141,7 @@ public class ChatThreadFragment extends Fragment {
         );
 
         EditText msgEntryField = (EditText) mView.findViewById(R.id.chatmsg_entry);
-        msgEntryField.addTextChangedListener(
-                new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                        controlSendButton();
-                    }
-                }
-
-        );
+        msgEntryField.addTextChangedListener(messageTextWatcher);
 
         ImageButton sendButton = (ImageButton) mView.findViewById(R.id.chat_send_button);
         sendButton.setOnClickListener(
@@ -320,6 +307,18 @@ public class ChatThreadFragment extends Fragment {
         }
     }
 
+    private class MessageTextWatcher implements TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            controlSendButton();
+        }
+    }
     /*
     public void serverCallComplete() {
         Log.d(LOG_TAG, "Server call succeeded");

@@ -1,6 +1,7 @@
 package no.shitt.myshit.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,7 +28,11 @@ import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
-public class TripElement implements JSONable {
+public abstract class TripElement implements JSONable {
+    public enum ActivityType {
+        REGULAR, POPUP
+    }
+
     public String type;
     public String subType;
     public int id;
@@ -149,6 +154,10 @@ public class TripElement implements JSONable {
         TripElement elem;
         if (elemType.equals("TRA") && elemSubType.equals("AIR")) {
             elem = new Flight(tripId, tripCode, elementData);
+        } else if (elemType.equals("TRA") && elemSubType.equals("PBUS")) {
+            elem = new PrivateTransport(tripId, tripCode, elementData);
+        } else if (elemType.equals("TRA") && elemSubType.equals("LIMO")) {
+            elem = new PrivateTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA") && elemSubType.equals("BUS")) {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
         } else if (elemType.equals("TRA") && elemSubType.equals("TRN")) {
@@ -183,6 +192,14 @@ public class TripElement implements JSONable {
             jar.put(new JSONObject(ref));
         }
         jo.putOpt(Constants.JSON.ELEM_REFERENCES, jar);
+
+        JSONObject jsonNtf = new JSONObject();
+        for (Map.Entry<String, NotificationInfo> ntfInfo : notifications.entrySet()) {
+            String key = ntfInfo.getKey();
+            NotificationInfo value = ntfInfo.getValue();
+            jsonNtf.put(key, value.toJSON());
+        }
+        jo.put("notifications", jsonNtf);
 
         return jo;
     }
@@ -227,7 +244,23 @@ public class TripElement implements JSONable {
                 references.add(refData);
             }
         }
+
         notifications = new HashMap<>();
+        JSONObject savedNotifications = elementData.optJSONObject("notifications");
+        if (savedNotifications != null) {
+            Iterator i = savedNotifications.keys();
+            while (i.hasNext()) {
+                String key = (String) i.next();
+                JSONObject savedNtfInfo = savedNotifications.optJSONObject(key);
+                if (savedNtfInfo != null) {
+                    NotificationInfo ntfInfo = new NotificationInfo(savedNtfInfo);
+                    notifications.put(key, ntfInfo);
+                } else {
+                    Log.e("TripElement", "Unable to rebuild notification info.");
+                }
+            }
+        }
+
         serverData = elementData;
     }
 
@@ -275,7 +308,7 @@ public class TripElement implements JSONable {
         // Subclasses that support notifications must override this method
     }
 
-    void setNotification(String notificationType, int leadTime, int alertMessageId, /*Map<String,Object>*/ Bundle userInfo) {
+    void setNotification(String notificationType, int leadTime, int alertMessageId, String clickAction, Bundle userInfo) {
         // Logic starts here
         NotificationInfo oldInfo = notifications == null ? null : notifications.get(notificationType);  //TODO: Check what happens if key doesn't exist
         NotificationInfo newInfo = new NotificationInfo(getStartTime(), leadTime);
@@ -308,10 +341,6 @@ public class TripElement implements JSONable {
             }
 
             if (!combined) {
-                // iOS
-                // notification.soundName = UILocalNotificationDefaultSoundName
-                // notification.userInfo = actualUserInfo
-
                 Context ctx = SHiTApplication.getContext();
                 Calendar alarmTime = Calendar.getInstance();
                 alarmTime.setTime(newInfo.getNotificationDate());
@@ -320,7 +349,6 @@ public class TripElement implements JSONable {
                 extras.putString(SchedulingService.KEY_TRIP_CODE, tripCode);
                 extras.putInt(SchedulingService.KEY_ELEMENT_ID, id);
                 extras.putString(SchedulingService.KEY_TITLE, getTitle());
-                //extras.putAll(actualUserInfo);
 
                 long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
                 String leadTimeText = ServerDate.formatInterval(actualLeadTime);
@@ -329,7 +357,10 @@ public class TripElement implements JSONable {
                 extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(null, DateFormat.SHORT)));
 
                 AlarmReceiver alarm = new AlarmReceiver();
-                alarm.setAlarm(alarmTime.getTime(), Uri.parse("alarm://shitt.no/" + notificationType + "/" + tripCode + "/" + Integer.toString(id)), extras);
+                alarm.setAlarm( alarmTime.getTime()
+                        , Uri.parse("alarm://shitt.no/" + notificationType + "/" + tripCode + "/" + Integer.toString(id))
+                        , clickAction
+                        , extras);
             } else {
                 Log.d("TripElement", "Not setting " + notificationType + " notification for trip element " + id + " combined with other notification");
             }
@@ -341,6 +372,9 @@ public class TripElement implements JSONable {
 
     }
 
+    void setNotification(String notificationType, int leadTime, int alertMessageId, Bundle userInfo) {
+        setNotification(notificationType, leadTime, alertMessageId, null, userInfo);
+    }
 
     /* Don't need to cancel notifications on Android (I think...)
     void cancelNotifications() {
@@ -355,4 +389,8 @@ public class TripElement implements JSONable {
     void copyState(TripElement fromElement) {
         this.notifications = fromElement.notifications;
     }
+
+    abstract public Intent getActivityIntent(ActivityType activityType);
+
+    abstract protected String getNotificationClickAction();
 }

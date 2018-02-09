@@ -81,6 +81,7 @@
     <string name="chat_seen_by_one">Lest av %1$s</string>
     <string name="chat_seen_by_many">Lest av %1$s og %2$s</string>
     <string name="chat_seen_by_all">Lest av alle</string>
+    <string name="chat_reply_error_unknown_trip">Kan ikke sende svar til ukjent reise</string>
 
     <!-- Menu actions & other actions -->
     <string name="action_settings">Innstillinger</string>
@@ -218,6 +219,15 @@
     <string name="NTF.DELETE.ITINERARY">%1$s: Reiserute oppdatert</string>
     <string name="NTF.DELETE.TRIP">%1$s: Reise oppdatert</string>
     <string name="NTF.DELETE.USERPROFILE">Brukerprofil oppdatert</string>
+
+    <!-- Push notification categories -->
+    <string name="ntf_category_default">DEFAULT-NTF-CATEGORY</string>
+
+    <!-- Push notification actions -->
+    <string name="ntf_action_chat_reply">Svar</string>
+    <string name="ntf_action_chat_replied">Besvart</string>
+    <string name="ntf_action_chat_ignore">Ignorer</string>
+    <string name="ntf_action_chat_ignored">Ignorert</string>
 
     <!-- Entry field hints -->
     <string name="hint_chat_message">Skriv melding</string>

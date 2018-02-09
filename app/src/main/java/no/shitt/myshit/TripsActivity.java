@@ -53,6 +53,9 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     // Save state keys
     private static final String STATE_TRIP_CODE = "tripCode";
+    private final TripsUpdateHandler tripsUpdateHandler = new TripsUpdateHandler();
+    private final LogonSuccessHandler logonSuccessHandler = new LogonSuccessHandler();
+    private final CommErrorHandler commErrorHandler = new CommErrorHandler();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -176,8 +179,9 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.TRIPS_LOADED));
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(tripsUpdateHandler, new IntentFilter(Constants.Notification.TRIPS_LOADED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(logonSuccessHandler, new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(commErrorHandler, new IntentFilter(Constants.Notification.COMMUNICATION_FAILED));
     }
 
     @Override
@@ -275,6 +279,15 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(tripsUpdateHandler);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logonSuccessHandler);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(commErrorHandler);
+
+        super.onDestroy();
+    }
+
     private void updateListView() {
         //Log.d("TripsActivity", "updateListView");
         runOnUiThread(new Runnable() {
@@ -287,6 +300,29 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         });
     }
 
+    private class TripsUpdateHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serverCallComplete();
+        }
+    }
+
+    private class LogonSuccessHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadTrips(false);
+        }
+    }
+
+    private class CommErrorHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serverCallFailed();
+        }
+    }
+
+
+    /*
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -300,6 +336,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
             }
         }
     }
+    */
 
     public void serverCallComplete() {
         //Log.d("TripsActivity", "serverCallComplete");

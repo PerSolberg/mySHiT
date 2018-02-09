@@ -20,7 +20,7 @@ import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
 
-public class HotelActivity extends AppCompatActivity {
+public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
     private String trip_code;
     String element_id;
 

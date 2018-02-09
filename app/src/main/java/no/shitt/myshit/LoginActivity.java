@@ -45,6 +45,10 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
     private View mProgressView;
     private View mLoginFormView;
 
+    private final LogonSuccessHandler logonSuccessHandler = new LogonSuccessHandler();
+    private final LogonUnauthorisedHandler logonUnauthorisedHandler = new LogonUnauthorisedHandler();
+    private final LogonFailureHandler logonFailureHandler = new LogonFailureHandler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Constants.DEVELOPER_MODE) {
@@ -91,12 +95,49 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_UNAUTHORISED));
-        LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_FAILED));
+        //LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
+        //LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_UNAUTHORISED));
+        //LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_FAILED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(logonSuccessHandler, new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(logonUnauthorisedHandler, new IntentFilter(Constants.Notification.LOGON_UNAUTHORISED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(logonFailureHandler, new IntentFilter(Constants.Notification.LOGON_FAILED));
     }
 
+    @Override
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logonSuccessHandler);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logonUnauthorisedHandler);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(logonFailureHandler);
+        super.onDestroy();
+    }
 
+    private class LogonSuccessHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showProgress(false);
+            finish();
+        }
+    }
+
+    private class LogonUnauthorisedHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showProgress(false);
+            mPasswordView.setError(getString(R.string.error_unauthorised));
+            mPasswordView.requestFocus();
+        }
+    }
+
+    private class LogonFailureHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showProgress(false);
+            alert.showAlertDialogue(LoginActivity.this, "Logon Error",
+                    intent.getStringExtra("message"), false);
+        }
+    }
+
+    /*
     private class HandleNotification extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -112,6 +153,7 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
             }
         }
     }
+    */
 
 
     /**

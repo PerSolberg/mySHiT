@@ -1,6 +1,7 @@
 package no.shitt.myshit.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 
 import org.json.JSONException;
@@ -12,6 +13,10 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
+import no.shitt.myshit.EventActivity;
+import no.shitt.myshit.EventPopupActivity;
+import no.shitt.myshit.HotelActivity;
+import no.shitt.myshit.HotelPopupActivity;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
@@ -174,4 +179,32 @@ public class Hotel extends TripElement {
         return null;
     }
 
+
+    @Override
+    public Intent getActivityIntent(ActivityType activityType) {
+        Intent i = null;
+        switch (activityType) {
+            case REGULAR:
+                i = new Intent(SHiTApplication.getContext(), HotelActivity.class);
+                break;
+
+            case POPUP:
+                i = new Intent(SHiTApplication.getContext(), HotelPopupActivity.class);
+                break;
+
+            default:
+                return null;
+        }
+
+        i.putExtra(Constants.IntentExtra.TRIP_CODE, tripCode);
+        i.putExtra(Constants.IntentExtra.ELEMENT_ID, String.valueOf(id));
+
+        return i;
+    }
+
+
+    @Override
+    protected String getNotificationClickAction() {
+        return Constants.PushNotificationActions.HOTEL_CLICK;
+    }
 }

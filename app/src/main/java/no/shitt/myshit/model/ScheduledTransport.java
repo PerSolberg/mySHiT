@@ -1,5 +1,7 @@
 package no.shitt.myshit.model;
 
+import android.content.Intent;
+
 import org.json.JSONObject;
 
 import java.text.DateFormat;
@@ -8,6 +10,8 @@ import java.util.Map;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
+import no.shitt.myshit.ScheduledTransportActivity;
+import no.shitt.myshit.ScheduledTransportPopupActivity;
 import no.shitt.myshit.helper.StringUtil;
 
 public class ScheduledTransport extends GenericTransport {
@@ -69,36 +73,53 @@ public class ScheduledTransport extends GenericTransport {
 
         // Set notification(s) (if we have a start date)
         if (getTense() == Tense.FUTURE) {
-            //Context ctx = SHiTApplication.getContext();
-            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-
             int leadTimeDepartureMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, LEAD_TIME_MISSING);
-            /* try {
-                String leadTimeDeparture = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, "");
-                leadTimeDepartureMinutes = Integer.valueOf(leadTimeDeparture);
-            }
-            catch (Exception e) {
-                leadTimeDepartureMinutes = -1;
-            } */
-
             int leadTimeConnectionMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, LEAD_TIME_MISSING);
-            /* try {
-                String leadtimeConnection = sharedPref.getString(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, "");
-                leadTimeConnectionMinutes = Integer.valueOf(leadtimeConnection);
-            }
-            catch (Exception e) {
-                leadTimeConnectionMinutes = -1;
-            } */
 
             if (leadTimeDepartureMinutes != LEAD_TIME_MISSING && legNo == 1) {
-                setNotification(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, leadTimeDepartureMinutes, R.string.alert_msg_travel, null);
+                setNotification(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE
+                        , leadTimeDepartureMinutes
+                        , R.string.alert_msg_travel
+                        , getNotificationClickAction()
+                        , null);
             }
             if (leadTimeConnectionMinutes != LEAD_TIME_MISSING) {
-                setNotification(Constants.Setting.ALERT_LEAD_TIME_CONNECTION, leadTimeConnectionMinutes, R.string.alert_msg_travel, null);
+                setNotification(Constants.Setting.ALERT_LEAD_TIME_CONNECTION
+                        , leadTimeConnectionMinutes
+                        , R.string.alert_msg_travel
+                        , getNotificationClickAction()
+                        , null);
             }
         }
     }
 
+
+    @Override
+    public Intent getActivityIntent(ActivityType activityType) {
+        Intent i = null;
+        switch (activityType) {
+            case REGULAR:
+                i = new Intent(SHiTApplication.getContext(), ScheduledTransportActivity.class);
+                break;
+
+            case POPUP:
+                i = new Intent(SHiTApplication.getContext(), ScheduledTransportPopupActivity.class);
+                break;
+
+            default:
+                return null;
+        }
+
+        i.putExtra(Constants.IntentExtra.TRIP_CODE, tripCode);
+        i.putExtra(Constants.IntentExtra.ELEMENT_ID, String.valueOf(id));
+
+        return i;
+    }
+
+    @Override
+    protected String getNotificationClickAction() {
+        return Constants.PushNotificationActions.SCHEDULED_TRANSPORT_CLICK;
+    }
 }
 
 
