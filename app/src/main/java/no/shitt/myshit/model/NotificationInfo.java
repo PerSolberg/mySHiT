@@ -30,7 +30,7 @@ class NotificationInfo {
     NotificationInfo(JSONObject elementData) {
         String baseDateText = elementData.isNull(Constants.JSON.NTFINFO_BASE_DATE) ? null : elementData.optString(Constants.JSON.NTFINFO_BASE_DATE);
         if (baseDateText != null) {
-            baseDate = ServerDate.convertServerDate(baseDateText, null /*TIMEZONE*/);
+            baseDate = ServerDate.convertServerDate(baseDateText, TIMEZONE);
         }
         String notificationDateText = elementData.isNull(Constants.JSON.NTFINFO_NOTIFICATION_DATE) ? null : elementData.optString(Constants.JSON.NTFINFO_NOTIFICATION_DATE);
         if (notificationDateText != null) {
@@ -61,7 +61,7 @@ class NotificationInfo {
     public JSONObject toJSON() throws JSONException {
         JSONObject jo = new JSONObject(); // super.toJSON();
 
-        jo.putOpt(Constants.JSON.NTFINFO_BASE_DATE, baseDate);
+        jo.putOpt(Constants.JSON.NTFINFO_BASE_DATE, ServerDate.convertServerDate(baseDate, TIMEZONE));
         jo.putOpt(Constants.JSON.NTFINFO_NOTIFICATION_DATE, ServerDate.convertServerDate(notificationDate, TIMEZONE));
         jo.putOpt(Constants.JSON.NTFINFO_LEAD_TIME, leadTime);
 
@@ -81,8 +81,13 @@ class NotificationInfo {
         } else if (newNotificationTime.getTime().after(now)) {
             // New notification is in the future, probably because event time or lead time changed - refresh
             return true;
+        } else if (this.baseDate == null) {
+            // Base date unknown, assume it's changed
+            return true;
         } else if (this.baseDate.compareTo(baseDate) != 0) {
             // Event date changed, notify user about change
+            // Håkon rapporterer om NullPointerException i denne testen, trolig fordi baseDate er NULL
+            // som følge av konverteringsproblem fra lokal fil.
             return true;
         }
 

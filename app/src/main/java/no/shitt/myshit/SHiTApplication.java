@@ -30,8 +30,7 @@ public class SHiTApplication extends Application {
 
     public static int getStringResourceIdByName(String aString) {
         String packageName = getApplication().getPackageName();
-        int resId = getApplication().getResources().getIdentifier(aString, "string", packageName);
-        return resId;
+        return getApplication().getResources().getIdentifier(aString, "string", packageName);
     }
 
     public static int getPreferenceInt(String prefName, int defaultValue) {

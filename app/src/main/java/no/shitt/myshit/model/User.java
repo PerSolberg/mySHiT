@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
@@ -59,6 +60,10 @@ public class User implements ServerAPI.Listener {
 
     // Prevent other classes from instantiating - User is singleton!
     private User() {
+        final FirebaseApp firebaseApp = FirebaseApp.initializeApp(SHiTApplication.getContext());
+        if (firebaseApp == null) {
+            Log.e("User creation", "FirebaseApp not initialised");
+        }
     }
 
     public String getUserName() {

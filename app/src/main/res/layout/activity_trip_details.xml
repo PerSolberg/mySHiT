@@ -20,8 +20,8 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/trip_details_tabbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:tabMode="fixed" />
+        android:layout_height="?attr/actionBarSize" />
+    <!--    app:tabMode="fixed" /-->
     <!--android.support.design.widget.TabLayout
         android:id="@+id/trip_details_tabbar"
         android:layout_width="match_parent"

@@ -13,7 +13,8 @@ import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.google.android.gms.iid.InstanceID;
+//import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -114,7 +115,7 @@ public class ChatMessage implements JSONable {
     List<String> lastSeenBy;
 
     private class SaveResponseHandler implements ServerAPI.Listener {
-        ServerAPI.Listener parentResponseHandler = null;
+        ServerAPI.Listener parentResponseHandler;
 
         SaveResponseHandler(ServerAPI.Listener parentResponseHandler) {
             this.parentResponseHandler = parentResponseHandler;
@@ -163,7 +164,7 @@ public class ChatMessage implements JSONable {
     }
 
     private class ReadResponseHandler implements ServerAPI.Listener {
-        ServerAPI.Listener parentResponseHandler = null;
+        ServerAPI.Listener parentResponseHandler;
 
         ReadResponseHandler(ServerAPI.Listener parentResponseHandler) {
             this.parentResponseHandler = parentResponseHandler;
@@ -301,7 +302,8 @@ public class ChatMessage implements JSONable {
         userInitials = User.sharedUser.getInitials();
         localId = new LocalId();
         localId.deviceType = Constants.DEVICE_TYPE;
-        localId.deviceId   = InstanceID.getInstance(SHiTApplication.getContext()).getId();
+        localId.deviceId   = FirebaseInstanceId.getInstance().getId();
+        //localId.deviceId   = InstanceID.getInstance(SHiTApplication.getContext()).getId();
         //localId.deviceId   = Settings.Secure.getString(SHiTApplication.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         localId.localId    = generateLocalId();
         messageText = message;

@@ -269,14 +269,14 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
             tripCode = null;
         }
 
-        {
+        /*{
             String fcmToken;
 
             fcmToken = FirebaseInstanceId.getInstance().getToken();
             if (fcmToken != null) {
                 //Log.d("TripsActivity", "Firebase token = " + fcmToken);
             }
-        }
+        }*/
     }
 
     @Override
