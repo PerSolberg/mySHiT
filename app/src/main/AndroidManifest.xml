@@ -246,6 +246,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAppIconBackgroundLight" />
+        <!-- Disable Advertising ID -->
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <!-- Disable Analytics -->
+        <meta-data android:name="firebase_analytics_collection_deactivated" android:value="true" />
 
         <service
             android:name=".helper.FirebaseInstanceHelper"
