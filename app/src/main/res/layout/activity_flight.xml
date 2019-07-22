@@ -64,12 +64,13 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:layout_column="1" />
+
         <TextView
+            android:id="@+id/departure"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder_short"
-            android:id="@+id/departure"
-            android:layout_column="2"/>
+            android:layout_column="2"
+            android:text="@string/placeholder_short" />
     </TableRow>
 
     <TableRow
@@ -84,12 +85,13 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:layout_column="1" />
+
         <TextView
+            android:id="@+id/arrival"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder_short"
-            android:id="@+id/arrival"
-            android:layout_column="2"/>
+            android:layout_column="2"
+            android:text="@string/placeholder_short" />
     </TableRow>
 
     <!--TableRow

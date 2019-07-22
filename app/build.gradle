@@ -20,9 +20,9 @@ android {
 
     defaultConfig {
         applicationId "no.shitt.myshit"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 28
-        versionCode 9
+        versionCode 10
         versionName getVersionName()
         multiDexEnabled true
     }

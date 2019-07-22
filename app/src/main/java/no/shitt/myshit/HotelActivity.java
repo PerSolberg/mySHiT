@@ -7,12 +7,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.util.Linkify;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.Hotel;
@@ -51,9 +53,6 @@ public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
         trip_code = intent.getStringExtra(Constants.IntentExtra.TRIP_CODE);
         element_id = intent.getStringExtra(Constants.IntentExtra.ELEMENT_ID);
 
-        // calling background thread
-        //new LoadSingleTrack().execute();
-        //Log.d("Hotel", "Invoking background service");
         new getData().execute();
     }
 
@@ -64,6 +63,8 @@ public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
         ((TextView) findViewById(R.id.hotel_reference)).setText(references.toString());
         ((TextView) findViewById(R.id.hotel_phone)).setText(StringUtil.stringWithDefault(hotel.phone, ""));
         ((TextView) findViewById(R.id.hotel_transfer_info)).setText(StringUtil.stringWithDefault(hotel.transferInfo, ""));
+
+        Linkify.addLinks(((TextView) findViewById(R.id.hotel)), Constants.selectAllButFirstLine, "geo:0,0?q=");
     }
 
     @Override

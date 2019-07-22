@@ -51,9 +51,6 @@ public class PrivateTransportActivity extends TripElementActivity /*AppCompatAct
         trip_code = intent.getStringExtra(Constants.IntentExtra.TRIP_CODE);
         element_id = intent.getStringExtra(Constants.IntentExtra.ELEMENT_ID);
 
-        // calling background thread
-        //new LoadSingleTrack().execute();
-        //Log.d("PrivateTransportAct", "Invoking background service");
         new getData().execute();
     }
 

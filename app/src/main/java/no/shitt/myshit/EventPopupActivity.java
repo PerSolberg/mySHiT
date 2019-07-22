@@ -1,6 +1,5 @@
 package no.shitt.myshit;
 
-//import EventActivity;
 
 import android.app.NotificationManager;
 import android.content.Context;

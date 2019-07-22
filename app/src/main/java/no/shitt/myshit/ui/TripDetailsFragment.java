@@ -142,36 +142,8 @@ public class TripDetailsFragment extends Fragment {
                     updateListView();
                 }
 
-                Intent i;
-                /*
-                if ("TRA".equals(element.type) && "AIR".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), FlightActivity.class);
-                } else if ("TRA".equals(element.type) && "PBUS".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), PrivateTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "LIMO".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), PrivateTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "BUS".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), ScheduledTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "TRN".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), ScheduledTransportActivity.class);
-                } else if ("TRA".equals(element.type) && "BOAT".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), ScheduledTransportActivity.class);
-                } else if ("ACM".equals(element.type) && "HTL".equals(element.subType)) {
-                    i = new Intent(SHiTApplication.getContext(), HotelActivity.class);
-                } else if ("EVT".equals(element.type)) {
-                    i = new Intent(SHiTApplication.getContext(), EventActivity.class);
-                } else {
-                    //Log.e("TripDetailsActivity", "ChildItemClick: Unsupported element type");
-                    return false;
-                }
-                */
-
+                //Intent i;
                 Intent i2 = element.getActivityIntent(TripElement.ActivityType.REGULAR);
-                /*if (! i2.filterEquals(i)) {
-                    Log.e("TripDetailsActivity", "Old and new intents are different");
-                    Log.e("TripDetailsActivity", "Old = " + i.toString());
-                    Log.e("TripDetailsActivity", "New = " + i2.toString());
-                }*/
 
                 // Pass trip id and element id to details view
                 i2.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);

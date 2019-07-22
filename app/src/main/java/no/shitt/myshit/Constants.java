@@ -1,5 +1,7 @@
 package no.shitt.myshit;
 
+import java.util.regex.Pattern;
+
 public class Constants {
     public static final boolean DEVELOPER_MODE = false;  // Change to false for release version!
 
@@ -9,6 +11,9 @@ public class Constants {
 
     public static final String URL_ENCODE_CHARSET = "utf-8";
     public static final String DEVICE_TYPE        = "Android";
+
+    public static final Pattern selectAll = Pattern.compile(".*", Pattern.DOTALL);
+    public static final Pattern selectAllButFirstLine = Pattern.compile("(?<=[\\r\\n]).*", Pattern.DOTALL | Pattern.MULTILINE);
 
     public class Notification {
         public static final String LOGON_FAILED           = "logonFailed";

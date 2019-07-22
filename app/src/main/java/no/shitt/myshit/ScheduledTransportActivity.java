@@ -7,6 +7,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.ScheduledTransport;
@@ -53,9 +55,6 @@ public class ScheduledTransportActivity extends TripElementActivity /*AppCompatA
         trip_code = intent.getStringExtra(Constants.IntentExtra.TRIP_CODE);
         element_id = intent.getStringExtra(Constants.IntentExtra.ELEMENT_ID);
 
-        // calling background thread
-        //new LoadSingleTrack().execute();
-        //Log.d("SchedTransportAct", "Invoking background service");
         new getData().execute();
     }
 
@@ -67,6 +66,9 @@ public class ScheduledTransportActivity extends TripElementActivity /*AppCompatA
         ((TextView) findViewById(R.id.scheduled_transport_arrival)).setText(arrivalInfo.toString());
         ((TextView) findViewById(R.id.scheduled_transport_phone)).setText(StringUtil.stringWithDefault(transport.companyPhone, ""));
         ((TextView) findViewById(R.id.scheduled_transport_reference)).setText(references.toString());
+
+        Linkify.addLinks(((TextView) findViewById(R.id.scheduled_transport_departure)), Constants.selectAllButFirstLine, "geo:0,0?q=");
+        Linkify.addLinks(((TextView) findViewById(R.id.scheduled_transport_arrival)), Constants.selectAllButFirstLine, "geo:0,0?q=");
     }
 
     @Override

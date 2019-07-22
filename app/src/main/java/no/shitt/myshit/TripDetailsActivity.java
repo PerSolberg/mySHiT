@@ -40,14 +40,11 @@ public class TripDetailsActivity extends AppCompatActivity
         implements TripDetailsFragment.OnFragmentInteractionListener
                  , ChatThreadFragment.OnFragmentInteractionListener
 {
-    //ConnectionDetector cd;
-    //AlertDialogueManager alert = new AlertDialogueManager();
     private ProgressDialog pDialog;
 
     private AnnotatedTrip annotatedTrip;
 
     String trip_code;
-    //String trip_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +60,6 @@ public class TripDetailsActivity extends AppCompatActivity
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .penaltyLog()
-                    //.penaltyDeath()
                     .build());
         }
 
@@ -114,7 +110,6 @@ public class TripDetailsActivity extends AppCompatActivity
 
         // Set up toolbar and enable Up button
         Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_details_toolbar);
-        //myToolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
@@ -129,13 +124,11 @@ public class TripDetailsActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //Log.d("TripDetailsActivity", "Opening settings screen");
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;
 
             case R.id.action_refresh:
-                //Log.d("TripDetailsActivity", "Refreshing from menu");
                 SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
                 swipeLayout.setRefreshing(true);
                 loadTripDetails(true);
@@ -143,7 +136,6 @@ public class TripDetailsActivity extends AppCompatActivity
 
 
             case R.id.action_logout:
-                // Log out user and clear list
                 TripList.getSharedList().clear();
                 User.sharedUser.logout();
                 finish();

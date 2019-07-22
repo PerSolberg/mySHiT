@@ -7,12 +7,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.util.Linkify;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.DateFormat;
+import java.util.regex.Pattern;
 
 import no.shitt.myshit.adapters.ReferenceListAdapter;
 import no.shitt.myshit.helper.StringUtil;
@@ -44,7 +46,6 @@ public class FlightActivity extends TripElementActivity /*AppCompatActivity*/ {
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .penaltyLog()
-                            //.penaltyDeath()
                     .build());
         }
 
@@ -70,7 +71,6 @@ public class FlightActivity extends TripElementActivity /*AppCompatActivity*/ {
         element_id = intent.getStringExtra(Constants.IntentExtra.ELEMENT_ID);
 
         // calling background thread
-        //new LoadSingleTrack().execute();
         try {
             flight = (Flight) TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id)).tripElement;
 
@@ -102,11 +102,13 @@ public class FlightActivity extends TripElementActivity /*AppCompatActivity*/ {
             ((TextView) findViewById(R.id.airline)).setText(flight.companyName);
             ((TextView) findViewById(R.id.departure)).setText(departureInfo.toString());
             ((TextView) findViewById(R.id.arrival)).setText(arrivalInfo.toString());
-            //((TextView) findViewById(R.id.referenceTitle)).setText();
+
+            Linkify.addLinks(((TextView) findViewById(R.id.departure)), Constants.selectAllButFirstLine, "geo:0,0?q=");
+            Linkify.addLinks(((TextView) findViewById(R.id.arrival)), Constants.selectAllButFirstLine, "geo:0,0?q=");
+
             runOnUiThread(new Runnable() {
                 public void run() {
                     ListAdapter adapter = new ReferenceListAdapter(FlightActivity.this, flight.references);
-                    //setListAdapter(adapter);
                     refListView.setAdapter(adapter);
                 }
             });

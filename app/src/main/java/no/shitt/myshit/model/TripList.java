@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -26,7 +27,7 @@ import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
 
-public class TripList implements ServerAPI.Listener, JSONable {
+public class TripList implements ServerAPI.Listener, JSONable, Iterable<AnnotatedTrip> {
     private static final TripList sharedList = new TripList();
 
     private List<AnnotatedTrip> trips = new ArrayList<>();
@@ -71,6 +72,15 @@ public class TripList implements ServerAPI.Listener, JSONable {
         params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
 
         new ServerAPI(this).execute(params);
+    }
+
+    //
+    // Iterable
+    //
+    public Iterator<AnnotatedTrip> iterator() {
+        //Iterator<AnnotatedTrip> i = trips.iterator();
+        //return i;
+        return trips.iterator();
     }
 
     // Copy data received from server to memory structure

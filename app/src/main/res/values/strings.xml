@@ -223,6 +223,9 @@
     <!-- Push notification categories -->
     <string name="ntf_category_default">DEFAULT-NTF-CATEGORY</string>
 
+    <!-- Push notification channels -->
+    <string name="ntf_channel_default">DEFAULT</string>
+
     <!-- Push notification actions -->
     <string name="ntf_action_chat_reply">Reply</string>
     <string name="ntf_action_chat_replied">Replied</string>
@@ -236,5 +239,9 @@
     <string name="content_collapsible_group">Collapsible group, click to collapse or expand</string>
     <string name="content_trip_icon">SHiT trip icon</string>
     <string name="content_element_icon">Element icon (flight, train, etc.)</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_chatmsg_long_label">Send message to %1$s participants</string>
+    <string name="shortcut_chatmsg_short_label">%1$s</string>
 
 </resources>

@@ -236,4 +236,9 @@
     <string name="content_collapsible_group">Ekspanderbar gruppe, klikk for å kollapse eller ekspandere</string>
     <string name="content_trip_icon">SHiT-reise</string>
     <string name="content_element_icon">Element (flight, tog, buss, etc.)</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_chatmsg_long_label">Send melding til %1$s-deltagere</string>
+    <string name="shortcut_chatmsg_short_label">%1$s</string>
+
 </resources>

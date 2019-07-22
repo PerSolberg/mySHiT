@@ -1,16 +1,19 @@
 package no.shitt.myshit;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-//import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,23 +21,25 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-//import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-//import android.widget.ListAdapter;
-//import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.firebase.iid.FirebaseInstanceId;
+
+//import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import no.shitt.myshit.adapters.TripListAdapter;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.ChangeState;
+import no.shitt.myshit.model.Tense;
 import no.shitt.myshit.model.TripList;
 import no.shitt.myshit.model.User;
 
-public class TripsActivity extends AppCompatActivity /* ListActivity */ {
+public class TripsActivity extends AppCompatActivity {
     // Connection detector
     ConnectionDetector cd;
 
@@ -78,7 +83,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
                     .build());
         }
 
-        //Log.d("TripsActivity", "onCreate: savedInstanceState = " + savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
 
@@ -89,10 +93,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_list_toolbar);
         //myToolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(myToolbar);
-
-        // Common name isn't persisted so may not work (especially if app crashes due to race condition)
-        //ActionBar ab = getSupportActionBar();
-        //ab.setTitle(User.sharedUser.getCommonName());
 
         // Set up list view
         listView = (ExpandableListView) findViewById(R.id.trip_list);
@@ -113,23 +113,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
                 return true;
             }
         });
-
-        /*
-        listView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View view, int arg2,
-                                    long arg3) {
-                // On selecting a trip: TripDetailsActivity will be launched to trip details
-                Intent i = new Intent(getApplicationContext(), TripDetailsActivity.class);
-
-                // send trip code to TripDetails activity to get list of trip elements
-                tripCode = ((TextView) view.findViewById(R.id.trip_code)).getText().toString();
-                i.putExtra(Constants.IntentExtra.TRIP_CODE, tripCode);
-
-                startActivity(i);
-            }
-        });
-        */
 
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setOnRefreshListener(
@@ -164,7 +147,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
         }
 
         if (savedInstanceState != null) {
-            //Log.d("TripsActivity", "Restoring state");
             // Restore value of members from saved state
             tripCode = savedInstanceState.getString(STATE_TRIP_CODE);
             if (tripCode != null) {
@@ -191,7 +173,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //Log.d("TripsActivity", "onCreateOptionsMenu");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.trip_list_menu, menu);
         return true;
@@ -199,7 +180,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //Log.d("TripsActivity", "onOptionsItemSelected");
         switch (item.getItemId()) {
             case R.id.action_settings:
                 //Log.d("TripsActivity", "Opening settings screen");
@@ -228,8 +208,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save the user's current game state
-        //Log.d("TripsActivity", "Saving state");
         if (tripCode != null) {
             savedInstanceState.putString(STATE_TRIP_CODE, tripCode);
         }
@@ -268,15 +246,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
             }
             tripCode = null;
         }
-
-        /*{
-            String fcmToken;
-
-            fcmToken = FirebaseInstanceId.getInstance().getToken();
-            if (fcmToken != null) {
-                //Log.d("TripsActivity", "Firebase token = " + fcmToken);
-            }
-        }*/
     }
 
     @Override
@@ -289,9 +258,9 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     private void updateListView() {
-        //Log.d("TripsActivity", "updateListView");
         runOnUiThread(new Runnable() {
             public void run() {
+                configureShortcuts();
                 listAdapter.notifyDataSetChanged();
                 //TripListAdapter adapter = new TripListAdapter(TripsActivity.this);
                 //listView.setAdapter(adapter);
@@ -322,24 +291,7 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
 
-    /*
-    private class HandleNotification extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //Log.d("TripsActivity", "HandleNotification onReceive, intent action = " + intent.getAction());
-            if (intent.getAction().equals(Constants.Notification.LOGON_SUCCEEDED)) {
-                loadTrips(false);
-            } else if (intent.getAction().equals(Constants.Notification.TRIPS_LOADED)) {
-                serverCallComplete();
-            } else if (intent.getAction().equals(Constants.Notification.COMMUNICATION_FAILED)) {
-                serverCallFailed();
-            }
-        }
-    }
-    */
-
     public void serverCallComplete() {
-        //Log.d("TripsActivity", "serverCallComplete");
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setRefreshing(false);
         if (pDialog != null) {
@@ -352,7 +304,6 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     public void serverCallFailed() {
-        //Log.d("TripsActivity", "serverCallFailed");
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setRefreshing(false);
         if (pDialog != null) {
@@ -362,26 +313,84 @@ public class TripsActivity extends AppCompatActivity /* ListActivity */ {
     }
 
     private void loadTrips(boolean refresh) {
-        //Log.d("TripsActivity", "loadTrips");
         if ( ! refresh ) {
-            pDialog = new ProgressDialog( /*TripsActivity.*/ this);
-            pDialog.setMessage("Loading SHiT Trips ...");
+            pDialog = new ProgressDialog(this);
+            pDialog.setMessage("Loading SHiT Trips ...");   // TO DO : Localise
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
         }
 
         TripList.getSharedList().getFromServer();
-        //new ServerAPI(this).execute(URL_TRIPS);
     }
 
     private void logout() {
-        //Log.d("TripsActivity", "logout");
         TripList.getSharedList().clear();
         User.sharedUser.logout();
-        //this.recreate();
         updateListView();
         Intent i = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(i);
+    }
+
+
+    @TargetApi(25)
+    private void configureShortcuts() {
+        if ( android.os.Build.VERSION.SDK_INT >= 25 ) {
+            ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
+            List<ShortcutInfo> shortcuts = new ArrayList<>();
+
+            AnnotatedTrip nextTrip = null, currentTrip = null, lastTrip = null;
+
+            for (AnnotatedTrip aTrip : TripList.getSharedList() ) {
+                switch ( aTrip.trip.getTense() ) {
+                    case FUTURE:
+                        nextTrip = aTrip;
+                        break;
+
+                    case PRESENT:
+                        currentTrip = aTrip;
+                        break;
+
+                    case PAST:
+                        lastTrip = lastTrip != null ? lastTrip : aTrip;
+                        break;
+                }
+            }
+
+            if ( lastTrip != null ) {
+                shortcuts.add(createShortcut(lastTrip));
+            }
+            if ( currentTrip != null ) {
+                shortcuts.add(createShortcut(currentTrip));
+            }
+            if ( nextTrip != null ) {
+                shortcuts.add(createShortcut(nextTrip));
+            }
+
+            shortcutManager.setDynamicShortcuts(shortcuts);
+        }
+    }
+
+    @TargetApi(25)
+    private ShortcutInfo createShortcut(AnnotatedTrip trip) {
+        Intent sendMsg = new Intent(this, TripDetailsPopupActivity.class)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .setAction(Constants.PushNotificationActions.CHATMSG_CLICK)
+            .putExtra(Constants.PushNotificationKeys.TRIP_ID, String.valueOf(trip.trip.id))
+            .putExtra(Constants.PushNotificationKeys.CHANGE_TYPE, Constants.PushNotificationData.TYPE_CHAT_MESSAGE);
+
+        ArrayList<Object> locArgs = new ArrayList<>();
+        locArgs.add(trip.trip.name);
+        Object[] locArgsArray = locArgs.toArray();
+        String shortLabel = getResources().getString(R.string.shortcut_chatmsg_short_label, locArgsArray);
+        String longLabel = getResources().getString(R.string.shortcut_chatmsg_long_label, locArgsArray);
+        ShortcutInfo shortcut = new ShortcutInfo.Builder(getApplicationContext(), trip.trip.code)
+                .setShortLabel(shortLabel)
+                .setLongLabel(longLabel)
+                .setIcon(Icon.createWithResource(getApplicationContext(), R.mipmap.icon_chat))
+                .setIntent(sendMsg)
+                .build();
+
+        return shortcut;
     }
 }

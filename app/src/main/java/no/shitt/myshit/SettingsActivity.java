@@ -16,7 +16,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Context ctx = SHiTApplication.getContext();
         Context ctx = getApplicationContext();
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
@@ -26,12 +25,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
-        // If we need to do different things based on what preference was changed, check the key
-        // if (key.equals(PREF_KEY_WHATEVER)) {
-        //     do something...
-        // }
-
-        //Log.d("SettingsActivity", "Settings changed, refreshing notifications");
         TripList.getSharedList().refreshNotifications();
     }
 

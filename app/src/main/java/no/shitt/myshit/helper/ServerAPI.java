@@ -41,23 +41,6 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
         Method(String rawValue) {
             this.rawValue = rawValue;
         }
-
-        /*
-        public String getRawValue() {
-            return rawValue;
-        }
-
-        public static Method fromString(String text) {
-            if (text != null) {
-                for (Method m : Method.values()) {
-                    if (text.equalsIgnoreCase(m.rawValue)) {
-                        return m;
-                    }
-                }
-            }
-            return null;
-        }
-        */
     }
 
     public final static String URL_USER_VERIFY  = "https://www.shitt.no/mySHiT/user";

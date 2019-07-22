@@ -63,7 +63,6 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .penaltyLog()
-                            //.penaltyDeath()
                     .build());
         }
 
@@ -95,9 +94,6 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        //LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
-        //LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_UNAUTHORISED));
-        //LocalBroadcastManager.getInstance(this).registerReceiver(new HandleNotification(), new IntentFilter(Constants.Notification.LOGON_FAILED));
         LocalBroadcastManager.getInstance(this).registerReceiver(logonSuccessHandler, new IntentFilter(Constants.Notification.LOGON_SUCCEEDED));
         LocalBroadcastManager.getInstance(this).registerReceiver(logonUnauthorisedHandler, new IntentFilter(Constants.Notification.LOGON_UNAUTHORISED));
         LocalBroadcastManager.getInstance(this).registerReceiver(logonFailureHandler, new IntentFilter(Constants.Notification.LOGON_FAILED));
@@ -212,10 +208,6 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -235,12 +227,6 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
                     mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
-        //} else {
-        //    // The ViewPropertyAnimator APIs are not available, so simply show
-        //    // and hide the relevant UI components.
-        //    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        //    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        //}
     }
 
 }

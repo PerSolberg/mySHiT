@@ -27,10 +27,7 @@ public class Flight extends ScheduledTransport {
 
     @Override
     public String getStartInfo() {
-        //Context ctx = SHiTApplication.getContext();
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
         String timeInfo = startTime(null, DateFormat.SHORT);
-        //String timeInfo = dateFormatter.format(departureTime);
         String airportName = (departureStop != null ? departureStop : "<Departure Airport>");
         String terminalInfo = (departureTerminalCode != null && !departureTerminalCode.isEmpty() ? " [" + departureTerminalCode + "]" : "");
         return (timeInfo != null ? timeInfo + ": " : "") + airportName + terminalInfo;
@@ -38,10 +35,7 @@ public class Flight extends ScheduledTransport {
 
     @Override
     public String getEndInfo() {
-        //Context ctx = SHiTApplication.getContext();
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
         String timeInfo = endTime(null, DateFormat.SHORT);
-        //String timeInfo = dateFormatter.format(arrivalTime);
         String airportName = (arrivalStop != null ? arrivalStop : "<Arrival-Airport>");
         String terminalInfo = (arrivalTerminalCode != null && !arrivalTerminalCode.isEmpty() ? " [" + arrivalTerminalCode + "]" : "");
         return (timeInfo != null ? timeInfo + ": " : "") + airportName + terminalInfo;

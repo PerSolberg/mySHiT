@@ -48,7 +48,6 @@ public class SchedulingService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        //Log.d("SchedulingService", "Action: " + intent.getAction() + ", Data: " + intent.getData());
         sendNotification(intent);
 
         // Release the wake lock provided by the BroadcastReceiver.

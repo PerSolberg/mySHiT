@@ -51,9 +51,7 @@ public class ServerDate {
                 TimeZone timezone = TimeZone.getTimeZone(timeZoneName);
                 dateFormatter.setTimeZone(timezone);
             }
-            //let locale = NSLocale(localeIdentifier: "en_US_POSIX");
-            //dateFormatter.dateFormat = formatString;
-            //dateFormatter.locale = locale;
+
             try {
                 return dateFormatter.parse(serverDateString);
             }
@@ -70,9 +68,8 @@ public class ServerDate {
             TimeZone timezone = TimeZone.getTimeZone(timeZoneName);
             dateFormatter.setTimeZone(timezone);
         }
-        //let locale = Locale(identifier: "en_US_POSIX");
+
         dateFormatter.applyPattern(ISO_FORMAT);
-        //dateFormatter.locale = locale;
         return dateFormatter.format(localDate);
     }
 

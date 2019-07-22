@@ -19,9 +19,10 @@ public class ChatMessageIgnoreReceiver extends BroadcastReceiver {
         if (Constants.Intent.CHATMSG_IGNORE.equals(intent.getAction())) {
             int tripId = intent.getIntExtra(Constants.IntentExtra.TRIP_ID, -1);
             int messageId = intent.getIntExtra(Constants.IntentExtra.MESSAGE_ID, -1);
-            //CharSequence reply = getMessageText(intent);
+
             if (tripId != -1 && messageId != -1) {
                 Log.d(TAG, "Ignoring message for TripId " + tripId);
+
                 // Update the notification to stop the progress spinner.
                 NotificationManagerCompat notificationManager =
                         NotificationManagerCompat.from(context);

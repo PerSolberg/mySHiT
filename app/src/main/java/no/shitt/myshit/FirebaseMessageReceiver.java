@@ -46,7 +46,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
         Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
         Log.d(LOG_TAG, "Data: " + remoteMessage.getData());
-        //Log.d(LOG_TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
 
         Map<String,String> ntfData = remoteMessage.getData();
         if (ntfData.size() > 0) {
@@ -54,7 +53,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
             boolean insert = ntfData.get(Constants.PushNotificationKeys.CHANGE_OPERATION).equals(Constants.PushNotificationData.OP_INSERT);
             int tripId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.TRIP_ID));
             if (chatMessage) {
-                Log.d(LOG_TAG, "Handle new/read message");
                 AnnotatedTrip aTrip = TripList.getSharedList().tripById(tripId);
                 if (aTrip != null && aTrip.trip.chatThread != null) {
                     if (insert) {
@@ -63,10 +61,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                         int fromUserId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.FROM_USER_ID));
                         int messageId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.MESSAGE_ID));
                         if (fromUserId != User.sharedUser.getId()) {
-                            //MediaPlayer mPlayer = MediaPlayer.create(SHiTApplication.getContext(), R.raw.chat_new_message);
-                            //mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                            //mPlayer.start();
-
                             Context ctx = SHiTApplication.getContext();
 
                             // Construct loc-args from individual elements (because we use data-only messages)
@@ -133,25 +127,19 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
             intent.setAction(bodyLocKey);
         }
         intent.putExtra(Constants.PushNotificationKeys.TRIP_ID, String.valueOf(tripId));
-        //intent.putExtra(Constants.PushNotificationKeys.CHANGE_TYPE, Constants.PushNotificationData.TYPE_CHAT_MESSAGE);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-        //Icon smallIcon = Icon.createWithResource(ctx, R.mipmap.icon_chat);
 
-        //String channelId = getString(R.string.ntf_category_default);
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        //Uri chatSoundUri = Uri.parse("android.resource://" + ctx.getPackageName()+"/"+R.raw.chat_new_message);
         Notification.Builder notificationBuilder = new Notification.Builder(this /*, channelId*/)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(largeIcon)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
-                //.setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setPriority(Notification.PRIORITY_HIGH)
-                //.setCategory(Notification.CATEGORY_EVENT)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
@@ -207,10 +195,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                         //.addRemoteInput(remoteInput)
                         .build();
 
-        //String channelId = getString(R.string.ntf_category_default);
-        //Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Uri chatSoundUri = Uri.parse("android.resource://" + ctx.getPackageName()+"/"+R.raw.chat_new_message);
-        //NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this /*, channelId*/)
         Notification.Builder notificationBuilder = new Notification.Builder(this /*, channelId*/)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(largeIcon)
