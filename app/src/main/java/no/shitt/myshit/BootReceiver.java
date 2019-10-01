@@ -15,8 +15,6 @@ import no.shitt.myshit.model.TripList;
  */
 
 public class BootReceiver extends BroadcastReceiver {
-    AlarmReceiver alarm = new AlarmReceiver();
-
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")

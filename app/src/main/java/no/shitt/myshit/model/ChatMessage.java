@@ -62,15 +62,6 @@ public class ChatMessage implements JSONable {
             if (o == null)
                 return false;
 
-            /*
-            if (getClass() != o.getClass())
-                return false;
-
-            LocalId otherId = (LocalId) o;
-            return (this.deviceType.equals(otherId.deviceType)
-                    && this.deviceId.equals(otherId.deviceId)
-                    && this.localId.equals(otherId.localId));
-            */
             if (getClass() == o.getClass()) {
                 LocalId otherId = (LocalId) o;
 
@@ -115,7 +106,7 @@ public class ChatMessage implements JSONable {
     List<String> lastSeenBy;
 
     private class SaveResponseHandler implements ServerAPI.Listener {
-        ServerAPI.Listener parentResponseHandler;
+        final ServerAPI.Listener parentResponseHandler;
 
         SaveResponseHandler(ServerAPI.Listener parentResponseHandler) {
             this.parentResponseHandler = parentResponseHandler;
@@ -145,7 +136,6 @@ public class ChatMessage implements JSONable {
         public void onRemoteCallFailed() {
             //Log.d("ChatMessage.Save", "Server call failed");
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
-            //intent.putExtra("message", "SHiT trips loaded");
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
             if (parentResponseHandler != null) {
                 parentResponseHandler.onRemoteCallFailed();
@@ -164,7 +154,7 @@ public class ChatMessage implements JSONable {
     }
 
     private class ReadResponseHandler implements ServerAPI.Listener {
-        ServerAPI.Listener parentResponseHandler;
+        final ServerAPI.Listener parentResponseHandler;
 
         ReadResponseHandler(ServerAPI.Listener parentResponseHandler) {
             this.parentResponseHandler = parentResponseHandler;
@@ -180,7 +170,6 @@ public class ChatMessage implements JSONable {
         public void onRemoteCallFailed() {
             //Log.d("ChatMessage.Read", "Server call failed");
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
-            //intent.putExtra("message", "SHiT trips loaded");
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
             if (parentResponseHandler != null) {
                 parentResponseHandler.onRemoteCallFailed();
@@ -242,13 +231,7 @@ public class ChatMessage implements JSONable {
             return true;
         if (o == null)
             return false;
-        /*
-        if (getClass() != o.getClass())
-            return false;
 
-        ChatMessage otherMsg = (ChatMessage) o;
-        return this.localId.equals(otherMsg.localId);
-        */
         if (getClass() == o.getClass()) {
             ChatMessage otherMsg = (ChatMessage) o;
             return this.localId.equals(otherMsg.localId);
@@ -266,7 +249,7 @@ public class ChatMessage implements JSONable {
     }
 
     static /* synchronized */ private String generateLocalId() {
-        return Long.toString(System.currentTimeMillis()) + "." + Long.toString(Process.myTid());
+        return System.currentTimeMillis() + "." + Process.myTid();
     }
 
     // MARK: Initialisers
@@ -328,14 +311,11 @@ public class ChatMessage implements JSONable {
             throw new AssertionError("Cannot read messages for unknown trip");
         }
 
-        //JSONObject payload = new JSONObject(this.savePayload());
         ServerAPI.Params params = new ServerAPI.Params( ServerAPI.URL_BASE
                                                     , ServerAPI.RESOURCE_CHAT, Integer.toString(tripId)
                                                     , ServerAPI.VERB_MSG_READ, Integer.toString(id));
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
         params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
-        //params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
-        //params.setPayload(payload);
 
         new ServerAPI(ServerAPI.Method.POST, new ReadResponseHandler(parentResponseHandler)).execute(params);
     }

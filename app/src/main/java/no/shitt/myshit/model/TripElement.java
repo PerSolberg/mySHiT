@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
@@ -33,7 +35,7 @@ public abstract class TripElement implements JSONable {
         REGULAR, POPUP
     }
 
-    public String type;
+    private String type;
     public String subType;
     public int id;
     public List<Map<String,String>> references;
@@ -45,9 +47,26 @@ public abstract class TripElement implements JSONable {
     //private int    tripId;
     private JSONObject serverData;
 
-    public static final String REFTAG_REF_NO       = "refNo";
-    public static final String REFTAG_TYPE         = "type";
-    public static final String REFTAG_LOOKUP_URL   = "urlLookup";
+    public static final String REFTAG_REF_NO          = "refNo";
+    public static final String REFTAG_TYPE            = "type";
+    public static final String REFTAG_LOOKUP_URL      = "urlLookup";
+
+    public static final String REFTYPE_ELECTRONIC_TKT = "ETKT";
+
+    public class Type {
+        public static final String ACCOMMODATION           = "ACM";
+        public static final String EVENT                   = "EVT";
+        public static final String TRANSPORT               = "TRA";
+    }
+
+    public class SubType {
+        public static final String AIRLINE                 = "AIR";
+        public static final String BOAT                    = "BOAT";
+        public static final String BUS                     = "BUS";
+        public static final String LIMOUSINE               = "LIMO";
+        public static final String PRIVATE_BUS             = "PBUS";
+        public static final String TRAIN                   = "TRN";
+    }
 
     private static final String iconBaseName = "icon_tripelement_";
 
@@ -104,6 +123,23 @@ public abstract class TripElement implements JSONable {
             return null; // Tense.FUTURE;
         }
     }
+    public String getReferences(String separator, boolean appendBlank, Set<String> excludeTypes) {
+        StringBuilder refList = new StringBuilder();
+        Iterator i = references.iterator();
+        String sep = "";
+        for (Map<String,String> refItem : references) {
+            String type = refItem.get(REFTAG_TYPE);
+            if (excludeTypes == null || ! excludeTypes.contains(type)) {
+                String ref = refItem.get(REFTAG_REF_NO);
+                StringUtil.appendWithLeadingSeparator(refList, ref, sep, appendBlank);
+                sep = separator;
+            }
+        }
+        return refList.toString();
+    }
+    public String getReferences(String separator, boolean appendBlank) {
+        return getReferences(separator, appendBlank, null);
+    }
 
     public int getIconId() {
         Context ctx = SHiTApplication.getContext();
@@ -152,23 +188,23 @@ public abstract class TripElement implements JSONable {
         String elemSubType = elementData.optString(Constants.JSON.ELEM_SUB_TYPE);
 
         TripElement elem;
-        if (elemType.equals("TRA") && elemSubType.equals("AIR")) {
+        if (elemType.equals(Type.TRANSPORT) && elemSubType.equals(SubType.AIRLINE)) {
             elem = new Flight(tripId, tripCode, elementData);
-        } else if (elemType.equals("TRA") && elemSubType.equals("PBUS")) {
+        } else if (elemType.equals(Type.TRANSPORT) && elemSubType.equals(SubType.PRIVATE_BUS)) {
             elem = new PrivateTransport(tripId, tripCode, elementData);
-        } else if (elemType.equals("TRA") && elemSubType.equals("LIMO")) {
+        } else if (elemType.equals(Type.TRANSPORT) && elemSubType.equals(SubType.LIMOUSINE)) {
             elem = new PrivateTransport(tripId, tripCode, elementData);
-        } else if (elemType.equals("TRA") && elemSubType.equals("BUS")) {
+        } else if (elemType.equals(Type.TRANSPORT) && elemSubType.equals(SubType.BUS)) {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
-        } else if (elemType.equals("TRA") && elemSubType.equals("TRN")) {
+        } else if (elemType.equals(Type.TRANSPORT) && elemSubType.equals(SubType.TRAIN)) {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
-        } else if (elemType.equals("TRA") && elemSubType.equals("BOAT")) {
+        } else if (elemType.equals(Type.TRANSPORT) && elemSubType.equals(SubType.BOAT)) {
             elem = new ScheduledTransport(tripId, tripCode, elementData);
-        } else if (elemType.equals("TRA")) {
+        } else if (elemType.equals(Type.TRANSPORT)) {
             elem = new GenericTransport(tripId, tripCode, elementData);
-        } else if (elemType.equals("ACM")) {
+        } else if (elemType.equals(Type.ACCOMMODATION)) {
             elem = new Hotel(tripId, tripCode, elementData);
-        } else if (elemType.equals("EVT")) {
+        } else if (elemType.equals(Type.EVENT)) {
             elem = new Event(tripId, tripCode, elementData);
         } else {
             elem = null;
@@ -186,9 +222,7 @@ public abstract class TripElement implements JSONable {
         jo.putOpt(Constants.JSON.ELEM_ID, id);
 
         JSONArray jar = new JSONArray();
-        Iterator i = references.iterator();
-        while (i.hasNext()) {
-            Map ref = (Map) i.next();
+        for (Map ref : references) {
             jar.put(new JSONObject(ref));
         }
         jo.putOpt(Constants.JSON.ELEM_REFERENCES, jar);
@@ -266,6 +300,7 @@ public abstract class TripElement implements JSONable {
 
 
     // MARK: Methods
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEqual(Object otherObject) {
         if (this.getClass() != otherObject.getClass()) {
             //Log.d("GenericTransport", "Changed class! " + this.getClass().getCanonicalName() + " != " + otherObject.getClass().getCanonicalName());
@@ -275,8 +310,10 @@ public abstract class TripElement implements JSONable {
             TripElement otherTripElement = (TripElement) otherObject;
 
             if (this.id != otherTripElement.id)                             { return false; }
-            if (!StringUtil.equal(this.type, otherTripElement.type)      )  { return false; }
-            if (!StringUtil.equal(this.subType, otherTripElement.subType))  { return false; }
+            //if (!StringUtil.equal(this.type, otherTripElement.type)      )  { return false; }
+            //if (!StringUtil.equal(this.subType, otherTripElement.subType))  { return false; }
+            if (!Objects.equals(this.type, otherTripElement.type)      )  { return false; }
+            if (!Objects.equals(this.subType, otherTripElement.subType))  { return false; }
 
             if (this.references != null && otherTripElement.references != null) {
                 if (this.references.size() != otherTripElement.references.size()) {
@@ -316,7 +353,7 @@ public abstract class TripElement implements JSONable {
         if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {
             boolean combined = false;
 
-            Log.d("TripElement", "Setting " + notificationType + " notification for trip element " + id + " at " + newInfo.getNotificationDate());
+            //Log.d("TripElement", "Setting " + notificationType + " notification for trip element " + id + " at " + newInfo.getNotificationDate());
 
             Bundle extras = new Bundle();
             //Map<String,Object> actualUserInfo = new HashMap<>();
@@ -358,7 +395,7 @@ public abstract class TripElement implements JSONable {
 
                 AlarmReceiver alarm = new AlarmReceiver();
                 alarm.setAlarm( alarmTime.getTime()
-                        , Uri.parse("alarm://shitt.no/" + notificationType + "/" + tripCode + "/" + Integer.toString(id))
+                        , Uri.parse("alarm://shitt.no/" + notificationType + "/" + tripCode + "/" + id)
                         , clickAction
                         , extras);
             } else {
@@ -375,16 +412,6 @@ public abstract class TripElement implements JSONable {
     void setNotification(String notificationType, int leadTime, int alertMessageId, Bundle userInfo) {
         setNotification(notificationType, leadTime, alertMessageId, null, userInfo);
     }
-
-    /* Don't need to cancel notifications on Android (I think...)
-    void cancelNotifications() {
-        for notification in UIApplication.shared.scheduledLocalNotifications! as [UILocalNotification] {
-            if (notification.userInfo![Constant.notificationUserInfo.tripElementId] as? Int == id) {
-                UIApplication.shared.cancelLocalNotification(notification)
-            }
-        }
-    }
-    */
 
     void copyState(TripElement fromElement) {
         this.notifications = fromElement.notifications;

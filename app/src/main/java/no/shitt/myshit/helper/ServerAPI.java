@@ -1,10 +1,7 @@
 package no.shitt.myshit.helper;
 
-//import android.content.Context;
-//import android.content.Intent;
 import android.accounts.AuthenticatorException;
 import android.os.AsyncTask;
-//import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -21,14 +18,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-//import java.util.Iterator;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-//import java.util.regex.Pattern;
 
 import no.shitt.myshit.Constants;
-//import no.shitt.myshit.SHiTApplication;
-//import no.shitt.myshit.model.TripList;
 
 public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
     // Interface constants
@@ -44,8 +38,8 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
     }
 
     public final static String URL_USER_VERIFY  = "https://www.shitt.no/mySHiT/user";
-    public final static String URL_TRIP_INFO    = "http://www.shitt.no/mySHiT/trip";
-    public final static String URL_BASE         = "http://www.shitt.no/mySHiT";
+    public final static String URL_TRIP_INFO    = "https://www.shitt.no/mySHiT/trip";
+    public final static String URL_BASE         = "https://www.shitt.no/mySHiT";
 
     public final static String RESOURCE_TRIP    = "trip";
     public final static String RESOURCE_CHAT    = "thread";
@@ -55,7 +49,7 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
     public final static String PARAM_USER_NAME        = "userName";
     public final static String PARAM_PASSWORD         = "password";
     public final static String PARAM_DETAILS_TYPE     = "details";
-    public final static String PARAM_PLATFORM         = "platform";
+    //public final static String PARAM_PLATFORM         = "platform";
     public final static String PARAM_LANGUAGE         = "language";
     public final static String PARAM_LAST_MESSAGE_ID  = "lastMessageId";
 
@@ -114,12 +108,11 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
         }
 
         String urlString = urlBuilder.toString();
-        String resultToDisplay = "";
+        String resultToDisplay;
 
         // Invoke REST API
         InputStream in;
 
-        //Log.d("Server API", "Connecting to " + urlString);
         HttpURLConnection urlConnection = null;
         try {
             URL url = new URL(urlString);
@@ -135,7 +128,7 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
             if ( (method == Method.POST || method == Method.PUT) && params[0].getPayload() != null ) {
                 OutputStream out = urlConnection.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(out, "UTF-8"));
+                        new OutputStreamWriter(out, StandardCharsets.UTF_8));
                 writer.write(params[0].getPayload().toString());
                 writer.flush();
                 writer.close();
@@ -149,7 +142,7 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
             in = new BufferedInputStream(urlConnection.getInputStream());
 
             //Log.d("Server API", "Result retrieved");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "iso-8859-1"), 8);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.ISO_8859_1), 8);
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -184,11 +177,11 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
     }
 
     public static class Params {
-        public final String baseUrl;
-        public String resource;
-        public String resourceId;
-        public String verb;
-        public String verbArgument;
+        private final String baseUrl;
+        private String resource;
+        private String resourceId;
+        private String verb;
+        private String verbArgument;
         public Map<String, String> parameters;
         private JSONObject payload;
 
@@ -203,14 +196,6 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
             this.verb = verb;
             this.verbArgument = verbArgument;
         }
-
-        /*
-        public Params(String baseUrl, String verb, String verbArgument) {
-            this.baseUrl = baseUrl;
-            this.verb = verb;
-            this.verbArgument = verbArgument;
-        }
-        */
 
         public void addParameter(String name, String value) {
             if (parameters == null) {

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import no.shitt.myshit.R;
 import no.shitt.myshit.helper.StringUtil;
@@ -59,7 +60,7 @@ public class TripElementListAdapter extends BaseExpandableListAdapter {
         ChildViewHolder holder;
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null || !(convertView instanceof RelativeLayout)) {
+        if ( ! (convertView instanceof RelativeLayout) ) {
             convertView = mInflater.inflate(R.layout.list_item_trip_element, null);
             holder = new ChildViewHolder();
             holder.txtTripCode  = (TextView) convertView.findViewById(R.id.element_trip_code);
@@ -216,7 +217,8 @@ public class TripElementListAdapter extends BaseExpandableListAdapter {
         for (int i = 0; i < annotatedTrip.trip.elements.size(); i++) {
             AnnotatedTripElement element = annotatedTrip.trip.elementByPosition(i);
             String elementTitle = element.tripElement.startTime(DateFormat.MEDIUM, null);
-            if (!StringUtil.equal(lastSectionTitle, elementTitle)) {
+            //if (!StringUtil.equal(lastSectionTitle, elementTitle)) {
+            if (!Objects.equals(lastSectionTitle, elementTitle)) {
                 // First check if previous section should be expanded by default
                 // For active trips, past dates are collapsed by default; active and future dates are expanded
                 // For past and future trips, all sections are expanded by default
@@ -233,12 +235,6 @@ public class TripElementListAdapter extends BaseExpandableListAdapter {
             }
             lastElementTense = element.tripElement.getTense();
         }
-
-        /*
-        for (int g = 0; g < sections.size(); g++) {
-            Log.d("TripElementListAdapter", "Group " + g + ": " + sections.get(g).title + ", first item = " + sections.get(g).firstElement + ", expandByDefault = " + sections.get(g).expandedByDefault);
-        }
-        */
     }
 
     public void applyDefaultCollapse(ExpandableListView listView) {

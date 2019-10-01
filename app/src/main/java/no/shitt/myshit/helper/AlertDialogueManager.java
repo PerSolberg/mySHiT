@@ -3,6 +3,7 @@ package no.shitt.myshit.helper;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Message;
 
 import no.shitt.myshit.R;
 
@@ -19,21 +20,17 @@ public class AlertDialogueManager {
                                 Boolean status) {
         AlertDialog alertDialog = new AlertDialog.Builder(context).create();
 
-        // Setting Dialog Title
         alertDialog.setTitle(title);
-
-        // Setting Dialog Message
         alertDialog.setMessage(message);
 
-        if(status != null)
-            // Setting alert dialog icon
-            alertDialog.setIcon((status) ? R.drawable.success : R.drawable.fail);
+        if(status != null) {
+            alertDialog.setIcon((status) ? android.R.drawable.ic_dialog_info : android.R.drawable.ic_dialog_alert);
+        }
 
         // Setting OK Button
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
+        alertDialog.setButton( DialogInterface.BUTTON_POSITIVE
+                             , context.getString(R.string.btn_ok)
+                             , (Message) null);
 
         // Showing Alert Message
         alertDialog.show();

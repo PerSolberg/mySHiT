@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,17 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.EventActivity;
-import no.shitt.myshit.FlightActivity;
-import no.shitt.myshit.HotelActivity;
-import no.shitt.myshit.PrivateTransportActivity;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.ScheduledTransportActivity;
 import no.shitt.myshit.adapters.TripElementListAdapter;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
@@ -47,6 +42,7 @@ import no.shitt.myshit.model.TripList;
  * create an instance of this fragment.
  */
 public class TripDetailsFragment extends Fragment {
+    private final static String LOG_TAG = TripDetailsFragment.class.getSimpleName();
     // Fragment initialization parameters
     public static final String ARG_TRIP_CODE = "ARG_TRIP_CODE";
     public static final String ARG_TRIP_ID   = "ARG_TRIP_ID";
@@ -120,7 +116,7 @@ public class TripDetailsFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_trip_details, container, false);
@@ -168,14 +164,14 @@ public class TripDetailsFragment extends Fragment {
         );
 
         if (annotatedTrip == null) {
-            //Log.e("TripDetailsActivity", "Invalid trip!");
+            Log.e(LOG_TAG, "Invalid trip!");
         } else if (annotatedTrip.trip.elementCount() == 0) {
             // Check if Internet present
             cd = new ConnectionDetector(SHiTApplication.getContext());
-            if (!cd.isConnectingToInternet()) {
+            if (!cd.isConnectedToInternet()) {
                 // Internet Connection is not present
-                alert.showAlertDialogue(SHiTApplication.getContext()/*no.shitt.myshit.ui.TripDetailsFragment.this*/, "Internet Connection Error",
-                        "Please connect to working Internet connection", false);
+                alert.showAlertDialogue(getActivity(), getResources().getString(R.string.dlgtitle_network_connection_error),
+                        getString(R.string.msg_connect_to_network), false);
                 // stop executing code by return
             } else {
                 loadTripDetails(false);
@@ -277,7 +273,7 @@ public class TripDetailsFragment extends Fragment {
     private void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
             pDialog = new ProgressDialog( getActivity()  /*no.shitt.myshit.ui.TripDetailsFragment.this*/);
-            pDialog.setMessage("Loading trip details ...");
+            pDialog.setMessage(getString(R.string.msg_loading_trip_details));
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();

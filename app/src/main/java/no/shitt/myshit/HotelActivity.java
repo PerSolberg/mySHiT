@@ -5,20 +5,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Linkify;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.text.DateFormat;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.Hotel;
-import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
 
@@ -30,7 +25,7 @@ public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
     private Intent intent;
 
     StringBuilder hotelInfo;
-    StringBuilder references;
+    String        references;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +55,7 @@ public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
         ((TextView) findViewById(R.id.hotel)).setText(hotelInfo.toString());
         ((TextView) findViewById(R.id.hotel_checkin)).setText(hotel.startTime(DateFormat.MEDIUM, null));
         ((TextView) findViewById(R.id.hotel_checkout)).setText(hotel.endTime(DateFormat.MEDIUM, null));
-        ((TextView) findViewById(R.id.hotel_reference)).setText(references.toString());
+        ((TextView) findViewById(R.id.hotel_reference)).setText(references);
         ((TextView) findViewById(R.id.hotel_phone)).setText(StringUtil.stringWithDefault(hotel.phone, ""));
         ((TextView) findViewById(R.id.hotel_transfer_info)).setText(StringUtil.stringWithDefault(hotel.transferInfo, ""));
 
@@ -69,6 +64,7 @@ public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpTo(this, intent);
@@ -87,15 +83,7 @@ public class HotelActivity extends TripElementActivity /*AppCompatActivity*/ {
                 StringUtil.appendWithLeadingSeparator(hotelInfo, hotel.postCode, "\n", false);
                 StringUtil.appendWithLeadingSeparator(hotelInfo, hotel.city, "\n", false);
 
-                references = new StringBuilder();
-                Iterator i = hotel.references.iterator();
-                String sep = "";
-                while (i.hasNext()) {
-                    Map<String,String> refMap = (Map<String,String>) i.next();
-                    String ref = refMap.get(TripElement.REFTAG_REF_NO);
-                    StringUtil.appendWithLeadingSeparator(references, ref, sep, false);
-                    sep = ", ";
-                }
+                references = hotel.getReferences(", ", false);
             }
             catch (Exception e) {
                 //Log.e("Hotel/get", "Unexpected error: " + e.toString());

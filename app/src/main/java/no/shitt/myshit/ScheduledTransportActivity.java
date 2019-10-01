@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -13,13 +12,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.text.DateFormat;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.ScheduledTransport;
-import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
 public class ScheduledTransportActivity extends TripElementActivity /*AppCompatActivity*/ {
@@ -32,7 +27,7 @@ public class ScheduledTransportActivity extends TripElementActivity /*AppCompatA
 
     StringBuilder departureInfo;
     StringBuilder arrivalInfo;
-    StringBuilder references;
+    String        references;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,7 +60,7 @@ public class ScheduledTransportActivity extends TripElementActivity /*AppCompatA
         ((TextView) findViewById(R.id.scheduled_transport_departure)).setText(departureInfo.toString());
         ((TextView) findViewById(R.id.scheduled_transport_arrival)).setText(arrivalInfo.toString());
         ((TextView) findViewById(R.id.scheduled_transport_phone)).setText(StringUtil.stringWithDefault(transport.companyPhone, ""));
-        ((TextView) findViewById(R.id.scheduled_transport_reference)).setText(references.toString());
+        ((TextView) findViewById(R.id.scheduled_transport_reference)).setText(references);
 
         Linkify.addLinks(((TextView) findViewById(R.id.scheduled_transport_departure)), Constants.selectAllButFirstLine, "geo:0,0?q=");
         Linkify.addLinks(((TextView) findViewById(R.id.scheduled_transport_arrival)), Constants.selectAllButFirstLine, "geo:0,0?q=");
@@ -73,6 +68,7 @@ public class ScheduledTransportActivity extends TripElementActivity /*AppCompatA
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpTo(this, intent);
@@ -100,15 +96,7 @@ public class ScheduledTransportActivity extends TripElementActivity /*AppCompatA
                 StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalAddress, "\n", false);
                 StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalLocation, "\n", false);
 
-                references = new StringBuilder();
-                Iterator i = transport.references.iterator();
-                String sep = "";
-                while (i.hasNext()) {
-                    Map<String,String> refMap = (Map<String,String>) i.next();
-                    String ref = refMap.get(TripElement.REFTAG_REF_NO);
-                    StringUtil.appendWithLeadingSeparator(references, ref, sep, false);
-                    sep = ", ";
-                }
+                references = transport.getReferences(", ", false);
             }
             catch (Exception e) {
                 Log.e("SchedTransportAct/get", "Unexpected error: " + e.toString());

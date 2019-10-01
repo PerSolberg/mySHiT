@@ -1,25 +1,21 @@
 package no.shitt.myshit;
 
-//import no.shitt.myshit.TripDetailsActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 
 import no.shitt.myshit.adapters.TripPagerAdapter;
-import no.shitt.myshit.model.TripList;
 
 /**
- * Created by persolberg on 2018-02-02.
+ * Created by Per Solberg on 2018-02-02.
  */
 
 public class TripDetailsPopupActivity extends TripDetailsActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("TripDetailsPopup", "Launching TripDetails as pop-up");
+        //Log.d("TripDetailsPopup", "Launching TripDetails as pop-up");
         super.onCreate(savedInstanceState);
         cancelAlert();
 
@@ -42,13 +38,6 @@ public class TripDetailsPopupActivity extends TripDetailsActivity {
             Log.e("TripDetailsPopup", "Could not get intent action");
         }
     }
-
-    /*
-    @Override
-    public void onBackPressed() {
-        Log.d("TripDetailsPopup", "Back pressed");
-    }
-    */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

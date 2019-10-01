@@ -26,7 +26,7 @@ public class TripPagerAdapter extends FragmentPagerAdapter {
     private final String mTripCode;
     private final int mTripId;
 
-    private static final int tabTitles[] = new int[] { R.string.trip_page_itinerary , R.string.trip_page_messages };
+    private static final int[] tabTitles = new int[]{R.string.trip_page_itinerary, R.string.trip_page_messages};
     //private Context context;
 
     public TripPagerAdapter(FragmentManager fm, Context context, int tripId, String tripCode) {

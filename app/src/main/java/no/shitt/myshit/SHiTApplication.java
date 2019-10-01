@@ -20,6 +20,7 @@ public class SHiTApplication extends Application {
         return getApplication().getApplicationContext();
     }
 
+    @SuppressWarnings("FinalStaticMethod")
     public static final void runOnUiThread(Runnable runnable) {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             runnable.run();

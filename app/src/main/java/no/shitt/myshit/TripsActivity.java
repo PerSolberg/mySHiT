@@ -24,9 +24,6 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
-
-//import com.google.firebase.iid.FirebaseInstanceId;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +32,11 @@ import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.ChangeState;
-import no.shitt.myshit.model.Tense;
 import no.shitt.myshit.model.TripList;
 import no.shitt.myshit.model.User;
 
 public class TripsActivity extends AppCompatActivity {
+    private static final String LOG_TAG = TripsActivity.class.getSimpleName();
     // Connection detector
     ConnectionDetector cd;
 
@@ -64,8 +61,8 @@ public class TripsActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("TripActivity", "onCreate starting");
-        Log.d("TripActivity", "onCreate Intent action = " + getIntent().getAction());
+        //Log.d("TripActivity", "onCreate starting");
+        //Log.d("TripActivity", "onCreate Intent action = " + getIntent().getAction());
 
         if (Constants.DEVELOPER_MODE) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -130,13 +127,10 @@ public class TripsActivity extends AppCompatActivity {
         if (User.sharedUser.getUserName() != null) {
             TripList.getSharedList().loadFromArchive();
             if (TripList.getSharedList().tripCount() == 0) {
-                // Check for internet connection and load from server
                 cd = new ConnectionDetector(getApplicationContext());
-                if (!cd.isConnectingToInternet()) {
-                    // Internet Connection is not present
-                    alert.showAlertDialogue(TripsActivity.this, "Internet Connection Error",
-                            "Please connect to working Internet connection", false);
-                    // stop executing code by return
+                if (!cd.isConnectedToInternet()) {
+                    alert.showAlertDialogue(this, getResources().getString(R.string.dlgtitle_network_connection_error),
+                            getString(R.string.msg_connect_to_network), false);
                     return;
                 }
 
@@ -286,7 +280,7 @@ public class TripsActivity extends AppCompatActivity {
     private class CommErrorHandler extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            serverCallFailed();
+            serverCallFailed(context, intent);
         }
     }
 
@@ -303,19 +297,28 @@ public class TripsActivity extends AppCompatActivity {
         updateListView();
     }
 
-    public void serverCallFailed() {
+    public void serverCallFailed(Context context, Intent intent) {
+        Log.e(LOG_TAG, "Server call failed");
         SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_list_container);
         swipeLayout.setRefreshing(false);
         if (pDialog != null) {
             pDialog.dismiss();
             pDialog = null;
         }
+
+        String message = intent.getStringExtra("message");
+        if (message == null) {
+            message = getString(R.string.msg_unknown_network_error);
+        }
+        alert.showAlertDialogue(this, getString(R.string.dlgtitle_network_connection_error),
+                message, false);
+
     }
 
     private void loadTrips(boolean refresh) {
         if ( ! refresh ) {
             pDialog = new ProgressDialog(this);
-            pDialog.setMessage("Loading SHiT Trips ...");   // TO DO : Localise
+            pDialog.setMessage(getResources().getString(R.string.msg_loading_trips));
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
@@ -384,13 +387,11 @@ public class TripsActivity extends AppCompatActivity {
         Object[] locArgsArray = locArgs.toArray();
         String shortLabel = getResources().getString(R.string.shortcut_chatmsg_short_label, locArgsArray);
         String longLabel = getResources().getString(R.string.shortcut_chatmsg_long_label, locArgsArray);
-        ShortcutInfo shortcut = new ShortcutInfo.Builder(getApplicationContext(), trip.trip.code)
+        return new ShortcutInfo.Builder(getApplicationContext(), trip.trip.code)
                 .setShortLabel(shortLabel)
                 .setLongLabel(longLabel)
                 .setIcon(Icon.createWithResource(getApplicationContext(), R.mipmap.icon_chat))
                 .setIntent(sendMsg)
                 .build();
-
-        return shortcut;
     }
 }

@@ -2,6 +2,7 @@ package no.shitt.myshit.helper;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
 
 public class ConnectionDetector {
@@ -15,17 +16,18 @@ public class ConnectionDetector {
     /**
      * Checking for all possible internet providers
      * **/
-    public boolean isConnectingToInternet(){
-        ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null)
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isConnectedToInternet(){
+        ConnectivityManager connectivityMgr = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityMgr != null)
         {
-            NetworkInfo[] info = connectivity.getAllNetworkInfo();
-            if (info != null)
-                for (int i = 0; i < info.length; i++)
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
-                    {
-                        return true;
-                    }
+            Network[] networks = connectivityMgr.getAllNetworks();
+            for (Network n : networks) {
+                NetworkInfo networkInfo = connectivityMgr.getNetworkInfo(n);
+                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
+                    return true;
+                }
+            }
 
         }
         return false;

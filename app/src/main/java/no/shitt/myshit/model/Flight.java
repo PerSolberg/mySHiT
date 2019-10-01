@@ -6,13 +6,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.FlightActivity;
 import no.shitt.myshit.FlightPopupActivity;
 import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.helper.StringUtil;
 
 public class Flight extends ScheduledTransport {
     // MARK: Properties
@@ -44,14 +45,9 @@ public class Flight extends ScheduledTransport {
     @Override
     public String getDetailInfo() {
         if (references != null) {
-            String refList = "";
-            for (int i = 0; i < references.size(); i++) {
-                Map<String,String> ref = references.get(i);
-                if (!"ETKT".equals(ref.get("type"))) {
-                    refList = refList + (refList.equals("") ? "" : ", ") + references.get(i).get("refNo");
-                }
-            }
-            return refList;
+            Set<String> excludeRefTypes = new HashSet<>();
+            excludeRefTypes.add(REFTYPE_ELECTRONIC_TKT);
+            return getReferences(", ", false, excludeRefTypes);
         }
         return null;
     }
@@ -80,7 +76,8 @@ public class Flight extends ScheduledTransport {
         }
         try {
             Flight otherFlight = (Flight) otherObject;
-            if (!StringUtil.equal(this.airlineCode, otherFlight.airlineCode))      { return false; }
+//            if (!StringUtil.equal(this.airlineCode, otherFlight.airlineCode))      { return false; }
+            if (!Objects.equals(this.airlineCode, otherFlight.airlineCode))      { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {
@@ -90,7 +87,7 @@ public class Flight extends ScheduledTransport {
 
     @Override
     public Intent getActivityIntent(ActivityType activityType) {
-        Intent i = null;
+        Intent i;
         switch (activityType) {
             case REGULAR:
                 i = new Intent(SHiTApplication.getContext(), FlightActivity.class);

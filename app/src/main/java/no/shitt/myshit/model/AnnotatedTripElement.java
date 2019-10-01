@@ -31,11 +31,4 @@ public class AnnotatedTripElement /* NSObject, NSCoding */ {
         this.modified = ChangeState.UNCHANGED;
         this.tripElement = tripElement;
     }
-
-    AnnotatedTripElement(TripElement tripElement, ChangeState modified) {
-        super();
-        // Initialize stored properties.
-        this.modified = modified;
-        this.tripElement = tripElement;
-    }
 }

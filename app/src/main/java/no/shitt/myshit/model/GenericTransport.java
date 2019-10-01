@@ -8,11 +8,10 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.FlightActivity;
-import no.shitt.myshit.FlightPopupActivity;
 import no.shitt.myshit.PrivateTransportActivity;
 import no.shitt.myshit.PrivateTransportPopupActivity;
 import no.shitt.myshit.SHiTApplication;
@@ -83,11 +82,7 @@ public class GenericTransport extends TripElement {
     @Override
     public String getDetailInfo() {
         if (references != null) {
-            String refList = "";
-            for (int i = 0; i < references.size(); i++) {
-                refList = refList + (refList.equals("") ? "" : ", ") + references.get(i).get("refNo");
-            }
-            return refList;
+            return getReferences(", ", false);
         }
         return null;
     }
@@ -171,26 +166,26 @@ public class GenericTransport extends TripElement {
             GenericTransport otherTransport = (GenericTransport) otherObject;
             if (this.segmentId             != otherTransport.segmentId                             ) { return false; }
             if (this.legNo                 != otherTransport.legNo                                 ) { return false; }
-            if (!StringUtil.equal(this.segmentCode, otherTransport.segmentCode)                    ) { return false; }
-            if (!ServerDate.equal(this.departureTime, otherTransport.departureTime)                ) { return false; }
-            if (!StringUtil.equal(this.departureLocation, otherTransport.departureLocation)        ) { return false; }
-            if (!StringUtil.equal(this.departureStop, otherTransport.departureStop)                ) { return false; }
-            if (!StringUtil.equal(this.departureAddress, otherTransport.departureAddress)          ) { return false; }
-            if (!StringUtil.equal(this.departureTimeZone, otherTransport.departureTimeZone)        ) { return false; }
-            if (!StringUtil.equal(this.departureCoordinates, otherTransport.departureCoordinates)  ) { return false; }
-            if (!StringUtil.equal(this.departureTerminalCode, otherTransport.departureTerminalCode)) { return false; }
-            if (!StringUtil.equal(this.departureTerminalName, otherTransport.departureTerminalName)) { return false; }
-            if (!ServerDate.equal(this.arrivalTime, otherTransport.arrivalTime)                    ) { return false; }
-            if (!StringUtil.equal(this.arrivalLocation, otherTransport.arrivalLocation)            ) { return false; }
-            if (!StringUtil.equal(this.arrivalStop, otherTransport.arrivalStop)                    ) { return false; }
-            if (!StringUtil.equal(this.arrivalAddress, otherTransport.arrivalAddress)              ) { return false; }
-            if (!StringUtil.equal(this.arrivalTimeZone, otherTransport.arrivalTimeZone)            ) { return false; }
-            if (!StringUtil.equal(this.arrivalCoordinates, otherTransport.arrivalCoordinates)      ) { return false; }
-            if (!StringUtil.equal(this.arrivalTerminalCode, otherTransport.arrivalTerminalCode)    ) { return false; }
-            if (!StringUtil.equal(this.arrivalTerminalName, otherTransport.arrivalTerminalName)    ) { return false; }
-            if (!StringUtil.equal(this.routeNo, otherTransport.routeNo)                            ) { return false; }
-            if (!StringUtil.equal(this.companyName, otherTransport.companyName)                    ) { return false; }
-            if (!StringUtil.equal(this.companyPhone, otherTransport.companyPhone)                  ) { return false; }
+            if (!Objects.equals(this.segmentCode, otherTransport.segmentCode)                    ) { return false; }
+            if (!Objects.equals(this.departureTime, otherTransport.departureTime)                ) { return false; }
+            if (!Objects.equals(this.departureLocation, otherTransport.departureLocation)        ) { return false; }
+            if (!Objects.equals(this.departureStop, otherTransport.departureStop)                ) { return false; }
+            if (!Objects.equals(this.departureAddress, otherTransport.departureAddress)          ) { return false; }
+            if (!Objects.equals(this.departureTimeZone, otherTransport.departureTimeZone)        ) { return false; }
+            if (!Objects.equals(this.departureCoordinates, otherTransport.departureCoordinates)  ) { return false; }
+            if (!Objects.equals(this.departureTerminalCode, otherTransport.departureTerminalCode)) { return false; }
+            if (!Objects.equals(this.departureTerminalName, otherTransport.departureTerminalName)) { return false; }
+            if (!Objects.equals(this.arrivalTime, otherTransport.arrivalTime)                    ) { return false; }
+            if (!Objects.equals(this.arrivalLocation, otherTransport.arrivalLocation)            ) { return false; }
+            if (!Objects.equals(this.arrivalStop, otherTransport.arrivalStop)                    ) { return false; }
+            if (!Objects.equals(this.arrivalAddress, otherTransport.arrivalAddress)              ) { return false; }
+            if (!Objects.equals(this.arrivalTimeZone, otherTransport.arrivalTimeZone)            ) { return false; }
+            if (!Objects.equals(this.arrivalCoordinates, otherTransport.arrivalCoordinates)      ) { return false; }
+            if (!Objects.equals(this.arrivalTerminalCode, otherTransport.arrivalTerminalCode)    ) { return false; }
+            if (!Objects.equals(this.arrivalTerminalName, otherTransport.arrivalTerminalName)    ) { return false; }
+            if (!Objects.equals(this.routeNo, otherTransport.routeNo)                            ) { return false; }
+            if (!Objects.equals(this.companyName, otherTransport.companyName)                    ) { return false; }
+            if (!Objects.equals(this.companyPhone, otherTransport.companyPhone)                  ) { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {
@@ -244,7 +239,7 @@ public class GenericTransport extends TripElement {
     // TODO: Create new activity for GenericTransport
     @Override
     public Intent getActivityIntent(ActivityType activityType) {
-        Intent i = null;
+        Intent i;
         switch (activityType) {
             case REGULAR:
                 i = new Intent(SHiTApplication.getContext(), PrivateTransportActivity.class);

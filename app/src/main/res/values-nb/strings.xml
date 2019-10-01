@@ -241,4 +241,15 @@
     <string name="shortcut_chatmsg_long_label">Send melding til %1$s-deltagere</string>
     <string name="shortcut_chatmsg_short_label">%1$s</string>
 
+    <!-- Buttons -->
+    <string name="btn_ok">OK</string>
+
+    <!-- Application messages -->
+    <string name="dlgtitle_network_connection_error">Internett-forbindelse feilet</string>
+    <string name="msg_unknown_network_error">Ukjent feil ved tilkobling til SHiT.</string>
+    <string name="msg_loading_trips">Henter SHiT-reiser &#8230;</string>
+    <string name="msg_loading_trip_details">Henter reisedetaljer &#8230;</string>
+    <string name="msg_logon_error">Pålogging feilet</string>
+    <string name="msg_connect_to_network">Vennligst koble til nettverk med Internett-forbindelse</string>
+
 </resources>

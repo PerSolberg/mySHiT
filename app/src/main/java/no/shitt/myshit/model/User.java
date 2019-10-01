@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.R;
+//import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerAPI;
 
@@ -125,7 +125,7 @@ public class User implements ServerAPI.Listener {
         } else {
             try {
                 FileOutputStream fos = SHiTApplication.getContext().openFileOutput(Constants.CRED_U_FILE, Context.MODE_PRIVATE);
-                String fileData = Integer.toString(id) + ID_USER_SEP + userName;
+                String fileData = id + ID_USER_SEP + userName;
                 //Log.d("User", "Saved user data '" + fileData + "'");
                 fos.write(fileData.getBytes());
                 fos.close();
@@ -217,15 +217,6 @@ public class User implements ServerAPI.Listener {
     }
 
     public void logon(String userName, String password) {
-        /*
-        try {
-           String urlSafePassword = URLEncoder.encode(password, Constants.URL_ENCODE_CHARSET);
-        }
-        catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException(uee.getMessage());
-        }
-        */
-
         serverParams = new ServerAPI.Params(ServerAPI.URL_USER_VERIFY);
         serverParams.addParameter(ServerAPI.PARAM_USER_NAME, userName);
         serverParams.addParameter(ServerAPI.PARAM_PASSWORD, password);
@@ -268,7 +259,6 @@ public class User implements ServerAPI.Listener {
     public void onRemoteCallFailed() {
         Log.d("User", "User authentication call failed with unknown exception");
         Intent intent = new Intent(Constants.Notification.LOGON_FAILED);
-        //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
@@ -278,7 +268,6 @@ public class User implements ServerAPI.Listener {
             Log.d("User", "User authentication failed");
             Context ctx = SHiTApplication.getContext();
             Intent intent = new Intent(Constants.Notification.LOGON_UNAUTHORISED);
-            //intent.putExtra("message", ctx.getString(R.string.error_unauthorised));
             LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
         } else {
             Log.d("User", "User authentication call failed with exception");

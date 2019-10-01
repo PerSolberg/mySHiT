@@ -8,9 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.WakefulBroadcastReceiver;
+import android.content.BroadcastReceiver;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Date;
 
@@ -18,7 +17,7 @@ import java.util.Date;
  * When the alarm fires, this WakefulBroadcastReceiver receives the broadcast Intent
  * and then starts the IntentService {@code SampleSchedulingService} to do some work.
  */
-public class AlarmReceiver extends WakefulBroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver {
     // The app's AlarmManager, which provides access to the system alarm services.
     private AlarmManager alarmMgr;
     // The pending intent that is triggered when the alarm fires.
@@ -29,9 +28,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         Log.d("AlarmReceiver", "Broadcast received");
         /* Ensure intent extras are passed along to SchedulingService */
         /* Toasts are not good enough */
-        ComponentName comp = new ComponentName(context.getPackageName(), SchedulingService.class.getName());
-        intent.setComponent(comp);
-        startWakefulService(context, intent);
+        AlarmIntentService.enqueueWork(context, intent);
+//        ComponentName comp = new ComponentName(context.getPackageName(), SchedulingService.class.getName());
+//        intent.setComponent(comp);
+//        startWakefulService(context, intent);
     }
 
     /**
@@ -64,9 +64,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 PackageManager.DONT_KILL_APP);
     }
 
+    /*
     public void setAlarm(Date alertTime, Uri data, Bundle extras) {
         setAlarm(alertTime, data, null, extras);
     }
+    */
 
 
     /**

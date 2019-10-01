@@ -2,7 +2,6 @@ package no.shitt.myshit;
 
 import no.shitt.myshit.adapters.TripPagerAdapter;
 import no.shitt.myshit.model.AnnotatedTrip;
-import no.shitt.myshit.model.ChatMessage;
 import no.shitt.myshit.model.TripList;
 import no.shitt.myshit.model.User;
 import no.shitt.myshit.ui.ChatThreadFragment;
@@ -10,17 +9,12 @@ import no.shitt.myshit.ui.TripDetailsFragment;
 
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
-//import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -32,16 +26,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 
 public class TripDetailsActivity extends AppCompatActivity
         implements TripDetailsFragment.OnFragmentInteractionListener
                  , ChatThreadFragment.OnFragmentInteractionListener
 {
-    private ProgressDialog pDialog;
-
     private AnnotatedTrip annotatedTrip;
 
     String trip_code;
@@ -171,7 +160,7 @@ public class TripDetailsActivity extends AppCompatActivity
 
     protected void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
-            pDialog = new ProgressDialog(/*TripDetailsActivity.*/this);
+            ProgressDialog pDialog = new ProgressDialog(/*TripDetailsActivity.*/this);
             pDialog.setMessage("Loading trip details ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);

@@ -1,6 +1,5 @@
 package no.shitt.myshit;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
 
 import no.shitt.myshit.model.AnnotatedTrip;
@@ -19,17 +20,9 @@ import no.shitt.myshit.model.Trip;
 import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
-/**
- * This {@code IntentService} does the app's actual work.
- * {@code SampleAlarmReceiver} (a {@code WakefulBroadcastReceiver}) holds a
- * partial wake lock for this service while the service does its work. When the
- * service is finished, it calls {@code completeWakefulIntent()} to release the
- * wake lock.
- */
-
-public class SchedulingService extends IntentService {
-    // An ID used to post the notification.
-    //private static final int NOTIFICATION_ID = 1;
+public class AlarmIntentService extends JobIntentService {
+    // An ID used to enqueue the job.
+    private static final int JOB_ID = 1;
     private static final long[] VIBRATION_PATTERN = new long[] { 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50 };
 
     // Keys for intent extras (bundle keys)
@@ -39,17 +32,17 @@ public class SchedulingService extends IntentService {
     public static final String KEY_MESSAGE    = "msg";
 
 
-    public SchedulingService() {
-        super("SchedulingService");
+    public AlarmIntentService() {
+        super();
     }
 
+    static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, AlarmIntentService.class, JOB_ID, work);
+    }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleWork(@NonNull Intent intent) {
         sendNotification(intent);
-
-        // Release the wake lock provided by the BroadcastReceiver.
-        //AlarmReceiver.completeWakefulIntent(intent);
     }
 
     // Post a notification
@@ -121,3 +114,8 @@ public class SchedulingService extends IntentService {
         mNotificationManager.notify(tag, notificationId /*NOTIFICATION_ID*/, ntf);
     }
 }
+
+
+
+
+

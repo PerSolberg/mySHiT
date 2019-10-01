@@ -1,10 +1,10 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">mySHiT</string>
 
     <!-- Placeholder text (mainly for design verification purposes -->
     <string name="placeholder_short">Placeholder</string>
     <string name="placeholder_medium">Medium length placeholder text</string>
-    <string name="placeholder_long">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="placeholder_long"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.]]></string>
     <string name="placeholder_multiline_2">Placeholder text\nSecond line of placeholder</string>
     <string name="placeholder_multiline_3">Placeholder text\nSecond line of placeholder\nThird line of text</string>
     <string name="placeholder_initials">TGr</string>
@@ -192,39 +192,39 @@
     </string-array>
 
     <!-- Push notifications -->
-    <string name="NTF.INSERT.ADDRESS">%1$s: Address information updated</string>
-    <string name="NTF.INSERT.BOOKING">%1$s: New booking added</string>
-    <string name="NTF.INSERT.BOOKINGREF">%1$s: New booking reference added</string>
-    <string name="NTF.INSERT.EVENT">%1$s: New event added</string>
-    <string name="NTF.INSERT.HOTEL">%1$s: New hotel booking added</string>
-    <string name="NTF.INSERT.ITINERARY">%1$s: Itinerary updated</string>
-    <string name="NTF.INSERT.TRIP">%1$s: New trip added</string>
-    <string name="NTF.INSERT.USERPROFILE">User profile updated</string>
+    <string name="NTF.INSERT.ADDRESS" tools:ignore="UnusedResources">%1$s: Address information updated</string>
+    <string name="NTF.INSERT.BOOKING" tools:ignore="UnusedResources">%1$s: New booking added</string>
+    <string name="NTF.INSERT.BOOKINGREF" tools:ignore="UnusedResources">%1$s: New booking reference added</string>
+    <string name="NTF.INSERT.EVENT" tools:ignore="UnusedResources">%1$s: New event added</string>
+    <string name="NTF.INSERT.HOTEL" tools:ignore="UnusedResources">%1$s: New hotel booking added</string>
+    <string name="NTF.INSERT.ITINERARY" tools:ignore="UnusedResources">%1$s: Itinerary updated</string>
+    <string name="NTF.INSERT.TRIP" tools:ignore="UnusedResources">%1$s: New trip added</string>
+    <string name="NTF.INSERT.USERPROFILE" tools:ignore="UnusedResources">User profile updated</string>
     <string name="NTF.INSERT.CHATMESSAGE">%1$s to %2$s: %3$s</string>
 
-    <string name="NTF.UPDATE.ADDRESS">%1$s: Address information updated</string>
-    <string name="NTF.UPDATE.BOOKING">%1$s: Booking updated</string>
-    <string name="NTF.UPDATE.BOOKINGREF">%1$s: Booking reference updated</string>
-    <string name="NTF.UPDATE.EVENT">%1$s: Event updated</string>
-    <string name="NTF.UPDATE.HOTEL">%1$s: Hotel booking updated</string>
-    <string name="NTF.UPDATE.ITINERARY">%1$s: Itinerary updated</string>
-    <string name="NTF.UPDATE.TRIP">%1$s: Trip updated</string>
-    <string name="NTF.UPDATE.USERPROFILE">User profile updated</string>
+    <string name="NTF.UPDATE.ADDRESS" tools:ignore="UnusedResources">%1$s: Address information updated</string>
+    <string name="NTF.UPDATE.BOOKING" tools:ignore="UnusedResources">%1$s: Booking updated</string>
+    <string name="NTF.UPDATE.BOOKINGREF" tools:ignore="UnusedResources">%1$s: Booking reference updated</string>
+    <string name="NTF.UPDATE.EVENT" tools:ignore="UnusedResources">%1$s: Event updated</string>
+    <string name="NTF.UPDATE.HOTEL" tools:ignore="UnusedResources">%1$s: Hotel booking updated</string>
+    <string name="NTF.UPDATE.ITINERARY" tools:ignore="UnusedResources">%1$s: Itinerary updated</string>
+    <string name="NTF.UPDATE.TRIP" tools:ignore="UnusedResources">%1$s: Trip updated</string>
+    <string name="NTF.UPDATE.USERPROFILE" tools:ignore="UnusedResources">User profile updated</string>
 
-    <string name="NTF.DELETE.ADDRESS">%1$s: Address information updated</string>
-    <string name="NTF.DELETE.BOOKING">%1$s: Booking removed</string>
-    <string name="NTF.DELETE.BOOKINGREF">%1$s: Booking reference removed</string>
-    <string name="NTF.DELETE.EVENT">%1$s: Event cancelled</string>
-    <string name="NTF.DELETE.HOTEL">%1$s: Hotel booking removed</string>
-    <string name="NTF.DELETE.ITINERARY">%1$s: Itinerary updated</string>
-    <string name="NTF.DELETE.TRIP">%1$s: Trip updated</string>
-    <string name="NTF.DELETE.USERPROFILE">User profile updated</string>
+    <string name="NTF.DELETE.ADDRESS" tools:ignore="UnusedResources">%1$s: Address information updated</string>
+    <string name="NTF.DELETE.BOOKING" tools:ignore="UnusedResources">%1$s: Booking removed</string>
+    <string name="NTF.DELETE.BOOKINGREF" tools:ignore="UnusedResources">%1$s: Booking reference removed</string>
+    <string name="NTF.DELETE.EVENT" tools:ignore="UnusedResources">%1$s: Event cancelled</string>
+    <string name="NTF.DELETE.HOTEL" tools:ignore="UnusedResources">%1$s: Hotel booking removed</string>
+    <string name="NTF.DELETE.ITINERARY" tools:ignore="UnusedResources">%1$s: Itinerary updated</string>
+    <string name="NTF.DELETE.TRIP" tools:ignore="UnusedResources">%1$s: Trip updated</string>
+    <string name="NTF.DELETE.USERPROFILE" tools:ignore="UnusedResources">User profile updated</string>
 
     <!-- Push notification categories -->
     <string name="ntf_category_default">DEFAULT-NTF-CATEGORY</string>
 
     <!-- Push notification channels -->
-    <string name="ntf_channel_default">DEFAULT</string>
+    <string name="ntf_channel_default" tools:ignore="MissingTranslation">DEFAULT</string>
 
     <!-- Push notification actions -->
     <string name="ntf_action_chat_reply">Reply</string>
@@ -243,5 +243,16 @@
     <!-- Shortcuts -->
     <string name="shortcut_chatmsg_long_label">Send message to %1$s participants</string>
     <string name="shortcut_chatmsg_short_label">%1$s</string>
+
+    <!-- Buttons -->
+    <string name="btn_ok">OK</string>
+
+    <!-- Application messages -->
+    <string name="dlgtitle_network_connection_error">Internet Connection Error</string>
+    <string name="msg_unknown_network_error">Unknown error while connecting to SHiT.</string>
+    <string name="msg_loading_trips">Loading SHiT Trips &#8230;</string>
+    <string name="msg_loading_trip_details">Loading trip details &#8230;</string>
+    <string name="msg_logon_error">Logon Error</string>
+    <string name="msg_connect_to_network">Please connect to working Internet connection</string>
 
 </resources>

@@ -100,8 +100,4 @@ public class ServerDate {
 
         return sb.toString();
     }
-
-    public static boolean equal(Date str1, Date str2) {
-        return (str1 == null ? str2 == null : str1.equals(str2));
-    }
 }

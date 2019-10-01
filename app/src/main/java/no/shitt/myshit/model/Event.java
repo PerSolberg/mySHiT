@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
@@ -17,7 +18,6 @@ import no.shitt.myshit.EventPopupActivity;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
-import no.shitt.myshit.helper.StringUtil;
 
 /******************************************************************************
  * Created by Per Solberg on 2017-01-19.
@@ -65,11 +65,7 @@ public class Event extends TripElement {
     @Override
     public String getDetailInfo() {
         if (references != null) {
-            String refList = "";
-            for (int i = 0; i < references.size(); i++) {
-                refList = refList + (refList.equals("") ? "" : ", ") + references.get(i).get("refNo");
-            }
-            return refList;
+            return getReferences(", ", false);
         }
         return null;
     }
@@ -125,15 +121,15 @@ public class Event extends TripElement {
         }
         try {
             Event otherEvent = (Event) otherObject;
-            if (!ServerDate.equal(this.startTime, otherEvent.startTime))          { return false; }
-            if (this.travelTime != otherEvent.travelTime)                         { return false; }
-            if (!StringUtil.equal(this.venueName, otherEvent.venueName))          { return false; }
-            if (!StringUtil.equal(this.venueAddress, otherEvent.venueAddress))    { return false; }
-            if (!StringUtil.equal(this.venuePostCode, otherEvent.venuePostCode))  { return false; }
-            if (!StringUtil.equal(this.venueCity, otherEvent.venueCity))          { return false; }
-            if (!StringUtil.equal(this.venuePhone, otherEvent.venuePhone))        { return false; }
-            if (!StringUtil.equal(this.accessInfo, otherEvent.accessInfo))        { return false; }
-            if (!StringUtil.equal(this.timezone, otherEvent.timezone))            { return false; }
+            if (!Objects.equals(this.startTime, otherEvent.startTime))          { return false; }
+            if (this.travelTime != otherEvent.travelTime)                       { return false; }
+            if (!Objects.equals(this.venueName, otherEvent.venueName))          { return false; }
+            if (!Objects.equals(this.venueAddress, otherEvent.venueAddress))    { return false; }
+            if (!Objects.equals(this.venuePostCode, otherEvent.venuePostCode))  { return false; }
+            if (!Objects.equals(this.venueCity, otherEvent.venueCity))          { return false; }
+            if (!Objects.equals(this.venuePhone, otherEvent.venuePhone))        { return false; }
+            if (!Objects.equals(this.accessInfo, otherEvent.accessInfo))        { return false; }
+            if (!Objects.equals(this.timezone, otherEvent.timezone))            { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {

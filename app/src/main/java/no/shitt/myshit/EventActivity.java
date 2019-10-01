@@ -6,21 +6,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.util.Linkify;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-
 import java.text.DateFormat;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.Event;
-import no.shitt.myshit.model.TripElement;
 import no.shitt.myshit.model.TripList;
 
 public class EventActivity extends TripElementActivity {
@@ -31,7 +25,7 @@ public class EventActivity extends TripElementActivity {
     private Intent intent;
 
     StringBuilder venueInfo;
-    StringBuilder references;
+    String        references;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +55,7 @@ public class EventActivity extends TripElementActivity {
         ((TextView) findViewById(R.id.event_venue)).setText(venueInfo.toString());
         ((TextView) findViewById(R.id.event_start)).setText(event.startTime(null, DateFormat.SHORT));
         ((TextView) findViewById(R.id.event_travel_time)).setText(event.travelTime());
-        ((TextView) findViewById(R.id.event_reference)).setText(references.toString());
+        ((TextView) findViewById(R.id.event_reference)).setText(references);
         ((TextView) findViewById(R.id.event_venue_phone)).setText(StringUtil.stringWithDefault(event.venuePhone, ""));
         ((TextView) findViewById(R.id.event_access_info)).setText(StringUtil.stringWithDefault(event.accessInfo, ""));
 
@@ -70,6 +64,7 @@ public class EventActivity extends TripElementActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpTo(this, intent);
@@ -88,15 +83,7 @@ public class EventActivity extends TripElementActivity {
                 StringUtil.appendWithLeadingSeparator(venueInfo, event.venuePostCode, "\n", false);
                 StringUtil.appendWithLeadingSeparator(venueInfo, event.venueCity, "\n", false);
 
-                references = new StringBuilder();
-                Iterator i = event.references.iterator();
-                String sep = "";
-                while (i.hasNext()) {
-                    Map<String,String> refMap = (Map<String,String>) i.next();
-                    String ref = refMap.get(TripElement.REFTAG_REF_NO);
-                    StringUtil.appendWithLeadingSeparator(references, ref, sep, false);
-                    sep = ", ";
-                }
+                references = event.getReferences(", ", false);
 
                 // Set title
                 int titleId = getTitleId();

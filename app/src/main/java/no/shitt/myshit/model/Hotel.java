@@ -10,16 +10,14 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
-import no.shitt.myshit.EventActivity;
-import no.shitt.myshit.EventPopupActivity;
 import no.shitt.myshit.HotelActivity;
 import no.shitt.myshit.HotelPopupActivity;
 import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
-import no.shitt.myshit.helper.StringUtil;
 
 public class Hotel extends TripElement {
     // MARK: Properties
@@ -67,11 +65,7 @@ public class Hotel extends TripElement {
     @Override
     public String getDetailInfo() {
         if (references != null) {
-            String refList = "";
-            for (int i = 0; i < references.size(); i++) {
-                refList = refList + (refList.equals("") ? "" : ", ") + references.get(i).get("refNo");
-            }
-            return refList;
+            return getReferences(", ", false);
         }
         return null;
     }
@@ -121,15 +115,15 @@ public class Hotel extends TripElement {
         }
         try {
             Hotel otherHotel = (Hotel) otherObject;
-            if (!ServerDate.equal(this.checkInDate, otherHotel.checkInDate))    { return false; }
-            if (!ServerDate.equal(this.checkOutDate, otherHotel.checkOutDate))  { return false; }
-            if (!StringUtil.equal(this.hotelName, otherHotel.hotelName))        { return false; }
-            if (!StringUtil.equal(this.address, otherHotel.address))            { return false; }
-            if (!StringUtil.equal(this.postCode, otherHotel.postCode))          { return false; }
-            if (!StringUtil.equal(this.city, otherHotel.city))                  { return false; }
-            if (!StringUtil.equal(this.phone, otherHotel.phone))                { return false; }
-            if (!StringUtil.equal(this.transferInfo, otherHotel.transferInfo))  { return false; }
-            if (!StringUtil.equal(this.timezone, otherHotel.timezone))          { return false; }
+            if (!Objects.equals(this.checkInDate, otherHotel.checkInDate))    { return false; }
+            if (!Objects.equals(this.checkOutDate, otherHotel.checkOutDate))  { return false; }
+            if (!Objects.equals(this.hotelName, otherHotel.hotelName))        { return false; }
+            if (!Objects.equals(this.address, otherHotel.address))            { return false; }
+            if (!Objects.equals(this.postCode, otherHotel.postCode))          { return false; }
+            if (!Objects.equals(this.city, otherHotel.city))                  { return false; }
+            if (!Objects.equals(this.phone, otherHotel.phone))                { return false; }
+            if (!Objects.equals(this.transferInfo, otherHotel.transferInfo))  { return false; }
+            if (!Objects.equals(this.timezone, otherHotel.timezone))          { return false; }
 
             return super.isEqual(otherObject);
         } catch (Exception e) {
@@ -182,7 +176,7 @@ public class Hotel extends TripElement {
 
     @Override
     public Intent getActivityIntent(ActivityType activityType) {
-        Intent i = null;
+        Intent i;
         switch (activityType) {
             case REGULAR:
                 i = new Intent(SHiTApplication.getContext(), HotelActivity.class);

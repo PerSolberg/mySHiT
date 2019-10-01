@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+//import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,12 +31,6 @@ import no.shitt.myshit.model.User;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity /* implements LoaderCallbacks<Cursor> */ {
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    //private UserLoginTask mAuthTask = null;
-
     // Alert dialog manager
     private final AlertDialogueManager alert = new AlertDialogueManager();
 
@@ -75,7 +70,7 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (/*id == R.id.login || */id == EditorInfo.IME_ACTION_GO) {
                     attemptLogin();
                     return true;
                 }
@@ -128,28 +123,10 @@ public class LoginActivity extends AppCompatActivity /* implements LoaderCallbac
         @Override
         public void onReceive(Context context, Intent intent) {
             showProgress(false);
-            alert.showAlertDialogue(LoginActivity.this, "Logon Error",
+            alert.showAlertDialogue(LoginActivity.this, getString(R.string.msg_logon_error),
                     intent.getStringExtra("message"), false);
         }
     }
-
-    /*
-    private class HandleNotification extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            showProgress(false);
-            if (intent.getAction().equals(Constants.Notification.LOGON_SUCCEEDED)) {
-                finish();
-            } else if (intent.getAction().equals(Constants.Notification.LOGON_UNAUTHORISED)) {
-                mPasswordView.setError(getString(R.string.error_unauthorised));
-                mPasswordView.requestFocus();
-            } else if (intent.getAction().equals(Constants.Notification.LOGON_FAILED)) {
-                alert.showAlertDialogue(LoginActivity.this, "Logon Error",
-                        intent.getStringExtra("message"), false);
-            }
-        }
-    }
-    */
 
 
     /**

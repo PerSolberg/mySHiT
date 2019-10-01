@@ -185,9 +185,10 @@ public class ChatThread extends DataSetObservable implements JSONable {
 
         rwl.readLock().lock();
         if (lastDisplayedId != null) {
+            //noinspection SuspiciousMethodCalls
             item = messages.indexOf(lastDisplayedId);
         } else if (lastSeenByUserLocal != ChatMessage.ID_NONE) {
-            //item = messages.indexOf(lastSeenByUserLocal);  Doesn't work because index of uses .equals on the parameter not the array elements
+            //item = messages.indexOf(lastSeenByUserLocal);  Doesn't work because indexOf uses .equals on the parameter not the array elements
             for (int i = 0; i < messages.size(); i++) {
                 if (messages.get(i).id == lastSeenByUserLocal) {
                     item = i;
@@ -241,18 +242,6 @@ public class ChatThread extends DataSetObservable implements JSONable {
 
         return message;
     }
-
-    /*
-    void set(int index, ChatMessage newValue) {
-        rwl.writeLock().lock();
-        if (index >= this.messages.size()) {
-            return;
-        }
-        this.messages.set(index, newValue);
-
-        rwl.writeLock().unlock();
-    }
-    */
 
 
     // Appends a new message (no need to check for duplicates)

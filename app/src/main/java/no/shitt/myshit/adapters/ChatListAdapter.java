@@ -137,7 +137,7 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         int viewType = getItemViewType(itemPosition);
-        if (convertView == null || !(convertView instanceof RelativeLayout)) {
+        if ( ! (convertView instanceof RelativeLayout) ) {
             holder = new MessageViewHolder();
             if (viewType == ViewTypes.OTHERS_PLAIN.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_other_plain, parent, false);
@@ -165,7 +165,7 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
                 holder.txtMessage       = (TextView) convertView.findViewById(R.id.chatmsg_text);
                 holder.txtSeenInfo      = (TextView) convertView.findViewById(R.id.chatmsg_seen_info);
             } else {
-                Log.e("ChatListAdapter", "Unknown view type " + viewType);
+                Log.e(LOG_TAG, "Unknown view type " + viewType);
             }
             convertView.setTag(holder);
         }
@@ -181,7 +181,7 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
         }
         if (holder.txtSeenInfo != null) {
             List<String> seenByUsers = msg.getLastSeenBy();
-            String seenInfo = "";
+            String seenInfo;
 
             if (seenByUsers.size() > 1) {
                 String seenByFirst = TextUtils.join(", ", seenByUsers.subList(0, seenByUsers.size() - 1));

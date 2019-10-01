@@ -14,7 +14,6 @@ import android.util.Log;
 
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.ChatMessage;
-import no.shitt.myshit.model.Trip;
 import no.shitt.myshit.model.TripList;
 
 

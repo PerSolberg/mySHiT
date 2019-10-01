@@ -10,7 +10,7 @@ import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.PrivateTransportActivity;
 
 /**
- * Created by persolberg on 2018-01-31.
+ * Created by Per Solberg on 2018-01-31.
  */
 
 public class PrivateTransport extends GenericTransport {
@@ -27,7 +27,7 @@ public class PrivateTransport extends GenericTransport {
 
     @Override
     public Intent getActivityIntent(ActivityType activityType) {
-        Intent i = null;
+        Intent i;
         switch (activityType) {
             case REGULAR:
                 i = new Intent(SHiTApplication.getContext(), PrivateTransportActivity.class);

@@ -28,6 +28,8 @@ import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
 
 public class TripList implements ServerAPI.Listener, JSONable, Iterable<AnnotatedTrip> {
+    private static final String LOG_TAG = TripList.class.getSimpleName();
+
     private static final TripList sharedList = new TripList();
 
     private List<AnnotatedTrip> trips = new ArrayList<>();
@@ -42,12 +44,6 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
         int count = 0;
 
         JSONArray jat = new JSONArray();
-//        Iterator i = trips.iterator();
-//        while (i.hasNext()) {
-//            count++;
-//            AnnotatedTrip at = (AnnotatedTrip) i.next();
-//            jat.put(at.toJSON());
-//        }
         for (AnnotatedTrip at: trips) {
             count++;
             jat.put(at.toJSON());
@@ -63,7 +59,7 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
         return sharedList;
     }
 
-    public void getFromServer(/*ServerAPIListener responseHandler*/) {
+    public void getFromServer() {
         //Send request
         ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_TRIP_INFO);
         params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
@@ -78,8 +74,6 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
     // Iterable
     //
     public Iterator<AnnotatedTrip> iterator() {
-        //Iterator<AnnotatedTrip> i = trips.iterator();
-        //return i;
         return trips.iterator();
     }
 
@@ -153,11 +147,16 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
     }
 
     public void onRemoteCallFailed() {
-        //
+        Log.e(LOG_TAG, "Server call failed");
+        Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
+        LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
     public void onRemoteCallFailed(Exception e) {
-        //
+        Log.e(LOG_TAG, "Server call failed with exception: " + e.getLocalizedMessage());
+        Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
+        intent.putExtra("message", e.getMessage());
+        LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
     // Load from JSON archive
@@ -184,13 +183,13 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
             copyServerData(jo.optJSONArray(Constants.JSON.QUERY_RESULTS), false);
         }
         catch (FileNotFoundException e) {
-            //Log.d("TripList", "File not found: " + e.toString());
+            //Log.d(LOG_TAG, "File not found: " + e.toString());
         }
         catch (IOException ioe) {
-            //Log.e("TripList", "Failed to load trips due to IO error...");
+            //Log.e(LOG_TAG, "Failed to load trips due to IO error...");
         }
         catch (JSONException je) {
-            //Log.e("TripList", "Failed to load trips due to JSON error...");
+            //Log.e(LOG_TAG, "Failed to load trips due to JSON error...");
         }
     }
 
@@ -202,13 +201,13 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
             fos.write(jsonString.getBytes());
             fos.close();
 
-            Log.d("TripList", "Trips saved to JSON file");
+            Log.d(LOG_TAG, "Trips saved to JSON file");
         }
         catch (JSONException je) {
-            //Log.e("TripList", "Failed to save trips due to JSON error...");
+            //Log.e(LOG_TAG, "Failed to save trips due to JSON error...");
         }
         catch (IOException ioe) {
-            //Log.e("TripList", "Failed to save trips due to IO error...");
+            //Log.e(LOG_TAG, "Failed to save trips due to IO error...");
         }
     }
 
@@ -239,26 +238,6 @@ public class TripList implements ServerAPI.Listener, JSONable, Iterable<Annotate
         for (int i = 0; i < trips.size(); i++) {
             if (tripCode.equals(trips.get(i).trip.code)) {
                 return trips.get(i);
-            }
-        }
-        return null;
-    }
-
-    public AnnotatedTrip tripByElementId(int elementId) {
-        for (int i = 0; i < trips.size(); i++) {
-            if (trips.get(i).trip.elementById(elementId) != null) {
-                return trips.get(i);
-            }
-        }
-        return null;
-    }
-
-    public AnnotatedTripElement elementById(int elementId) {
-        AnnotatedTripElement element;
-        for (int i = 0; i < trips.size(); i++) {
-            element = trips.get(i).trip.elementById(elementId);
-            if (element != null) {
-                return element;
             }
         }
         return null;

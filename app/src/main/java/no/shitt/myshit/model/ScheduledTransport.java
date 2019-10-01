@@ -5,7 +5,8 @@ import android.content.Intent;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
@@ -53,14 +54,9 @@ public class ScheduledTransport extends GenericTransport {
     @Override
     public String getDetailInfo() {
         if (references != null) {
-            String refList = "";
-            for (int i = 0; i < references.size(); i++) {
-                Map<String,String> ref = references.get(i);
-                if (!"ETKT".equals(ref.get("type"))) {
-                    refList = refList + (refList.equals("") ? "" : ", ") + references.get(i).get("refNo");
-                }
-            }
-            return refList;
+            Set<String> excludeRefTypes = new HashSet<>();
+            excludeRefTypes.add(REFTYPE_ELECTRONIC_TKT);
+            return getReferences(", ", false, excludeRefTypes);
         }
         return null;
     }
@@ -96,7 +92,7 @@ public class ScheduledTransport extends GenericTransport {
 
     @Override
     public Intent getActivityIntent(ActivityType activityType) {
-        Intent i = null;
+        Intent i;
         switch (activityType) {
             case REGULAR:
                 i = new Intent(SHiTApplication.getContext(), ScheduledTransportActivity.class);

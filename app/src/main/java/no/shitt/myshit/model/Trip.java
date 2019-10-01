@@ -1,13 +1,9 @@
 package no.shitt.myshit.model;
 
-//import android.text.format.Formatter;
-
 import android.content.Context;
 import android.content.Intent;
-//import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-//import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -17,7 +13,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-//import java.text.DateFormat;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -25,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +36,6 @@ import no.shitt.myshit.TripDetailsPopupActivity;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerAPI;
 import no.shitt.myshit.helper.ServerDate;
-import no.shitt.myshit.helper.StringUtil;
 
 public class Trip implements ServerAPI.Listener, JSONable {
     public enum ActivityType {
@@ -270,12 +265,12 @@ public class Trip implements ServerAPI.Listener, JSONable {
             Trip otherTrip = (Trip) otherObject;
             if (this.id              != otherTrip.id                              ) { return false; }
             if (this.itineraryId     != otherTrip.itineraryId                     ) { return false; }
-            if (!ServerDate.equal(this.startDate, otherTrip.startDate)            ) { return false; }
-            if (!ServerDate.equal(this.endDate, otherTrip.endDate)                ) { return false; }
-            if (!StringUtil.equal(this.tripDescription, otherTrip.tripDescription)) { return false; }
-            if (!StringUtil.equal(this.code, otherTrip.code)                      ) { return false; }
-            if (!StringUtil.equal(this.name, otherTrip.name)                      ) { return false; }
-            if (!StringUtil.equal(this.type, otherTrip.type)                      ) { return false; }
+            if (!Objects.equals(this.startDate, otherTrip.startDate)            ) { return false; }
+            if (!Objects.equals(this.endDate, otherTrip.endDate)                ) { return false; }
+            if (!Objects.equals(this.tripDescription, otherTrip.tripDescription)) { return false; }
+            if (!Objects.equals(this.code, otherTrip.code)                      ) { return false; }
+            if (!Objects.equals(this.name, otherTrip.name)                      ) { return false; }
+            if (!Objects.equals(this.type, otherTrip.type)                      ) { return false; }
 
             return areTripElementsUnchanged();
         }
@@ -379,7 +374,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
         if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {
             boolean combined = false;
 
-            Log.d("Trip", "Setting " + notificationType + " notification for trip " + id + " at " + newInfo.getNotificationDate());
+            //Log.d("Trip", "Setting " + notificationType + " notification for trip " + id + " at " + newInfo.getNotificationDate());
 
             Bundle extras = new Bundle();
             //Map<String,Object> actualUserInfo = new HashMap<>();
@@ -420,7 +415,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
 
                 AlarmReceiver alarm = new AlarmReceiver();
                 alarm.setAlarm(alarmTime.getTime()
-                        , Uri.parse("alarm://shitt.no/" + notificationType + "/" + code + "/" + Integer.toString(id))
+                        , Uri.parse("alarm://shitt.no/" + notificationType + "/" + code + "/" + id)
                         , Constants.PushNotificationActions.TRIP_CLICK
                         , extras);
             } else {
@@ -485,7 +480,6 @@ public class Trip implements ServerAPI.Listener, JSONable {
     public void onRemoteCallFailed() {
         //Log.d("Trip", "Server call failed");
         Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
-        //intent.putExtra("message", "SHiT trips loaded");
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 

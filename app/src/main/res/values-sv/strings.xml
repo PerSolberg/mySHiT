@@ -241,4 +241,15 @@
     <string name="shortcut_chatmsg_long_label">Skicka meddelande till %1$s-resenärer</string>
     <string name="shortcut_chatmsg_short_label">%1$s</string>
 
+    <!-- Buttons -->
+    <string name="btn_ok">OK</string>
+
+    <!-- Application messages -->
+    <string name="dlgtitle_network_connection_error">Internett-forbindelse feilet</string>
+    <string name="msg_unknown_network_error">Okänt fel vid tillkoppling till SHiT.</string>
+    <string name="msg_loading_trips">Hämtar SHiT-resor &#8230;</string>
+    <string name="msg_loading_trip_details">Hämtar resedetaljer &#8230;</string>
+    <string name="msg_logon_error">Fel vid inloggning</string>
+    <string name="msg_connect_to_network">Var god koppla till nätverk med Internett-anslutning</string>
+
 </resources>
