@@ -18,20 +18,17 @@ import java.util.Date;
  * and then starts the IntentService {@code SampleSchedulingService} to do some work.
  */
 public class AlarmReceiver extends BroadcastReceiver {
-    // The app's AlarmManager, which provides access to the system alarm services.
+    private static final String LOG_TAG = AlarmReceiver.class.getSimpleName();
+
     private AlarmManager alarmMgr;
-    // The pending intent that is triggered when the alarm fires.
     private PendingIntent alarmIntent;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("AlarmReceiver", "Broadcast received");
-        /* Ensure intent extras are passed along to SchedulingService */
+        Log.d(LOG_TAG, "Broadcast received");
+        /* Ensure intent extras are passed along to AlarmIntentService */
         /* Toasts are not good enough */
         AlarmIntentService.enqueueWork(context, intent);
-//        ComponentName comp = new ComponentName(context.getPackageName(), SchedulingService.class.getName());
-//        intent.setComponent(comp);
-//        startWakefulService(context, intent);
     }
 
     /**
@@ -41,7 +38,7 @@ public class AlarmReceiver extends BroadcastReceiver {
      * @param extras    Additional information (text to display to user)
      */
     public void setAlarm(Date alertTime, Uri data, String actionName, Bundle extras) {
-        //Log.d("AlarmReceiver", "Setting alarm for " + data.toString() + " at " + alertTime.toString());
+        Log.d(LOG_TAG, "Setting alarm for " + data.toString() + " at " + alertTime.toString());
         Context ctx = SHiTApplication.getContext();
         alarmMgr = (AlarmManager)ctx.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(ctx, AlarmReceiver.class);
@@ -63,12 +60,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
     }
-
-    /*
-    public void setAlarm(Date alertTime, Uri data, Bundle extras) {
-        setAlarm(alertTime, data, null, extras);
-    }
-    */
 
 
     /**

@@ -5,11 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import no.shitt.myshit.model.AnnotatedTrip;
@@ -35,16 +34,24 @@ public class ChatMessageReplyReceiver extends BroadcastReceiver {
                 if (at != null) {
                     ChatMessage replyMsg = new ChatMessage(reply.toString());
                     at.trip.chatThread.append(replyMsg);
-                    notificationManager.cancel(messageId);
+                    notificationManager.cancel(Constants.NotificationTag.CHAT, messageId);
                 } else {
                     // Update the notification with error to stop the progress spinner.
-                    Notification replyErrorNotification = new NotificationCompat.Builder(context)
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setLargeIcon(BitmapFactory.decodeResource(
-                                    context.getResources(), R.mipmap.icon_chat))
-                            .setContentText(context.getString(R.string.chat_reply_error_unknown_trip))
-                            .build();
-                    notificationManager.notify(messageId, replyErrorNotification);
+                    //Icon smallIcon = Icon.createWithResource(context, R.mipmap.icon_chat);
+                    Notification.Builder replyBuilder;
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        replyBuilder = new Notification.Builder(context, Constants.NotificationChannel.CHAT);
+                    } else {
+                        replyBuilder = new Notification.Builder(context);
+                    }
+                    replyBuilder
+                                .setSmallIcon(R.mipmap.icon_chat)
+                                .setContentText(context.getString(R.string.chat_reply_error_unknown_trip))
+                                .build();
+
+                    // Issue the new notification.
+                    //NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+                    notificationManager.notify(Constants.NotificationTag.CHAT, messageId, replyBuilder.build());
                 }
 
             }

@@ -223,6 +223,14 @@
     <!-- Push notification categories -->
     <string name="ntf_category_default">DEFAULT-NTF-CATEGORY</string>
 
+    <!-- Push notification channels -->
+    <string name="ntf_channel_name_chat">SHiTChat</string>
+    <string name="ntf_channel_name_alarm">Forestående hendelse</string>
+    <string name="ntf_channel_name_update">Reiseoppdatering</string>
+    <string name="ntf_channel_desc_chat">SHiTChat-melding fra andre reisedeltagere</string>
+    <string name="ntf_channel_desc_alarm">Påminnelse om forestående avganger, hendelser osv.</string>
+    <string name="ntf_channel_desc_update">Varsel om reiseoppdateringer (ruteendringer, nye hendelser osv.)</string>
+
     <!-- Push notification actions -->
     <string name="ntf_action_chat_reply">Svar</string>
     <string name="ntf_action_chat_replied">Besvart</string>

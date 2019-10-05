@@ -28,7 +28,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        >
 
         <!-- Main screen -->
         <activity
@@ -207,11 +208,10 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".SchedulingService" />
-
         <!-- SHiT Chat components -->
         <receiver
             android:name=".ChatMessageIgnoreReceiver"
+            android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="no.shitt.myshit.CHATMSG_IGNORE" />
@@ -219,6 +219,7 @@
         </receiver>
         <receiver
             android:name=".ChatMessageReplyReceiver"
+            android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="no.shitt.myshit.CHATMSG_REPLY" />
@@ -258,6 +259,14 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+        </service>
+        <service
+            android:name=".AlarmIntentService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false">
+            <!--intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter-->
         </service>
 
         <!-- Disable Advertising ID -->

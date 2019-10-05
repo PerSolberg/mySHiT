@@ -27,10 +27,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import no.shitt.myshit.AlarmReceiver;
+//import no.shitt.myshit.AlarmIntentService;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.TripDetailsActivity;
 import no.shitt.myshit.TripDetailsPopupActivity;
 import no.shitt.myshit.helper.JSONable;
@@ -38,6 +38,8 @@ import no.shitt.myshit.helper.ServerAPI;
 import no.shitt.myshit.helper.ServerDate;
 
 public class Trip implements ServerAPI.Listener, JSONable {
+    private static final String LOG_TAG = Trip.class.getSimpleName();
+
     public enum ActivityType {
         REGULAR, POPUP
     }
@@ -52,6 +54,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
     public String code;
     public String name;
     public String type;
+    @SuppressWarnings("CanBeFinal")
     private int elementCount;
     public List<AnnotatedTripElement> elements;
     public ChatThread chatThread;
@@ -154,11 +157,8 @@ public class Trip implements ServerAPI.Listener, JSONable {
         // Try dummy image
         iconName = iconBaseName + "UNKNOWN";
         iconId = ctx.getResources().getIdentifier(iconName.toLowerCase(), "mipmap", ctx.getPackageName());
-        if (iconId != 0) {
-            return iconId;
-        }
 
-        return 0;
+        return iconId;
     }
 
 
@@ -292,7 +292,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
 
     void compareTripElements(Trip otherTrip) {
         if (elements == null || otherTrip.elements == null || elements.size() == 0 || otherTrip.elements.size() == 0) {
-            //Log.d("Trip", "compareTripElements: Empty element list in one or both trips");
+            //Log.d(LOG_TAG, "compareTripElements: Empty element list in one or both trips");
             return;
         }
 
@@ -302,16 +302,16 @@ public class Trip implements ServerAPI.Listener, JSONable {
             AnnotatedTripElement e2 = null;
             for (int j = 0; j < otherTrip.elements.size(); j++) {
                 if (otherTrip.elements.get(j).tripElement.id == e1.tripElement.id) {
-                    //Log.d("Trip", "compareTripElements: Found matching element for " + e1.tripElement.id);
+                    //Log.d(LOG_TAG, "compareTripElements: Found matching element for " + e1.tripElement.id);
                     e2 = otherTrip.elements.get(j);
                     break;
                 }
             }
             if (e2 == null) {
-                //Log.d("Trip", "compareTripElements: Did not find matching element for " + e1.tripElement.id);
+                //Log.d(LOG_TAG, "compareTripElements: Did not find matching element for " + e1.tripElement.id);
                 e1.modified = ChangeState.NEW;
             } else if (!e1.tripElement.isEqual(e2.tripElement)) {
-                //Log.d("Trip", "compareTripElements: Differences in element " + e1.tripElement.id);
+                //Log.d(LOG_TAG, "compareTripElements: Differences in element " + e1.tripElement.id);
                 e1.modified = ChangeState.CHANGED;
             } else {
                 // Keep modification flag from old trip
@@ -374,7 +374,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
         if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {
             boolean combined = false;
 
-            //Log.d("Trip", "Setting " + notificationType + " notification for trip " + id + " at " + newInfo.getNotificationDate());
+            //Log.d(LOG_TAG, "Setting " + notificationType + " notification for trip " + id + " at " + newInfo.getNotificationDate());
 
             Bundle extras = new Bundle();
             //Map<String,Object> actualUserInfo = new HashMap<>();
@@ -403,15 +403,15 @@ public class Trip implements ServerAPI.Listener, JSONable {
                 Calendar alarmTime = Calendar.getInstance();
                 alarmTime.setTime(newInfo.getNotificationDate());
 
-                // Set up information to be passed to AlarmReceiver/SchedulingService
-                extras.putString(SchedulingService.KEY_TRIP_CODE, code);
-                extras.putString(SchedulingService.KEY_TITLE, getTitle());
+                // Set up information to be passed to AlarmReceiver
+                extras.putString(Constants.IntentExtra.TRIP_CODE, code);
+                extras.putString(Constants.IntentExtra.TITLE, getTitle());
 
                 //extras.putAll(actualUserInfo);
                 long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
                 String leadTimeText = ServerDate.formatInterval(actualLeadTime);
 
-                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(DateUtils.FORMAT_SHOW_TIME)));
+                extras.putString(Constants.IntentExtra.MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(DateUtils.FORMAT_SHOW_TIME)));
 
                 AlarmReceiver alarm = new AlarmReceiver();
                 alarm.setAlarm(alarmTime.getTime()
@@ -419,12 +419,12 @@ public class Trip implements ServerAPI.Listener, JSONable {
                         , Constants.PushNotificationActions.TRIP_CLICK
                         , extras);
             } else {
-                Log.d("Trip", "Not setting " + notificationType + " notification for trip " + id + " combined with other notification");
+                Log.d(LOG_TAG, "Not setting " + notificationType + " notification for trip " + id + " combined with other notification");
             }
 
             notifications.put(notificationType, newInfo);
         } else {
-            Log.d("Trip", "Not refreshing " + notificationType + " notification for trip  " + id + ", already triggered");
+            Log.d(LOG_TAG, "Not refreshing " + notificationType + " notification for trip  " + id + ", already triggered");
         }
     }
 
@@ -443,7 +443,7 @@ public class Trip implements ServerAPI.Listener, JSONable {
     }
 
     public void onRemoteCallComplete(JSONObject response) {
-        //Log.d("Trip", "Trip details retrieved");
+        //Log.d(LOG_TAG, "Trip details retrieved");
         int count = response.optInt(Constants.JSON.QUERY_COUNT, -1);
         if (count == 1) {
             JSONArray results = response.optJSONArray(Constants.JSON.QUERY_RESULTS);
@@ -478,13 +478,13 @@ public class Trip implements ServerAPI.Listener, JSONable {
     }
 
     public void onRemoteCallFailed() {
-        //Log.d("Trip", "Server call failed");
+        //Log.d(LOG_TAG, "Server call failed");
         Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
     public void onRemoteCallFailed(Exception e) {
-        //Log.d("Trip", "Server call failed");
+        //Log.d(LOG_TAG, "Server call failed");
         Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
         intent.putExtra("message", e.getMessage());
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
@@ -506,26 +506,26 @@ public class Trip implements ServerAPI.Listener, JSONable {
 
     private void registerForPushNotifications() {
         String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
-        //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicTrip);
+        //Log.d(LOG_TAG, "registerForPushNotifications: Register for topic " + topicTrip);
         FirebaseMessaging.getInstance().subscribeToTopic(topicTrip);
 
         // TODO: Or not?
         if (itineraryId > 0) {
             String topicItinerary = Constants.PushNotification.TOPIC_ROOT_ITINERARY + itineraryId;
-            //Log.d("Trip", "registerForPushNotifications: Register for topic " + topicItinerary);
+            //Log.d(LOG_TAG, "registerForPushNotifications: Register for topic " + topicItinerary);
             FirebaseMessaging.getInstance().subscribeToTopic(topicItinerary);
         }
     }
 
     void deregisterFromPushNotifications() {
         String topicTrip = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
-        //Log.d("Trip", "registerForPushNotifications: Deregister from topic " + topicTrip);
+        //Log.d(LOG_TAG, "registerForPushNotifications: Deregister from topic " + topicTrip);
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topicTrip);
 
         // TODO: Or not?
         if (itineraryId > 0) {
             String topicItinerary = Constants.PushNotification.TOPIC_ROOT_TRIP + id;
-            //Log.d("Trip", "registerForPushNotifications: Deregister from topic " + topicItinerary);
+            //Log.d(LOG_TAG, "registerForPushNotifications: Deregister from topic " + topicItinerary);
             FirebaseMessaging.getInstance().unsubscribeFromTopic(topicItinerary);
         }
     }

@@ -15,6 +15,18 @@ public class Constants {
     public static final Pattern selectAll = Pattern.compile(".*", Pattern.DOTALL);
     public static final Pattern selectAllButFirstLine = Pattern.compile("(?<=[\\r\\n]).*", Pattern.DOTALL | Pattern.MULTILINE);
 
+    public class NotificationChannel {
+        public static final String CHAT      = "CHAT";
+        public static final String ALARM     = "ALARM";
+        public static final String UPDATE    = "UPDATE";
+    }
+
+    public class NotificationTag {
+        public static final String CHAT           = "Chat";
+        public static final String TRIP           = "Trip";
+        public static final String TRIP_ELEMENT   = "TripElement";
+    }
+
     public class Notification {
         public static final String LOGON_FAILED           = "logonFailed";
         public static final String LOGON_UNAUTHORISED     = "logonUnauthorised";
@@ -49,6 +61,8 @@ public class Constants {
         public static final String LAST_SEEN_INFO         = "lastSeenInfo";
         public static final String LOC_ARGS               = "loc-args";
         public static final String LOC_KEY                = "loc-key";
+        public static final String TITLE_LOC_ARGS         = "title-loc-args";
+        public static final String TITLE_LOC_KEY          = "title-loc-key";
         public static final String FROM_USER_ID           = "fromUserId";
         public static final String MESSAGE_ID             = "id";
     }
@@ -87,11 +101,17 @@ public class Constants {
     }
 
     public class IntentExtra {
-        public static final String TRIP_CODE            = "trip_code";
-        public static final String TRIP_ID              = "trip_id";
         public static final String ELEMENT_ID           = "element_id";
+        public static final String MESSAGE              = "message";
         public static final String MESSAGE_ID           = "message_id";
         public static final String NOTIFICATION_TAG     = "ntf_tag";
+        public static final String TITLE                = "title";
+        public static final String TRIP_CODE            = "trip_code";
+        public static final String TRIP_ID              = "trip_id";
+//        public static final String KEY_TRIP_CODE  = "tripCode";
+//        public static final String KEY_ELEMENT_ID = "tripElement";
+//        public static final String KEY_TITLE      = "title";
+//        public static final String KEY_MESSAGE    = "msg";
     }
 
     public class UpcomingPreference {

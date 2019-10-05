@@ -22,15 +22,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+//import no.shitt.myshit.AlarmIntentService;
 import no.shitt.myshit.AlarmReceiver;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.SHiTApplication;
-import no.shitt.myshit.SchedulingService;
 import no.shitt.myshit.helper.JSONable;
 import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
 public abstract class TripElement implements JSONable {
+    private static final String LOG_TAG = TripElement.class.getSimpleName();
+
     public enum ActivityType {
         REGULAR, POPUP
     }
@@ -290,7 +292,7 @@ public abstract class TripElement implements JSONable {
                     NotificationInfo ntfInfo = new NotificationInfo(savedNtfInfo);
                     notifications.put(key, ntfInfo);
                 } else {
-                    Log.e("TripElement", "Unable to rebuild notification info.");
+                    Log.e(LOG_TAG, "Unable to rebuild notification info.");
                 }
             }
         }
@@ -303,7 +305,7 @@ public abstract class TripElement implements JSONable {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEqual(Object otherObject) {
         if (this.getClass() != otherObject.getClass()) {
-            //Log.d("GenericTransport", "Changed class! " + this.getClass().getCanonicalName() + " != " + otherObject.getClass().getCanonicalName());
+            //Log.d(LOG_TAG, "Changed class! " + this.getClass().getCanonicalName() + " != " + otherObject.getClass().getCanonicalName());
             return false;
         }
         try {
@@ -353,7 +355,7 @@ public abstract class TripElement implements JSONable {
         if (oldInfo == null || oldInfo.needsRefresh(newInfo)) {
             boolean combined = false;
 
-            //Log.d("TripElement", "Setting " + notificationType + " notification for trip element " + id + " at " + newInfo.getNotificationDate());
+            //Log.d(LOG_TAG, "Setting " + notificationType + " notification for trip element " + id + " at " + newInfo.getNotificationDate());
 
             Bundle extras = new Bundle();
             //Map<String,Object> actualUserInfo = new HashMap<>();
@@ -382,16 +384,16 @@ public abstract class TripElement implements JSONable {
                 Calendar alarmTime = Calendar.getInstance();
                 alarmTime.setTime(newInfo.getNotificationDate());
 
-                // Set up information to be passed to AlarmReceiver/SchedulingService
-                extras.putString(SchedulingService.KEY_TRIP_CODE, tripCode);
-                extras.putInt(SchedulingService.KEY_ELEMENT_ID, id);
-                extras.putString(SchedulingService.KEY_TITLE, getTitle());
+                // Set up information to be passed to AlarmReceiver
+                extras.putString(Constants.IntentExtra.TRIP_CODE, tripCode);
+                extras.putInt(Constants.IntentExtra.ELEMENT_ID, id);
+                extras.putString(Constants.IntentExtra.TITLE, getTitle());
 
                 long actualLeadTime = getStartTime().getTime() - alarmTime.getTimeInMillis();
                 String leadTimeText = ServerDate.formatInterval(actualLeadTime);
 
                 // Set up message based on alertMessage parameter
-                extras.putString(SchedulingService.KEY_MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(null, DateFormat.SHORT)));
+                extras.putString(Constants.IntentExtra.MESSAGE, ctx.getString(alertMessageId, leadTimeText, startTime(null, DateFormat.SHORT)));
 
                 AlarmReceiver alarm = new AlarmReceiver();
                 alarm.setAlarm( alarmTime.getTime()
@@ -399,12 +401,12 @@ public abstract class TripElement implements JSONable {
                         , clickAction
                         , extras);
             } else {
-                Log.d("TripElement", "Not setting " + notificationType + " notification for trip element " + id + " combined with other notification");
+                Log.d(LOG_TAG, "Not setting " + notificationType + " notification for trip element " + id + " combined with other notification");
             }
 
             notifications.put(notificationType, newInfo);
         } else {
-            Log.d("TripElement", "Not refreshing " + notificationType + " notification for trip element " + id + ", already triggered");
+            Log.d(LOG_TAG, "Not refreshing " + notificationType + " notification for trip element " + id + ", already triggered");
         }
 
     }

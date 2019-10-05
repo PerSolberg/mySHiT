@@ -3,17 +3,16 @@ package no.shitt.myshit;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
-//import android.media.AudioManager;
-//import android.media.MediaPlayer;
-//import android.media.RingtoneManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.app.RemoteInput;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -48,9 +47,10 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         Log.d(LOG_TAG, "Data: " + remoteMessage.getData());
 
         Map<String,String> ntfData = remoteMessage.getData();
+
         if (ntfData.size() > 0) {
-            boolean chatMessage = ntfData.get(Constants.PushNotificationKeys.CHANGE_TYPE).equals(Constants.PushNotificationData.TYPE_CHAT_MESSAGE);
-            boolean insert = ntfData.get(Constants.PushNotificationKeys.CHANGE_OPERATION).equals(Constants.PushNotificationData.OP_INSERT);
+            boolean chatMessage = Constants.PushNotificationData.TYPE_CHAT_MESSAGE.equals(ntfData.get(Constants.PushNotificationKeys.CHANGE_TYPE));
+            boolean insert = Constants.PushNotificationData.OP_INSERT.equals(ntfData.get(Constants.PushNotificationKeys.CHANGE_OPERATION));
             int tripId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.TRIP_ID));
             if (chatMessage) {
                 AnnotatedTrip aTrip = TripList.getSharedList().tripById(tripId);
@@ -62,15 +62,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                         int messageId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.MESSAGE_ID));
                         if (fromUserId != User.sharedUser.getId()) {
                             Context ctx = SHiTApplication.getContext();
-
-                            // Construct loc-args from individual elements (because we use data-only messages)
-                            int locArgNo = 1;
-                            List<String> locArgs = new ArrayList<>();
-                            while (ntfData.containsKey(Constants.PushNotificationKeys.LOC_ARGS + "-" + locArgNo)) {
-                                locArgs.add(ntfData.get(Constants.PushNotificationKeys.LOC_ARGS + "-" + locArgNo));
-                                locArgNo++;
-                            }
-                            Object[] locArgsArray = locArgs.toArray();
+                            Object[] locArgsArray = getLocArgs(remoteMessage);
                             String msg = ctx.getString(R.string.NTF_INSERT_CHATMESSAGE, locArgsArray);
                             sendChatNotification(tripId, messageId, msg);
                         }
@@ -106,17 +98,18 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         String messageBody = "Unknown update";
         String messageTitle = null;
 
-        String bodyLocKey = remoteMessage.getNotification().getBodyLocalizationKey();
+        String bodyLocKey = ntfData.get(Constants.PushNotificationKeys.LOC_KEY);
         if (bodyLocKey != null) {
             int locKeyId = SHiTApplication.getStringResourceIdByName(bodyLocKey);
-            Object[] locArgs = remoteMessage.getNotification().getBodyLocalizationArgs();
+            Object[] locArgs = getLocArgs(remoteMessage);
             messageBody = ctx.getString(locKeyId, locArgs);
         }
 
-        String titleLocKey = remoteMessage.getNotification().getTitleLocalizationKey();
+        String titleLocKey = ntfData.get(Constants.PushNotificationKeys.TITLE_LOC_KEY);
         if (titleLocKey != null) {
             int locKeyId = SHiTApplication.getStringResourceIdByName(titleLocKey);
-            Object[] locArgs = remoteMessage.getNotification().getTitleLocalizationArgs();
+            Object[] locArgs = getTitleLocArgs(remoteMessage);
+            //Object[] locArgs = remoteMessage.getNotification().getTitleLocalizationArgs();
             messageTitle = ctx.getString(locKeyId, locArgs);
         }
 
@@ -134,7 +127,13 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Notification.Builder notificationBuilder = new Notification.Builder(this /*, channelId*/)
+        Notification.Builder notificationBuilder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationBuilder = new Notification.Builder(this, Constants.NotificationChannel.UPDATE);
+        } else {
+            notificationBuilder = new Notification.Builder(this);
+        }
+        notificationBuilder
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(largeIcon)
                 .setContentTitle(messageTitle)
@@ -147,7 +146,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(tripId, notificationBuilder.build());
+        notificationManager.notify(Constants.NotificationTag.TRIP, tripId, notificationBuilder.build());
     }
 
 
@@ -156,12 +155,13 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
         // Intent for clicking the notification
         Intent intent = new Intent(this, TripDetailsPopupActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(Constants.PushNotificationActions.CHATMSG_CLICK);
         intent.putExtra(Constants.PushNotificationKeys.TRIP_ID, String.valueOf(tripId));
         intent.putExtra(Constants.PushNotificationKeys.CHANGE_TYPE, Constants.PushNotificationData.TYPE_CHAT_MESSAGE);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
@@ -174,7 +174,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 .build();
         PendingIntent replyPendingIntent =
                 PendingIntent.getBroadcast(getApplicationContext(),
-                        tripId, //conversation.getConversationId(),
+                        tripId,
                         getMessageReplyIntent(tripId, messageId),
                         PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Action replyAction =
@@ -186,7 +186,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         // Ignore action
         PendingIntent ignorePendingIntent =
                 PendingIntent.getBroadcast(getApplicationContext(),
-                        tripId, //conversation.getConversationId(),
+                        tripId,
                         getMessageIgnoreIntent(tripId, messageId),
                         PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Action ignoreAction =
@@ -195,11 +195,16 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                         //.addRemoteInput(remoteInput)
                         .build();
 
-        Uri chatSoundUri = Uri.parse("android.resource://" + ctx.getPackageName()+"/"+R.raw.chat_new_message);
-        Notification.Builder notificationBuilder = new Notification.Builder(this /*, channelId*/)
+        Uri chatSoundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + ctx.getPackageName()+"/"+R.raw.chat_new_message);
+        Notification.Builder notificationBuilder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationBuilder = new Notification.Builder(this, Constants.NotificationChannel.CHAT);
+        } else {
+            notificationBuilder = new Notification.Builder(this);
+        }
+        notificationBuilder
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(largeIcon)
-                //.setContentTitle("SHiT FCM Message")
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(chatSoundUri)
@@ -211,12 +216,12 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(messageId /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(Constants.NotificationTag.CHAT, messageId, notificationBuilder.build());
     }
 
 
     private Intent getMessageReplyIntent(int tripId, int messageId) {
-        return new Intent()
+        return new Intent(this, ChatMessageReplyReceiver.class)
                 .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 .setAction(Constants.Intent.CHATMSG_REPLY)
                 .putExtra(Constants.IntentExtra.TRIP_ID, tripId)
@@ -225,11 +230,34 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
 
     private Intent getMessageIgnoreIntent(int tripId, int messageId) {
-        return new Intent()
+        return new Intent(this, ChatMessageIgnoreReceiver.class)
                 .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 .setAction(Constants.Intent.CHATMSG_IGNORE)
                 .putExtra(Constants.IntentExtra.TRIP_ID, tripId)
                 .putExtra(Constants.IntentExtra.MESSAGE_ID, messageId);
     }
 
+    private Object[] getLocArgs(RemoteMessage remoteMessage) {
+        // Construct loc-args from individual elements (because we use data-only messages)
+        int locArgNo = 1;
+        Map<String,String> ntfData = remoteMessage.getData();
+        List<String> locArgs = new ArrayList<>();
+        while (ntfData.containsKey(Constants.PushNotificationKeys.LOC_ARGS + "-" + locArgNo)) {
+            locArgs.add(ntfData.get(Constants.PushNotificationKeys.LOC_ARGS + "-" + locArgNo));
+            locArgNo++;
+        }
+        return locArgs.toArray();
+    }
+
+    private Object[] getTitleLocArgs(RemoteMessage remoteMessage) {
+        // Construct loc-args from individual elements (because we use data-only messages)
+        int locArgNo = 1;
+        Map<String,String> ntfData = remoteMessage.getData();
+        List<String> locArgs = new ArrayList<>();
+        while (ntfData.containsKey(Constants.PushNotificationKeys.TITLE_LOC_ARGS + "-" + locArgNo)) {
+            locArgs.add(ntfData.get(Constants.PushNotificationKeys.TITLE_LOC_ARGS + "-" + locArgNo));
+            locArgNo++;
+        }
+        return locArgs.toArray();
+    }
 }

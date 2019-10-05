@@ -26,7 +26,7 @@ public class ChatMessageIgnoreReceiver extends BroadcastReceiver {
                 // Update the notification to stop the progress spinner.
                 NotificationManagerCompat notificationManager =
                         NotificationManagerCompat.from(context);
-                notificationManager.cancel(messageId);
+                notificationManager.cancel(Constants.NotificationTag.CHAT, messageId);
             }
         }
     }

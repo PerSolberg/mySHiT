@@ -225,6 +225,12 @@
 
     <!-- Push notification channels -->
     <string name="ntf_channel_default" tools:ignore="MissingTranslation">DEFAULT</string>
+    <string name="ntf_channel_name_chat">SHiTChat</string>
+    <string name="ntf_channel_name_alarm">Upcoming Event</string>
+    <string name="ntf_channel_name_update">Trip Update</string>
+    <string name="ntf_channel_desc_chat">Instant SHiTChat messages from other trip participants</string>
+    <string name="ntf_channel_desc_alarm">Notification of upcoming departures, events, etc.</string>
+    <string name="ntf_channel_desc_update">Notification of trip updates (itinerary changes, new events, etc.)</string>
 
     <!-- Push notification actions -->
     <string name="ntf_action_chat_reply">Reply</string>
