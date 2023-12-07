@@ -3,17 +3,25 @@ package no.shitt.myshit.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 import no.shitt.myshit.Constants;
 
-public class AnnotatedTripElement /* NSObject, NSCoding */ {
+public class AnnotatedTripElement {
     public final TripElement tripElement;
     public ChangeState modified;
 
     AnnotatedTripElement(int tripId, String tripCode, JSONObject jsonData) {
         super();
-        String modifiedRaw = jsonData.optString(Constants.JSON.ANNELEMENT_MODIFIED);
-        modified = ChangeState.fromString(modifiedRaw);
-        tripElement = TripElement.createFromDictionary(tripId, tripCode, jsonData.optJSONObject(Constants.JSON.ANNELEMENT_ELEMENT));
+
+        if (jsonData.isNull(Constants.JSON.ANNELEMENT_ELEMENT)) {
+            modified = ChangeState.UNCHANGED;
+            tripElement = TripElement.createFromDictionary(tripId, tripCode, jsonData);
+        } else {
+            String modifiedRaw = jsonData.optString(Constants.JSON.ANNELEMENT_MODIFIED);
+            modified = ChangeState.fromString(modifiedRaw);
+            tripElement = TripElement.createFromDictionary(tripId, tripCode, Objects.requireNonNull(jsonData.optJSONObject(Constants.JSON.ANNELEMENT_ELEMENT)));
+        }
     }
 
     public JSONObject toJSON() throws JSONException {
@@ -23,12 +31,5 @@ public class AnnotatedTripElement /* NSObject, NSCoding */ {
         jo.put(Constants.JSON.ANNELEMENT_ELEMENT, tripElement.toJSON());
 
         return jo;
-    }
-
-    AnnotatedTripElement(TripElement tripElement) {
-        super();
-        // Initialize stored properties.
-        this.modified = ChangeState.UNCHANGED;
-        this.tripElement = tripElement;
     }
 }

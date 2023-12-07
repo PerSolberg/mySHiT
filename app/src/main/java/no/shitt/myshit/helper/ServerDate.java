@@ -1,11 +1,13 @@
 package no.shitt.myshit.helper;
 
+import static java.util.Map.entry;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.format.DateUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,18 @@ import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
 
 public class ServerDate {
-    private static final Map<String,String> dateFormats;
+//    private static final Map<String,String> dateFormats;
+    private static final Map<String,String> dateFormats =
+        Map.ofEntries( entry("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "yyyy-MM-dd")
+                , entry("^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$", "yyyy-MM-dd HH:mm:ss")
+                , entry("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$", "yyyy-MM-dd'T'HH:mm:ss")
+    // Shouldn't be necessary but needed to recover from errors due to missing conversion
+    //Mon Jul 03 17:00:00 GMT+02:00 2017
+                , entry("^[A-Za-z]{3} [A-Za-z]{3} [0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} GMT[-+][0-9]{2}:[0-9]{2} [0-9]{4}$", "EEE MMM dd HH:mm:ss z yyyy")
+        );
+
+
+    @SuppressLint("SimpleDateFormat")
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat();
 
     private static final String ISO_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -31,7 +44,8 @@ public class ServerDate {
         //Mon Jul 03 17:00:00 GMT+02:00 2017
         initMap.put("^[A-Za-z]{3} [A-Za-z]{3} [0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} GMT[-+][0-9]{2}:[0-9]{2} [0-9]{4}$", "EEE MMM dd HH:mm:ss z yyyy");
 
-        dateFormats = Collections.unmodifiableMap(initMap);
+        //dateFormats = Collections.unmodifiableMap(initMap);
+        assert initMap.equals(dateFormats);
     }
 
     private static String findFormatString (String serverDateString) {

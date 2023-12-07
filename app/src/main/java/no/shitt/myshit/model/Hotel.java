@@ -3,6 +3,7 @@ package no.shitt.myshit.model;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,7 +11,6 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
@@ -20,17 +20,19 @@ import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.helper.ServerDate;
 
 public class Hotel extends TripElement {
+    private final static String LOG_TAG = Hotel.class.getSimpleName();
+
     // MARK: Properties
-    private final String checkInDateText;  // Hold original value for saving in archive
-    private final String checkOutDateText; // Hold original value for saving in archive
+    private String checkInDateText;  // Hold original value for saving in archive
+    private String checkOutDateText; // Hold original value for saving in archive
     private Date checkInDate;
     private Date checkOutDate;
-    public final String hotelName;
-    public final String address;
-    public final String postCode;
-    public final String city;
-    public final String phone;
-    public final String transferInfo;
+    public String hotelName;
+    public String address;
+    public String postCode;
+    public String city;
+    public String phone;
+    public String transferInfo;
     private String timezone;
 
 
@@ -49,18 +51,23 @@ public class Hotel extends TripElement {
     @Override
     public String getStartInfo() {
         Context ctx = SHiTApplication.getContext();
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
-        //dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-        //dateFormatter.timeStyle = NSDateFormatterStyle.NoStyle
 
-        return DateUtils.formatDateRange(ctx, checkInDate.getTime(), checkOutDate.getTime(), DateUtils.FORMAT_SHOW_DATE + DateUtils.FORMAT_ABBREV_MONTH);
-        //return dateFormatter.format(checkInDate) + " - " + dateFormatter.format(checkOutDate);
+        if (checkInDate != null && checkOutDate != null) {
+            return DateUtils.formatDateRange(ctx, checkInDate.getTime(), checkOutDate.getTime(), DateUtils.FORMAT_SHOW_DATE + DateUtils.FORMAT_ABBREV_MONTH);
+        } else if (checkInDate != null) {
+            Log.w(LOG_TAG, "Checkout date missing");
+            return startTime(DateFormat.SHORT, DateFormat.SHORT);
+        } else if (checkOutDate != null) {
+            Log.w(LOG_TAG, "Checkin date missing");
+            return endTime(DateFormat.SHORT, DateFormat.SHORT);
+        } else {
+            Log.w(LOG_TAG, "Checkin and checkout date missing");
+            return "";
+        }
     }
     @Override
     public String getEndInfo() {
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat();
         return null;
-        //return dateFormatter.stringFromDate(checkOutTime!)
     }
     @Override
     public String getDetailInfo() {
@@ -75,6 +82,7 @@ public class Hotel extends TripElement {
     public JSONObject toJSON() throws JSONException {
         JSONObject jo = super.toJSON();
 
+        jo.putOpt(Constants.JSON.ELEM_HOTEL_TIMEZONE, timezone);
         jo.putOpt(Constants.JSON.ELEM_HOTEL_CHECK_IN, checkInDateText);
         jo.putOpt(Constants.JSON.ELEM_HOTEL_CHECK_OUT, checkOutDateText);
         jo.putOpt(Constants.JSON.ELEM_HOTEL_NAME, hotelName);
@@ -90,6 +98,7 @@ public class Hotel extends TripElement {
     Hotel(int tripId, String tripCode, JSONObject elementData) {
         super(tripId, tripCode, elementData);
 
+        timezone = elementData.isNull(Constants.JSON.ELEM_HOTEL_TIMEZONE) ? null : elementData.optString(Constants.JSON.ELEM_HOTEL_TIMEZONE);
         checkInDateText = elementData.isNull(Constants.JSON.ELEM_HOTEL_CHECK_IN) ? null : elementData.optString(Constants.JSON.ELEM_HOTEL_CHECK_IN);
         if (checkInDateText != null) {
             checkInDate = ServerDate.convertServerDate(checkInDateText, timezone);
@@ -107,29 +116,37 @@ public class Hotel extends TripElement {
         transferInfo = elementData.isNull(Constants.JSON.ELEM_HOTEL_TRANSFER_INFO) ? null : elementData.optString(Constants.JSON.ELEM_HOTEL_TRANSFER_INFO);
     }
 
-    // MARK: Methods
-    @Override
-    public boolean isEqual(Object otherObject) {
-        if (this.getClass() != otherObject.getClass()) {
-            return false;
-        }
-        try {
-            Hotel otherHotel = (Hotel) otherObject;
-            if (!Objects.equals(this.checkInDate, otherHotel.checkInDate))    { return false; }
-            if (!Objects.equals(this.checkOutDate, otherHotel.checkOutDate))  { return false; }
-            if (!Objects.equals(this.hotelName, otherHotel.hotelName))        { return false; }
-            if (!Objects.equals(this.address, otherHotel.address))            { return false; }
-            if (!Objects.equals(this.postCode, otherHotel.postCode))          { return false; }
-            if (!Objects.equals(this.city, otherHotel.city))                  { return false; }
-            if (!Objects.equals(this.phone, otherHotel.phone))                { return false; }
-            if (!Objects.equals(this.transferInfo, otherHotel.transferInfo))  { return false; }
-            if (!Objects.equals(this.timezone, otherHotel.timezone))          { return false; }
 
-            return super.isEqual(otherObject);
-        } catch (Exception e) {
-            return false;
+    //
+    // MARK: Methods
+    //
+    @Override
+    boolean update(JSONObject elementData) {
+        changed = super.update(elementData);
+
+        timezone = updateField(timezone, elementData, Constants.JSON.ELEM_HOTEL_TIMEZONE);
+        checkInDateText = updateField(checkInDateText, elementData, Constants.JSON.ELEM_HOTEL_CHECK_IN);
+        if (checkInDateText != null) {
+            checkInDate = ServerDate.convertServerDate(checkInDateText, timezone);
         }
+        checkOutDateText = updateField(checkOutDateText, elementData, Constants.JSON.ELEM_HOTEL_CHECK_OUT);
+        if (checkOutDateText != null) {
+            checkOutDate = ServerDate.convertServerDate(checkOutDateText, timezone);
+        }
+
+        hotelName = updateField(hotelName, elementData, Constants.JSON.ELEM_HOTEL_NAME);
+        address = updateField(address, elementData, Constants.JSON.ELEM_HOTEL_ADDR);
+        postCode = updateField(postCode, elementData, Constants.JSON.ELEM_HOTEL_POST_CODE);
+        city = updateField(city, elementData, Constants.JSON.ELEM_HOTEL_CITY);
+        phone = updateField(phone, elementData, Constants.JSON.ELEM_HOTEL_PHONE);
+        transferInfo = updateField(transferInfo, elementData, Constants.JSON.ELEM_HOTEL_TRANSFER_INFO);
+
+        if (changed && ( this.getClass() == Hotel.class) ) {
+            setNotification();
+        }
+        return changed;
     }
+
 
     @Override
     public String startTime(Integer dateStyle, Integer timeStyle) {

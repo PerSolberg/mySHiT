@@ -53,7 +53,7 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
     private final ChatThread chatThread;
 
     /* Private view holder class */
-    private class MessageViewHolder {
+    private static class MessageViewHolder {
         TextView  txtUserInitials;
         TextView  txtMessage;
         TextView  txtSeenInfo;
@@ -66,11 +66,7 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
             @Override
             public void onChanged() {
                 super.onChanged();
-                SHiTApplication.runOnUiThread(new Runnable() {
-                    public void run() {
-                        notifyDataSetChanged();
-                    }
-                });
+                SHiTApplication.runOnUiThread( () -> notifyDataSetChanged() );
             }
         });
     }
@@ -141,29 +137,29 @@ public class ChatListAdapter extends BaseAdapter /* ListAdapter /*BaseExpandable
             holder = new MessageViewHolder();
             if (viewType == ViewTypes.OTHERS_PLAIN.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_other_plain, parent, false);
-                holder.txtUserInitials  = (TextView) convertView.findViewById(R.id.chatmsg_who);
-                holder.txtMessage       = (TextView) convertView.findViewById(R.id.chatmsg_text);
+                holder.txtUserInitials  = convertView.findViewById(R.id.chatmsg_who);
+                holder.txtMessage       = convertView.findViewById(R.id.chatmsg_text);
                 holder.txtSeenInfo      = null;
             } else if (viewType == ViewTypes.OTHERS_SEEN_INFO.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_other_seeninfo, parent, false);
-                holder.txtUserInitials = (TextView) convertView.findViewById(R.id.chatmsg_who);
-                holder.txtMessage = (TextView) convertView.findViewById(R.id.chatmsg_text);
-                holder.txtSeenInfo = (TextView) convertView.findViewById(R.id.chatmsg_seen_info);
+                holder.txtUserInitials = convertView.findViewById(R.id.chatmsg_who);
+                holder.txtMessage = convertView.findViewById(R.id.chatmsg_text);
+                holder.txtSeenInfo = convertView.findViewById(R.id.chatmsg_seen_info);
             } else if (viewType == ViewTypes.OWN_UNSAVED.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_own_unsaved, parent, false);
                 holder.txtUserInitials  = null;
-                holder.txtMessage       = (TextView) convertView.findViewById(R.id.chatmsg_text);
+                holder.txtMessage       = convertView.findViewById(R.id.chatmsg_text);
                 holder.txtSeenInfo      = null;
             } else if (viewType == ViewTypes.OWN_PLAIN.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_own_plain, parent, false);
                 holder.txtUserInitials  = null;
-                holder.txtMessage       = (TextView) convertView.findViewById(R.id.chatmsg_text);
+                holder.txtMessage       = convertView.findViewById(R.id.chatmsg_text);
                 holder.txtSeenInfo      = null;
             } else if (viewType == ViewTypes.OWN_SEEN_INFO.rawValue) {
                 convertView = mInflater.inflate(R.layout.chatmsg_own_seeninfo, parent, false);
                 holder.txtUserInitials  = null;
-                holder.txtMessage       = (TextView) convertView.findViewById(R.id.chatmsg_text);
-                holder.txtSeenInfo      = (TextView) convertView.findViewById(R.id.chatmsg_seen_info);
+                holder.txtMessage       = convertView.findViewById(R.id.chatmsg_text);
+                holder.txtSeenInfo      = convertView.findViewById(R.id.chatmsg_seen_info);
             } else {
                 Log.e(LOG_TAG, "Unknown view type " + viewType);
             }

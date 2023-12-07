@@ -1,6 +1,7 @@
 package no.shitt.myshit.model;
 
 import android.content.Intent;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,7 +9,6 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
@@ -19,31 +19,32 @@ import no.shitt.myshit.helper.ServerDate;
 import no.shitt.myshit.helper.StringUtil;
 
 public class GenericTransport extends TripElement {
+    private final static String LOG_TAG = GenericTransport.class.getSimpleName();
     // MARK: Properties
-    private final int segmentId;
-    private final String segmentCode;
-    final int legNo;
-    private final String departureTimeText;  // Hold original value for saving in archive
+    private int segmentId;
+    private String segmentCode;
+    int legNo;
+    private String departureTimeText;  // Hold original value for saving in archive
     private Date   departureTime;
-    public final String departureLocation;
-    public final String departureStop;
-    public final String departureAddress;
-    private final String departureTimeZone;
-    private final String departureCoordinates;
-    final String departureTerminalCode;
-    public final String departureTerminalName;
-    private final String arrivalTimeText; // Hold original value for saving in archive
+    public String departureLocation;
+    public String departureStop;
+    public String departureAddress;
+    private String departureTimeZone;
+    private String departureCoordinates;
+    String departureTerminalCode;
+    public String departureTerminalName;
+    private String arrivalTimeText; // Hold original value for saving in archive
     private Date   arrivalTime;
-    public final String arrivalLocation;
-    public final String arrivalStop;
-    public final String arrivalAddress;
-    private final String arrivalTimeZone;
-    private final String arrivalCoordinates;
-    final String arrivalTerminalCode;
-    public final String arrivalTerminalName;
-    public final String routeNo;
-    public final String companyName;
-    public final String companyPhone;
+    public String arrivalLocation;
+    public String arrivalStop;
+    public String arrivalAddress;
+    private String arrivalTimeZone;
+    private String arrivalCoordinates;
+    String arrivalTerminalCode;
+    public String arrivalTerminalName;
+    public String routeNo;
+    public String companyName;
+    public String companyPhone;
 
     @Override
     public Date getStartTime() {
@@ -155,44 +156,54 @@ public class GenericTransport extends TripElement {
         companyPhone = elementData.isNull(Constants.JSON.ELEM_PHONE) ? null : elementData.optString(Constants.JSON.ELEM_PHONE);
     }
 
-    // MARK: Methods
-    @Override
-    public boolean isEqual(Object otherObject) {
-        if (this.getClass() != otherObject.getClass()) {
-            //Log.d("GenericTransport", "Changed class!");
-            return false;
-        }
-        try {
-            GenericTransport otherTransport = (GenericTransport) otherObject;
-            if (this.segmentId             != otherTransport.segmentId                             ) { return false; }
-            if (this.legNo                 != otherTransport.legNo                                 ) { return false; }
-            if (!Objects.equals(this.segmentCode, otherTransport.segmentCode)                    ) { return false; }
-            if (!Objects.equals(this.departureTime, otherTransport.departureTime)                ) { return false; }
-            if (!Objects.equals(this.departureLocation, otherTransport.departureLocation)        ) { return false; }
-            if (!Objects.equals(this.departureStop, otherTransport.departureStop)                ) { return false; }
-            if (!Objects.equals(this.departureAddress, otherTransport.departureAddress)          ) { return false; }
-            if (!Objects.equals(this.departureTimeZone, otherTransport.departureTimeZone)        ) { return false; }
-            if (!Objects.equals(this.departureCoordinates, otherTransport.departureCoordinates)  ) { return false; }
-            if (!Objects.equals(this.departureTerminalCode, otherTransport.departureTerminalCode)) { return false; }
-            if (!Objects.equals(this.departureTerminalName, otherTransport.departureTerminalName)) { return false; }
-            if (!Objects.equals(this.arrivalTime, otherTransport.arrivalTime)                    ) { return false; }
-            if (!Objects.equals(this.arrivalLocation, otherTransport.arrivalLocation)            ) { return false; }
-            if (!Objects.equals(this.arrivalStop, otherTransport.arrivalStop)                    ) { return false; }
-            if (!Objects.equals(this.arrivalAddress, otherTransport.arrivalAddress)              ) { return false; }
-            if (!Objects.equals(this.arrivalTimeZone, otherTransport.arrivalTimeZone)            ) { return false; }
-            if (!Objects.equals(this.arrivalCoordinates, otherTransport.arrivalCoordinates)      ) { return false; }
-            if (!Objects.equals(this.arrivalTerminalCode, otherTransport.arrivalTerminalCode)    ) { return false; }
-            if (!Objects.equals(this.arrivalTerminalName, otherTransport.arrivalTerminalName)    ) { return false; }
-            if (!Objects.equals(this.routeNo, otherTransport.routeNo)                            ) { return false; }
-            if (!Objects.equals(this.companyName, otherTransport.companyName)                    ) { return false; }
-            if (!Objects.equals(this.companyPhone, otherTransport.companyPhone)                  ) { return false; }
 
-            return super.isEqual(otherObject);
-        } catch (Exception e) {
-            //Log.d("GenericTransport", "Comparison failed with exception");
-            return false;
+    //
+    // MARK: Methods
+    //
+    @Override
+    boolean update(JSONObject elementData) {
+        changed = super.update(elementData);
+
+        subType = updateField(subType, elementData, Constants.JSON.ELEM_SUB_TYPE);
+
+        segmentId = updateField(segmentId, elementData.optInt(Constants.JSON.ELEM_SEGMENT_ID));
+        segmentCode = updateField(segmentCode, elementData, Constants.JSON.ELEM_SEGMENT_CODE);
+        legNo = updateField(legNo, elementData.optInt(Constants.JSON.ELEM_LEG_NO));
+
+        departureLocation = updateField(departureLocation, elementData, Constants.JSON.ELEM_DEP_LOCATION);
+        departureStop = updateField(departureStop, elementData, Constants.JSON.ELEM_DEP_STOP);
+        departureAddress = updateField(departureAddress, elementData, Constants.JSON.ELEM_DEP_ADDR);
+        departureTimeZone = updateField(departureTimeZone, elementData, Constants.JSON.ELEM_DEP_TZ);
+        departureTimeText = updateField(departureTimeText, elementData, Constants.JSON.ELEM_DEP_TIME);
+        if (departureTimeText != null) {
+            departureTime = ServerDate.convertServerDate(departureTimeText, departureTimeZone);
         }
+        departureCoordinates = updateField(departureCoordinates, elementData, Constants.JSON.ELEM_DEP_COORDINATES);
+        departureTerminalCode = updateField(departureTerminalCode, elementData, Constants.JSON.ELEM_DEP_TERMINAL_CODE);
+        departureTerminalName = updateField(departureTerminalName, elementData, Constants.JSON.ELEM_DEP_TERMINAL_NAME);
+
+        arrivalLocation = updateField(arrivalLocation, elementData, Constants.JSON.ELEM_ARR_LOCATION);
+        arrivalStop = updateField(arrivalStop, elementData, Constants.JSON.ELEM_ARR_STOP);
+        arrivalAddress = updateField(arrivalAddress, elementData, Constants.JSON.ELEM_ARR_ADDR);
+        arrivalTimeZone = updateField(arrivalTimeZone, elementData, Constants.JSON.ELEM_ARR_TZ);
+        arrivalTimeText = updateField(arrivalTimeText, elementData, Constants.JSON.ELEM_ARR_TIME);
+        if (arrivalTimeText != null) {
+            arrivalTime = ServerDate.convertServerDate(arrivalTimeText, arrivalTimeZone);
+        }
+        arrivalCoordinates = updateField(arrivalCoordinates, elementData, Constants.JSON.ELEM_ARR_COORDINATES);
+        arrivalTerminalCode = updateField(arrivalTerminalCode, elementData, Constants.JSON.ELEM_ARR_TERMINAL_CODE);
+        arrivalTerminalName = updateField(arrivalTerminalName, elementData, Constants.JSON.ELEM_ARR_TERMINAL_NAME);
+
+        routeNo = updateField(routeNo, elementData, Constants.JSON.ELEM_ROUTE_NO);
+        companyName = updateField(companyName, elementData, Constants.JSON.ELEM_COMPANY);
+        companyPhone = updateField(companyPhone, elementData, Constants.JSON.ELEM_PHONE);
+
+        if (changed && ( this.getClass() == GenericTransport.class) ) {
+            setNotification();
+        }
+        return changed;
     }
+
 
     @Override
     public String startTime(Integer dateStyle, Integer timeStyle) {

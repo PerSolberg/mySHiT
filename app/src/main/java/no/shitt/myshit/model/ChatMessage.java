@@ -10,11 +10,8 @@ package no.shitt.myshit.model;
 
 import android.content.Intent;
 import android.os.Process;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
-
-//import com.google.android.gms.iid.InstanceID;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +31,7 @@ import no.shitt.myshit.helper.ServerDate;
 
 
 public class ChatMessage implements JSONable {
+    private static final String LOG_TAG = ChatMessage.class.getSimpleName();
 
     static class LocalId implements JSONable {
         String deviceType;
@@ -78,6 +76,17 @@ public class ChatMessage implements JSONable {
             return false;
         }
 
+        // Hash codes aren't used for chat messages, but hashCode() should always be overridden whenever equals() is
+        public int hashCode() {
+            int hash = 7;
+            hash = 31 * hash + (this.deviceType == null ? 0 : this.deviceType.hashCode());
+            hash = 31 * hash + (this.deviceId == null ? 0 : this.deviceId.hashCode());
+            hash = 31 * hash + (this.localId == null ? 0 : this.localId.hashCode());
+            return hash;
+        }
+
+
+
         public JSONObject toJSON() throws JSONException {
             JSONObject jo = new JSONObject();
 
@@ -113,19 +122,19 @@ public class ChatMessage implements JSONable {
         }
 
         public void onRemoteCallComplete(JSONObject response) {
-            //Log.d("ChatMessage.Save", "Message saved");
-            if (!response.isNull(Constants.JSON.CHATMSG_ID) && !response.isNull(Constants.JSON.CHATMSG_STORED_TS)) {
-                id = response.optInt(Constants.JSON.CHATMSG_ID);
+            JSONObject messageData = response.optJSONObject(ServerAPI.ResultItem.MESSAGE);
+            if (messageData != null) {
+                if (!messageData.isNull(Constants.JSON.CHATMSG_ID) && !messageData.isNull(Constants.JSON.CHATMSG_STORED_TS)) {
+                    id = messageData.optInt(Constants.JSON.CHATMSG_ID);
 
-                String storedTimestampText = response.isNull(Constants.JSON.CHATMSG_STORED_TS) ? null : response.optString(Constants.JSON.CHATMSG_STORED_TS);
-                storedTimestamp = ServerDate.convertServerDate(storedTimestampText, null);
+                    String storedTimestampText = messageData.isNull(Constants.JSON.CHATMSG_STORED_TS) ? null : messageData.optString(Constants.JSON.CHATMSG_STORED_TS);
+                    storedTimestamp = ServerDate.convertServerDate(storedTimestampText, null);
 
-                //Log.d("ChatMessage.Save", "Sending notification");
-                Intent intent = new Intent(Constants.Notification.CHAT_UPDATED);
-                //intent.putExtra("message", "SHiT Chat messages loaded");
-                LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+                    Intent intent = new Intent(Constants.Notification.CHAT_UPDATED);
+                    LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
+                }
             } else {
-                Log.e("ChatMessage.Save", "Incorrect response: " + response.toString());
+                Log.e("ChatMessage.Save", "Incorrect response: " + response);
             }
 
             if (parentResponseHandler != null) {
@@ -134,7 +143,6 @@ public class ChatMessage implements JSONable {
         }
 
         public void onRemoteCallFailed() {
-            //Log.d("ChatMessage.Save", "Server call failed");
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
             if (parentResponseHandler != null) {
@@ -143,7 +151,6 @@ public class ChatMessage implements JSONable {
         }
 
         public void onRemoteCallFailed(Exception e) {
-            //Log.d("ChatMessage.Save", "Server call failed");
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             intent.putExtra("message", e.getMessage());
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
@@ -152,6 +159,7 @@ public class ChatMessage implements JSONable {
             }
         }
     }
+
 
     private class ReadResponseHandler implements ServerAPI.Listener {
         final ServerAPI.Listener parentResponseHandler;
@@ -168,7 +176,6 @@ public class ChatMessage implements JSONable {
         }
 
         public void onRemoteCallFailed() {
-            //Log.d("ChatMessage.Read", "Server call failed");
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
             if (parentResponseHandler != null) {
@@ -177,7 +184,6 @@ public class ChatMessage implements JSONable {
         }
 
         public void onRemoteCallFailed(Exception e) {
-            //Log.d("ChatMessage.Read", "Server call failed");
             Intent intent = new Intent(Constants.Notification.COMMUNICATION_FAILED);
             intent.putExtra("message", e.getMessage());
             LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
@@ -248,7 +254,12 @@ public class ChatMessage implements JSONable {
         return false;
     }
 
-    static /* synchronized */ private String generateLocalId() {
+    // Hash codes aren't used for chat messages, but hashCode() should always be overridden whenever equals() is
+    public int hashCode() {
+        return this.localId.hashCode();
+    }
+
+    static private String generateLocalId() {
         return System.currentTimeMillis() + "." + Process.myTid();
     }
 
@@ -285,9 +296,7 @@ public class ChatMessage implements JSONable {
         userInitials = User.sharedUser.getInitials();
         localId = new LocalId();
         localId.deviceType = Constants.DEVICE_TYPE;
-        localId.deviceId   = FirebaseInstanceId.getInstance().getId();
-        //localId.deviceId   = InstanceID.getInstance(SHiTApplication.getContext()).getId();
-        //localId.deviceId   = Settings.Secure.getString(SHiTApplication.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        localId.deviceId   = SHiTApplication.getFirebaseId( (id) -> this.localId.deviceId = id);
         localId.localId    = generateLocalId();
         messageText = message;
         storedTimestamp = null;
@@ -296,11 +305,17 @@ public class ChatMessage implements JSONable {
 
     // MARK: Functions
     void save(int tripId, ServerAPI.Listener parentResponseHandler) {
+        if (localId.deviceId == null) {
+            // Haven't retrieved Firebase ID yet, unable to save
+            Log.i(LOG_TAG, "Device ID not yet populated, need to retry");
+            parentResponseHandler.onRemoteCallFailed();
+            return;
+        }
         JSONObject payload = new JSONObject(this.savePayload());
         ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_BASE, ServerAPI.RESOURCE_CHAT, Integer.toString(tripId), null, null);
-        params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
-        params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
-        params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
+        params.addParameter(ServerAPI.Param.USER_NAME, User.sharedUser.getUserName());
+        params.addParameter(ServerAPI.Param.PASSWORD, User.sharedUser.getPassword());
+        params.addParameter(ServerAPI.Param.LANGUAGE, Locale.getDefault().getLanguage());
         params.setPayload(payload);
 
         new ServerAPI(ServerAPI.Method.PUT, new SaveResponseHandler(parentResponseHandler)).execute(params);
@@ -314,8 +329,8 @@ public class ChatMessage implements JSONable {
         ServerAPI.Params params = new ServerAPI.Params( ServerAPI.URL_BASE
                                                     , ServerAPI.RESOURCE_CHAT, Integer.toString(tripId)
                                                     , ServerAPI.VERB_MSG_READ, Integer.toString(id));
-        params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
-        params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
+        params.addParameter(ServerAPI.Param.USER_NAME, User.sharedUser.getUserName());
+        params.addParameter(ServerAPI.Param.PASSWORD, User.sharedUser.getPassword());
 
         new ServerAPI(ServerAPI.Method.POST, new ReadResponseHandler(parentResponseHandler)).execute(params);
     }

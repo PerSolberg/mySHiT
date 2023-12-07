@@ -2,6 +2,7 @@ package no.shitt.myshit.model;
 
 import android.content.Intent;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,7 +10,6 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import no.shitt.myshit.Constants;
@@ -24,21 +24,21 @@ import no.shitt.myshit.helper.ServerDate;
  *****************************************************************************/
 
 public class Event extends TripElement {
+    private final static String LOG_TAG = Event.class.getSimpleName();
     private static final int TRAVEL_TIME_UNKNOWN = -1;
 
 
     // MARK: Properties
-    public final String venueName;
-    public final String venueAddress;
-    public final String venuePostCode;
-    public final String venueCity;
-    public final String venuePhone;
-    private final String startTimeText;  // Hold original value for saving in archive
+    public String venueName;
+    public String venueAddress;
+    public String venuePostCode;
+    public String venueCity;
+    public String venuePhone;
+    private String startTimeText;  // Hold original value for saving in archive
     private Date startTime;
-    private final int    travelTime;
-    public final String accessInfo;
-    //public String reference;
-    private final String timezone;
+    private int    travelTime;
+    public String accessInfo;
+    private String timezone;
 
 
     @Override
@@ -51,16 +51,11 @@ public class Event extends TripElement {
     }
     @Override
     public String getStartInfo() {
-        //Context ctx = SHiTApplication.getContext();
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat(ctx);
-
         return startTime(null, DateFormat.SHORT);
     }
     @Override
     public String getEndInfo() {
-        //DateFormat dateFormatter = android.text.format.DateFormat.getTimeFormat();
         return null;
-        //return dateFormatter.stringFromDate(checkOutTime!)
     }
     @Override
     public String getDetailInfo() {
@@ -107,35 +102,37 @@ public class Event extends TripElement {
         venuePhone = elementData.isNull(Constants.JSON.ELEM_EVENT_VENUE_PHONE) ? null : elementData.optString(Constants.JSON.ELEM_EVENT_VENUE_PHONE);
         accessInfo = elementData.isNull(Constants.JSON.ELEM_EVENT_ACCESS_INFO) ? null : elementData.optString(Constants.JSON.ELEM_EVENT_ACCESS_INFO);
         travelTime = elementData.isNull(Constants.JSON.ELEM_EVENT_TRAVEL_TIME) ? TRAVEL_TIME_UNKNOWN : elementData.optInt(Constants.JSON.ELEM_EVENT_TRAVEL_TIME);
-
-        //Log.d("Event", "Start time text = " + startTimeText
-        //             + ", startTime = " + startTime.toString()
-        //             + ", time zone = " + timezone);
     }
 
+
+    //
     // MARK: Methods
+    //
     @Override
-    public boolean isEqual(Object otherObject) {
-        if (this.getClass() != otherObject.getClass()) {
-            return false;
-        }
-        try {
-            Event otherEvent = (Event) otherObject;
-            if (!Objects.equals(this.startTime, otherEvent.startTime))          { return false; }
-            if (this.travelTime != otherEvent.travelTime)                       { return false; }
-            if (!Objects.equals(this.venueName, otherEvent.venueName))          { return false; }
-            if (!Objects.equals(this.venueAddress, otherEvent.venueAddress))    { return false; }
-            if (!Objects.equals(this.venuePostCode, otherEvent.venuePostCode))  { return false; }
-            if (!Objects.equals(this.venueCity, otherEvent.venueCity))          { return false; }
-            if (!Objects.equals(this.venuePhone, otherEvent.venuePhone))        { return false; }
-            if (!Objects.equals(this.accessInfo, otherEvent.accessInfo))        { return false; }
-            if (!Objects.equals(this.timezone, otherEvent.timezone))            { return false; }
+    boolean update(JSONObject elementData) {
+        changed = super.update(elementData);
 
-            return super.isEqual(otherObject);
-        } catch (Exception e) {
-            return false;
+        timezone = updateField(timezone, elementData, Constants.JSON.ELEM_EVENT_TIMEZONE);
+
+        startTimeText = updateField(startTimeText, elementData, Constants.JSON.ELEM_EVENT_START_TIME);
+        if (startTimeText != null) {
+            startTime = ServerDate.convertServerDate(startTimeText, timezone);
         }
+
+        venueName = updateField(venueName, elementData, Constants.JSON.ELEM_EVENT_VENUE_NAME);
+        venueAddress = updateField(venueAddress, elementData, Constants.JSON.ELEM_EVENT_VENUE_ADDR);
+        venuePostCode = updateField(venuePostCode, elementData, Constants.JSON.ELEM_EVENT_VENUE_POST_CODE);
+        venueCity = updateField(venueCity, elementData, Constants.JSON.ELEM_EVENT_VENUE_CITY);
+        venuePhone = updateField(venuePhone, elementData, Constants.JSON.ELEM_EVENT_VENUE_PHONE);
+        accessInfo = updateField(accessInfo, elementData, Constants.JSON.ELEM_EVENT_ACCESS_INFO);
+        travelTime = updateField(travelTime, elementData.optInt(Constants.JSON.ELEM_EVENT_TRAVEL_TIME, TRAVEL_TIME_UNKNOWN));
+
+        if (changed && ( this.getClass() == Event.class) ) {
+            setNotification();
+        }
+        return changed;
     }
+
 
     @Override
     public String startTime(Integer dateStyle, Integer timeStyle) {
@@ -172,15 +169,8 @@ public class Event extends TripElement {
 
     @Override
     public void setNotification() {
-        // New, simplified version
-        // First delete any existing notifications for this trip element (not needed in Android?)
-        //cancelNotifications();
-
         // Set notification (if we have a start time)
         if (getTense() == Tense.FUTURE) {
-            //Context ctx = SHiTApplication.getContext();
-            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-
             int leadTimeEventMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_EVENT, LEAD_TIME_MISSING);
 
             if (leadTimeEventMinutes != LEAD_TIME_MISSING) {

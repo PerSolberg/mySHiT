@@ -1,19 +1,24 @@
 package no.shitt.myshit;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import androidx.core.app.NavUtils;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import no.shitt.myshit.helper.StringUtil;
 import no.shitt.myshit.model.GenericTransport;
 import no.shitt.myshit.model.TripList;
 
-public class PrivateTransportActivity extends TripElementActivity /*AppCompatActivity*/ {
+public class PrivateTransportActivity extends TripElementActivity {
+    private static final String LOG_TAG = PrivateTransportActivity.class.getSimpleName();
+
     // Trip element info
     String trip_code;
     String element_id;
@@ -31,14 +36,13 @@ public class PrivateTransportActivity extends TripElementActivity /*AppCompatAct
         setContentView(R.layout.activity_private_transport);
 
         // Set up toolbar and enable Up button
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.private_transport_toolbar);
+        Toolbar myToolbar = findViewById(R.id.private_transport_toolbar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
-        try {
+        if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
-        }
-        catch (NullPointerException npe) {
-            //Log.e("PrivateTransportAct", "Unexpected NullPointerException when setting up toolbar");
+        } else {
+            Log.e(LOG_TAG, "Cannot find action bar");
         }
 
         // Get trip code and element ID
@@ -46,16 +50,44 @@ public class PrivateTransportActivity extends TripElementActivity /*AppCompatAct
         trip_code = intent.getStringExtra(Constants.IntentExtra.TRIP_CODE);
         element_id = intent.getStringExtra(Constants.IntentExtra.ELEMENT_ID);
 
-        new getData().execute();
+        getData();
+    }
+
+
+    private void getData() {
+        Executor background = Executors.newSingleThreadExecutor();
+        background.execute( () -> {
+            try {
+                transport = (GenericTransport) TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.parseInt(element_id)).tripElement;
+
+                departureInfo = new StringBuilder(StringUtil.stringWithDefault(transport.departureStop, ""));
+                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureTerminalName, "\n", false);
+                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureAddress, "\n", false);
+                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureLocation, "\n", false);
+
+                arrivalInfo = new StringBuilder(StringUtil.stringWithDefault(transport.arrivalStop, ""));
+                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalTerminalName, "\n", false);
+                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalAddress, "\n", false);
+                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalLocation, "\n", false);
+
+                references = transport.getReferences(", ", false);
+                fillScreen();
+            }
+            catch (Exception e) {
+                Log.e("PrivTransAct/get", "Unexpected error: " + e);
+            }
+        } );
     }
 
 
     private void fillScreen() {
-        ((TextView) findViewById(R.id.company)).setText(StringUtil.stringWithDefault(transport.companyName, ""));
-        ((TextView) findViewById(R.id.departure)).setText(departureInfo.toString());
-        ((TextView) findViewById(R.id.arrival)).setText(arrivalInfo.toString());
-        ((TextView) findViewById(R.id.phone)).setText(StringUtil.stringWithDefault(transport.companyPhone, ""));
-        ((TextView) findViewById(R.id.reference)).setText(references);
+        runOnUiThread( () -> {
+            ((TextView) findViewById(R.id.company)).setText(StringUtil.stringWithDefault(transport.companyName, ""));
+            ((TextView) findViewById(R.id.departure)).setText(departureInfo.toString());
+            ((TextView) findViewById(R.id.arrival)).setText(arrivalInfo.toString());
+            ((TextView) findViewById(R.id.phone)).setText(StringUtil.stringWithDefault(transport.companyPhone, ""));
+            ((TextView) findViewById(R.id.reference)).setText(references);
+        } );
     }
 
     @Override
@@ -69,31 +101,4 @@ public class PrivateTransportActivity extends TripElementActivity /*AppCompatAct
         return super.onOptionsItemSelected(item);
     }
 
-    private class getData extends AsyncTask<String,String,String> {
-        protected String doInBackground(String... params) {
-            try {
-                transport = (GenericTransport) TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id)).tripElement;
-
-                departureInfo = new StringBuilder(StringUtil.stringWithDefault(transport.departureStop, ""));
-                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureTerminalName, "\n", false);
-                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureAddress, "\n", false);
-                StringUtil.appendWithLeadingSeparator(departureInfo, transport.departureLocation, "\n", false);
-
-                arrivalInfo = new StringBuilder(StringUtil.stringWithDefault(transport.arrivalStop, ""));
-                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalTerminalName, "\n", false);
-                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalAddress, "\n", false);
-                StringUtil.appendWithLeadingSeparator(arrivalInfo, transport.arrivalLocation, "\n", false);
-
-                references = transport.getReferences(", ", false);
-            }
-            catch (Exception e) {
-                //Log.e("PrivTransAct/get", "Unexpected error: " + e.toString());
-            }
-            return null;
-        }
-
-        protected void onPostExecute(String result) {
-            fillScreen();
-        }
-    }
 }

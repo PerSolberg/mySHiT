@@ -1,22 +1,22 @@
 package no.shitt.myshit.ui;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -31,7 +31,6 @@ import android.widget.ListView;
 import no.shitt.myshit.Constants;
 import no.shitt.myshit.R;
 import no.shitt.myshit.SHiTApplication;
-//import no.shitt.myshit.TripDetailsActivity;
 import no.shitt.myshit.adapters.ChatListAdapter;
 import no.shitt.myshit.helper.AlertDialogueManager;
 import no.shitt.myshit.helper.ConnectionDetector;
@@ -55,18 +54,13 @@ public class ChatThreadFragment extends Fragment {
     private static final String ARG_TRIP_CODE = "ARG_TRIP_CODE";
     private static final String ARG_TRIP_ID = "ARG_TRIP_ID";
 
-    //private String sTripCode;
-    //private int nTripId;
     Parcelable state;
     Trip trip;
     Activity mActivity;
 
     View mView;
-    //ExpandableListView listView;
     ListView listView;
     ConnectionDetector cd;
-    private ProgressDialog pDialog;
-    private OnFragmentInteractionListener mListener;
     final AlertDialogueManager alert = new AlertDialogueManager();
     private final ChatUpdateHandler chatUpdateHandler = new ChatUpdateHandler();
     private final CommErrorHandler  commErrorHandler = new CommErrorHandler();
@@ -84,7 +78,6 @@ public class ChatThreadFragment extends Fragment {
      * @return A new instance of fragment chat_thread.
      */
     public static ChatThreadFragment newInstance(int tripId, String tripCode) {
-        //Log.d(LOG_TAG, "Creating new fragment object");
         ChatThreadFragment fragment = new ChatThreadFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_TRIP_ID, tripId);
@@ -95,7 +88,6 @@ public class ChatThreadFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //Log.d(LOG_TAG, "Create fragment from saved state");
         if (Constants.DEVELOPER_MODE) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
@@ -108,12 +100,10 @@ public class ChatThreadFragment extends Fragment {
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .penaltyLog()
-                    //.penaltyDeath()
                     .build());
         }
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            //nTripId = getArguments().getInt(ARG_TRIP_ID);
             String sTripCode = getArguments().getString(ARG_TRIP_CODE);
             trip = TripList.getSharedList().tripByCode(sTripCode).trip;
         }
@@ -125,34 +115,16 @@ public class ChatThreadFragment extends Fragment {
                              Bundle savedInstanceState) {
         //Log.d(LOG_TAG, "Creating view");
         mView = inflater.inflate(R.layout.fragment_chat_thread, container, false);
-        listView = (ListView) mView.findViewById(R.id.trip_chat_message_list);
+        listView = mView.findViewById(R.id.trip_chat_message_list);
 
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_chat_container);
-        swipeLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        //Log.i("TripDetailsActivity", "onRefresh called from SwipeRefreshLayout");
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        //refreshChat();
-                        loadChat(false);
-                    }
-                }
-        );
+        SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_chat_container);
+        swipeLayout.setOnRefreshListener( () -> loadChat(false) );
 
-        EditText msgEntryField = (EditText) mView.findViewById(R.id.chatmsg_entry);
+        EditText msgEntryField = mView.findViewById(R.id.chatmsg_entry);
         msgEntryField.addTextChangedListener(messageTextWatcher);
 
-        ImageButton sendButton = (ImageButton) mView.findViewById(R.id.chat_send_button);
-        sendButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        sendMessage(view);
-                    }
-                }
-        );
+        ImageButton sendButton = mView.findViewById(R.id.chat_send_button);
+        sendButton.setOnClickListener(this::sendMessage);
 
         if (trip != null) {
             // Check if Internet present
@@ -168,11 +140,9 @@ public class ChatThreadFragment extends Fragment {
                 trip.chatThread.refresh(ChatThread.RefreshMode.INCREMENTAL);
             }
         }
-
-        //controlSendButton();
-        //restorePosition();
         return mView;
     }
+
 
     @Override
     public void onPause() {
@@ -190,55 +160,33 @@ public class ChatThreadFragment extends Fragment {
         super.onResume();
 
         Context ctx = SHiTApplication.getContext();
-        //LocalBroadcastManager.getInstance(SHiTApplication.getContext()).registerReceiver(new no.shitt.myshit.ui.ChatThreadFragment.HandleNotification(), new IntentFilter(Constants.Notification.COMMUNICATION_FAILED));
-        //LocalBroadcastManager.getInstance(SHiTApplication.getContext()).registerReceiver(new no.shitt.myshit.ui.ChatThreadFragment.HandleNotification(), new IntentFilter(Constants.Notification.CHAT_UPDATED));
         LocalBroadcastManager.getInstance(ctx).registerReceiver(commErrorHandler, new IntentFilter(Constants.Notification.COMMUNICATION_FAILED));
         LocalBroadcastManager.getInstance(ctx).registerReceiver(chatUpdateHandler, new IntentFilter(Constants.Notification.CHAT_UPDATED));
 
         trip.chatThread.savePosition();
-        //restorePosition();
         controlSendButton();
-        //updateChatListView();
     }
 
-    /*
-    // Not used in sample, seems not to be needed
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onChatFragmentInteraction(uri);
-        }
-    }
-    */
 
     @Override
-    public void onAttach(Context context) {
-        //Log.i(LOG_TAG, "Attaching");
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof Activity) {
             mActivity = (Activity) context;
-        }
-        //Log.i(LOG_TAG, "Activity captured");
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        //mListener = null;
         mActivity = null;
-        //Log.i(LOG_TAG, "Detached");
     }
 
     @Override
     public void onDestroy() {
-        mListener = null;
+        //mListener = null;
         mActivity = null;
-        //Log.i(LOG_TAG, "Destroyed");
         super.onDestroy();
     }
 
@@ -256,9 +204,6 @@ public class ChatThreadFragment extends Fragment {
         void onChatFragmentInteraction(Uri uri);
     }
 
-    /*
-     *
-     */
 
     void refreshChat() {
         if (trip != null) {
@@ -266,31 +211,14 @@ public class ChatThreadFragment extends Fragment {
         }
     }
 
-    /*
-    private class HandleNotification extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Constants.Notification.CHAT_UPDATED)) {
-                serverCallComplete();
-            } else if (intent.getAction().equals(Constants.Notification.COMMUNICATION_FAILED)) {
-                serverCallFailed();
-            }
-        }
-    }
-    */
 
     private class ChatUpdateHandler extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Log.d(LOG_TAG, "Server call succeeded");
-            SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_chat_container);
+            SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_chat_container);
             swipeLayout.setRefreshing(false);
-            if (pDialog != null) {
-                pDialog.dismiss();
-                pDialog = null;
-            }
-            TripList.getSharedList().saveToArchive();
 
+            TripList.getSharedList().saveToArchive();
             updateChatListView();
         }
     }
@@ -299,12 +227,8 @@ public class ChatThreadFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Log.d(LOG_TAG, "Server REST call failed.");
-            SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_chat_container);
+            SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_chat_container);
             swipeLayout.setRefreshing(false);
-            if (pDialog != null) {
-                pDialog.dismiss();
-                pDialog = null;
-            }
         }
     }
 
@@ -320,38 +244,12 @@ public class ChatThreadFragment extends Fragment {
             controlSendButton();
         }
     }
-    /*
-    public void serverCallComplete() {
-        Log.d(LOG_TAG, "Server call succeeded");
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_chat_container);
-        swipeLayout.setRefreshing(false);
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-        TripList.getSharedList().saveToArchive();
 
-        updateChatListView();
-    }
-    */
-
-    /*
-    public void serverCallFailed() {
-        Log.d(LOG_TAG, "Server REST call failed.");
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_chat_container);
-        swipeLayout.setRefreshing(false);
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-    }
-    */
 
     private void updateChatListView() {
         //Log.i(LOG_TAG, "Updating chat list");
         if (getActivity() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
+            getActivity().runOnUiThread(() -> {
                 if (listView != null) {
                     if (listView.getAdapter() == null) {
                         //Log.d(LOG_TAG, "Creating new adapter");
@@ -369,34 +267,17 @@ public class ChatThreadFragment extends Fragment {
                         ((ChatListAdapter) listView.getAdapter()).notifyDataSetChanged();
                     }
                 }
-                }
             });
         } else {
             Log.e(LOG_TAG, "Activity not set");
         }
     }
 
-    private void loadChat(boolean refresh) {
-        /*
-        if ( ! refresh ) {
-            pDialog = new ProgressDialog(getActivity() /*SHiTApplication.getContext()* / /*no.shitt.myshit.ui.TripDetailsFragment.this* /);
-            pDialog.setMessage("Loading chat messages ...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-        */
 
+    private void loadChat(boolean refresh) {
         trip.chatThread.refresh( (refresh ? ChatThread.RefreshMode.INCREMENTAL : ChatThread.RefreshMode.FULL) );
     }
 
-    /*
-    private void controlSendButton() {
-        if (getActivity() instanceof TripDetailsActivity) {
-            ((TripDetailsActivity) getActivity()).controlSendButton();
-        }
-    }
-    */
 
     private void restorePosition() {
         if(state != null) {
@@ -404,21 +285,13 @@ public class ChatThreadFragment extends Fragment {
             listView.onRestoreInstanceState(state);
         } else {
             final int pos = trip.chatThread.lastDisplayedItem();
-            //int msgCount = trip.chatThread.count();
-            //Log.d(LOG_TAG, "Trying to restore list view position " + pos + "/" + msgCount);
-            //listView.setSelection(pos);
-            listView.post(new Runnable() {
-                @Override
-                public void run() {
-                    listView.setSelection(pos);
-                }
-            });
+            listView.post( () -> listView.setSelection(pos) );
         }
     }
 
     public void sendMessage(View v) {
         //Log.d(LOG_TAG, "Send message icon clicked");
-        EditText textField = (EditText) mActivity.findViewById(R.id.chatmsg_entry);
+        EditText textField = mActivity.findViewById(R.id.chatmsg_entry);
         String msgText = textField.getText().toString();
         ChatMessage msg = new ChatMessage(msgText);
 
@@ -434,19 +307,18 @@ public class ChatThreadFragment extends Fragment {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0 /*InputMethodManager.HIDE_IMPLICIT_ONLY*/);
         }
 
-        ListView listView = (ListView) mActivity.findViewById(R.id.trip_chat_message_list);
+        ListView listView = mActivity.findViewById(R.id.trip_chat_message_list);
         listView.setSelection(trip.chatThread.count());
     }
 
     private void controlSendButton() {
-        EditText textField = (EditText) mActivity.findViewById(R.id.chatmsg_entry);
-        ImageButton button = (ImageButton) mActivity.findViewById(R.id.chat_send_button);
+        EditText textField = mActivity.findViewById(R.id.chatmsg_entry);
+        ImageButton button = mActivity.findViewById(R.id.chat_send_button);
         if (textField != null && button != null) {
             boolean enabled = textField.getText().length() != 0;
             button.setEnabled(enabled);
 
-            //Drawable originalIcon = SHiTApplication.getContext().getResources().getDrawable(R.mipmap.icon_chat);
-            Drawable originalIcon = SHiTApplication.getContext().getDrawable(R.mipmap.icon_chat);
+            Drawable originalIcon = AppCompatResources.getDrawable(SHiTApplication.getContext(), R.mipmap.icon_chat);
             Drawable icon = enabled ? originalIcon : convertDrawableToGrayScale(originalIcon);
             button.setImageDrawable(icon);
         }
@@ -457,7 +329,8 @@ public class ChatThreadFragment extends Fragment {
             return null;
         }
         Drawable res = drawable.mutate();
-        res.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
+        //res.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
+        res.setTint(Color.GRAY);
         return res;
     }
 }

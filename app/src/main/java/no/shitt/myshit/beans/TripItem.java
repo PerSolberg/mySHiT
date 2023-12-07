@@ -1,4 +1,6 @@
 package no.shitt.myshit.beans;
+/*
+import androidx.annotation.NonNull;
 
 class TripItem {
     private int id;
@@ -37,7 +39,10 @@ class TripItem {
         this.name = name;
     }
     @Override
+    @NonNull
     public String toString() {
         return name + "\n" + desc;
     }
 }
+
+ */

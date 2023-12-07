@@ -1,8 +1,8 @@
 package no.shitt.myshit.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-//import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,20 +56,22 @@ public class TripElementListAdapter extends BaseExpandableListAdapter {
         updateSections();
     }
 
+    @SuppressLint("SetTextI18n")
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         ChildViewHolder holder;
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if ( ! (convertView instanceof RelativeLayout) ) {
-            convertView = mInflater.inflate(R.layout.list_item_trip_element, null);
+//            convertView = mInflater.inflate(R.layout.list_item_trip_element, null);
+            convertView = mInflater.inflate(R.layout.list_item_trip_element, parent, false);
             holder = new ChildViewHolder();
-            holder.txtTripCode  = (TextView) convertView.findViewById(R.id.element_trip_code);
-            holder.txtElementId = (TextView) convertView.findViewById(R.id.element_id);
-            holder.imageView    = (ImageView) convertView.findViewById(R.id.element_icon);
-            holder.overlayView  = (ImageView) convertView.findViewById(R.id.element_icon_overlay);
-            holder.txtTitle     = (TextView) convertView.findViewById(R.id.element_title);
-            holder.txtInfo      = (TextView) convertView.findViewById(R.id.element_info);
-            holder.txtDetails   = (TextView) convertView.findViewById(R.id.element_details);
+            holder.txtTripCode  = convertView.findViewById(R.id.element_trip_code);
+            holder.txtElementId = convertView.findViewById(R.id.element_id);
+            holder.imageView    = convertView.findViewById(R.id.element_icon);
+            holder.overlayView  = convertView.findViewById(R.id.element_icon_overlay);
+            holder.txtTitle     = convertView.findViewById(R.id.element_title);
+            holder.txtInfo      = convertView.findViewById(R.id.element_info);
+            holder.txtDetails   = convertView.findViewById(R.id.element_details);
             convertView.setTag(holder);
         }
         else {
@@ -85,9 +87,8 @@ public class TripElementListAdapter extends BaseExpandableListAdapter {
 
         holder.txtTripCode.setText(rowItem.tripElement.tripCode);
         holder.txtElementId.setText(Integer.toString(rowItem.tripElement.id));
-        holder.imageView.setImageResource(rowItem.tripElement.getIconId());
+        holder.imageView.setImageIcon(rowItem.tripElement.getIcon());
         holder.txtTitle.setText(rowItem.tripElement.getTitle());
-        //holder.txtInfo.setText(rowItem.tripElement.getStartInfo() + "\n" + rowItem.tripElement.getEndInfo());
         holder.txtInfo.setText(info.toString());
         holder.txtDetails.setText(rowItem.tripElement.getDetailInfo());
 
@@ -112,19 +113,17 @@ public class TripElementListAdapter extends BaseExpandableListAdapter {
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_group_trip_elements, null);
+            convertView = mInflater.inflate(R.layout.list_group_trip_elements, parent, false);
             holder = new GroupViewHolder();
-            holder.txtTitle   = (TextView) convertView.findViewById(R.id.element_group_title);
-            holder.imageView  = (ImageView) convertView.findViewById(R.id.element_group_icon);
+            holder.txtTitle   = convertView.findViewById(R.id.element_group_title);
+            holder.imageView  = convertView.findViewById(R.id.element_group_icon);
             convertView.setTag(holder);
         }
         else {
             holder = (GroupViewHolder) convertView.getTag();
         }
 
-        //Log.d("TripElementListAdapter", "holder = " + holder);
         ElementSectionInfo section = (ElementSectionInfo) getGroup(groupPosition);
-        //Log.d("TripElementListAdapter", "section = " + section + ", title = " + section.title);
         holder.txtTitle.setText(section.title);
         if (isExpanded) {
             holder.imageView.setImageResource(R.mipmap.icon_group_expanded);

@@ -4,25 +4,16 @@ public enum Tense {
     PAST    ("past"),
     PRESENT ("present"),
     FUTURE  ("future"),
-    UNKNOWN ("unknown");
+    //UNKNOWN ("unknown")
+    ;
 
     private final String rawValue;
     Tense(String rawValue) {
         this.rawValue = rawValue;
     }
 
+    @SuppressWarnings("unused")
     public String getRawValue() {
         return rawValue;
-    }
-
-    public static Tense fromString(String text) {
-        if (text != null) {
-            for (Tense t : Tense.values()) {
-                if (text.equalsIgnoreCase(t.rawValue)) {
-                    return t;
-                }
-            }
-        }
-        return null;
     }
 }

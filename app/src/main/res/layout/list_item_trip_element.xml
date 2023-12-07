@@ -25,6 +25,8 @@
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
+        android:paddingStart="2sp"
+        android:paddingEnd="2sp"
         android:contentDescription="@string/content_element_icon"
         />
 
@@ -34,6 +36,8 @@
         android:layout_height="60dp"
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
+        android:paddingStart="2sp"
+        android:paddingEnd="2sp"
         android:contentDescription="@null"
         />
 

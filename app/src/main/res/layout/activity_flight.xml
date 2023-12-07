@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:stretchColumns="2">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/flight_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"

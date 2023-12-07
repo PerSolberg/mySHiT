@@ -24,6 +24,7 @@
         android:paddingTop="2sp"
         android:paddingBottom="2sp"
         android:paddingEnd="2sp"
+        android:paddingStart="2sp"
         android:contentDescription="@string/content_trip_icon"
         />
 
@@ -35,6 +36,7 @@
         android:paddingBottom="2sp"
         android:src="@mipmap/ic_launcher"
         android:paddingEnd="2sp"
+        android:paddingStart="2sp"
         android:contentDescription="@null"
         />
 

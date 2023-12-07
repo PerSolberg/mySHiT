@@ -2,7 +2,7 @@ package no.shitt.myshit;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by Per Solberg on 2018-02-07.

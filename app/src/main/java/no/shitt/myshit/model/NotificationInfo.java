@@ -59,7 +59,7 @@ class NotificationInfo {
 
 
     public JSONObject toJSON() throws JSONException {
-        JSONObject jo = new JSONObject(); // super.toJSON();
+        JSONObject jo = new JSONObject();
 
         jo.putOpt(Constants.JSON.NTFINFO_BASE_DATE, ServerDate.convertServerDate(baseDate, TIMEZONE));
         jo.putOpt(Constants.JSON.NTFINFO_NOTIFICATION_DATE, ServerDate.convertServerDate(notificationDate, TIMEZONE));
@@ -84,14 +84,12 @@ class NotificationInfo {
         } else if (this.baseDate == null) {
             // Base date unknown, assume it's changed
             return true;
-        } else if (this.baseDate.compareTo(baseDate) != 0) {
-            // Event date changed, notify user about change
-            // Håkon rapporterer om NullPointerException i denne testen, trolig fordi baseDate er NULL
-            // som følge av konverteringsproblem fra lokal fil.
+        } else if (baseDate == null) {
+            // Shouldn't happen but may occur in case of conversion issues with local storage
             return true;
+        } else {
+            return this.baseDate.compareTo(baseDate) != 0;
         }
-
-        return false;
     }
 
     boolean needsRefresh(NotificationInfo newNotification)  {

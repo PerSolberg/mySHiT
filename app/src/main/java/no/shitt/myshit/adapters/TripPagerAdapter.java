@@ -1,12 +1,10 @@
 package no.shitt.myshit.adapters;
 
-import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import no.shitt.myshit.R;
-import no.shitt.myshit.SHiTApplication;
 import no.shitt.myshit.ui.ChatThreadFragment;
 import no.shitt.myshit.ui.TripDetailsFragment;
 
@@ -18,7 +16,7 @@ import no.shitt.myshit.ui.TripDetailsFragment;
  *  Created by Per Solberg on 2017-06-10.
  */
 
-public class TripPagerAdapter extends FragmentPagerAdapter {
+public class TripPagerAdapter extends FragmentStateAdapter /*FragmentPagerAdapter*/ {
     private static final int PAGE_COUNT = 2;
     public static final int TAB_TRIP_DETAILS = 0;
     public static final int TAB_MESSAGES = 1;
@@ -26,40 +24,27 @@ public class TripPagerAdapter extends FragmentPagerAdapter {
     private final String mTripCode;
     private final int mTripId;
 
-    private static final int[] tabTitles = new int[]{R.string.trip_page_itinerary, R.string.trip_page_messages};
-    //private Context context;
-
-    public TripPagerAdapter(FragmentManager fm, Context context, int tripId, String tripCode) {
-        super(fm);
+    public TripPagerAdapter(FragmentActivity fa, int tripId, String tripCode) {
+        super(fa);
         this.mTripId = tripId;
         this.mTripCode = tripCode;
-        //this.context = context;
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return PAGE_COUNT;
     }
 
     @Override
-    public Fragment getItem(int position) {
-        Fragment f = null;
+    @NonNull
+    public Fragment createFragment(int position) {
         switch (position) {
             case TAB_TRIP_DETAILS:
-                f = TripDetailsFragment.newInstance(mTripId, mTripCode);
-                break;
+                return TripDetailsFragment.newInstance(mTripId, mTripCode);
 
             case TAB_MESSAGES:
-                f = ChatThreadFragment.newInstance(mTripId, mTripCode);
-                break;
+                return ChatThreadFragment.newInstance(mTripId, mTripCode);
         }
-        //return PageFragment.newInstance(position + 1);
-        return f;
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        // Generate title based on item position
-        return SHiTApplication.getContext().getString(tabTitles[position]);
+        throw new IllegalArgumentException();
     }
 }

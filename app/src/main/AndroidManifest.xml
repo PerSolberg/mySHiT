@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="no.shitt.myshit"
     android:installLocation="internalOnly">
 
     <!-- Permission - Internet Connect -->
@@ -13,6 +12,7 @@
     <!-- Get notified when system boots, so we can reschedule alarms -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <supports-screens
@@ -21,9 +21,9 @@
         android:smallScreens="false"
         android:xlargeScreens="true" />
 
+    <!-- Removed attribute android:allowBackup="false", deprecated and probably not needed -->
     <application
         android:name=".SHiTApplication"
-        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -34,7 +34,8 @@
         <!-- Main screen -->
         <activity
             android:name=".TripsActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,7 +57,8 @@
             android:name=".TripDetailsPopupActivity"
             android:label="@string/title_trip_details"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:exported="true">
 
             <!-- android:parentActivityName=".TripsActivity" -->
 
@@ -107,7 +109,8 @@
             android:name=".FlightPopupActivity"
             android:label="@string/title_flight_details"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="no.shitt.myshit.TRANSPORT.FLIGHT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -127,7 +130,8 @@
             android:name=".PrivateTransportPopupActivity"
             android:label="@string/title_private_transport_details"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="no.shitt.myshit.TRANSPORT.PRIVATE" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -147,7 +151,8 @@
             android:name=".ScheduledTransportPopupActivity"
             android:label="@string/title_scheduled_transport_details"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="no.shitt.myshit.TRANSPORT.SCHEDULED" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -167,7 +172,8 @@
             android:name=".HotelPopupActivity"
             android:label="@string/title_hotel_details"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="no.shitt.myshit.ACCOM.HOTEL" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -187,7 +193,8 @@
             android:name=".EventPopupActivity"
             android:label="@string/title_event_details"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:finishOnTaskLaunch="true">
+            android:finishOnTaskLaunch="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="no.shitt.myshit.EVENT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -246,13 +253,13 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/ntf_channel_default" />
 
-        <service
+        <!--service
             android:name=".helper.FirebaseInstanceHelper"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
-        </service>
+        </service-->
         <service
             android:name=".FirebaseMessageReceiver"
             android:exported="false">
@@ -260,14 +267,14 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service
+        <!--service
             android:name=".AlarmIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false">
-            <!--intent-filter>
+            <!- -intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter-->
-        </service>
+            </intent-filter- ->
+        </service-->
 
         <!-- Disable Advertising ID -->
         <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />

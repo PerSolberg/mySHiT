@@ -1,17 +1,19 @@
 package no.shitt.myshit.ui;
 
-import android.app.ProgressDialog;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+//import android.net.Uri;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +38,7 @@ import no.shitt.myshit.model.TripList;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link TripDetailsFragment.OnFragmentInteractionListener} interface
+ * { @link TripDetailsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link TripDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -54,10 +56,9 @@ public class TripDetailsFragment extends Fragment {
     ConnectionDetector cd;
     final AlertDialogueManager alert = new AlertDialogueManager();
     ExpandableListView listView;
-    private ProgressDialog pDialog;
     private AnnotatedTrip annotatedTrip;
 
-    private OnFragmentInteractionListener mListener;
+    //private OnFragmentInteractionListener mListener;
     private final TripsUpdateHandler tripsUpdateHandler = new TripsUpdateHandler();
     private final TripDetailsUpdateHandler tripDetailsUpdateHandler = new TripDetailsUpdateHandler();
     private final CommErrorHandler  commErrorHandler = new CommErrorHandler();
@@ -109,9 +110,10 @@ public class TripDetailsFragment extends Fragment {
         annotatedTrip = TripList.getSharedList().tripByCode(sTripCode);
 
         //Context ctx = SHiTApplication.getContext();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(tripDetailsUpdateHandler, new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(tripsUpdateHandler, new IntentFilter(Constants.Notification.TRIPS_LOADED));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(commErrorHandler, new IntentFilter(Constants.Notification.COMMUNICATION_FAILED));
+        Activity a = requireActivity();
+        LocalBroadcastManager.getInstance(a).registerReceiver(tripDetailsUpdateHandler, new IntentFilter(Constants.Notification.TRIP_DETAILS_LOADED));
+        LocalBroadcastManager.getInstance(a).registerReceiver(tripsUpdateHandler, new IntentFilter(Constants.Notification.TRIPS_LOADED));
+        LocalBroadcastManager.getInstance(a).registerReceiver(commErrorHandler, new IntentFilter(Constants.Notification.COMMUNICATION_FAILED));
     }
 
 
@@ -121,58 +123,41 @@ public class TripDetailsFragment extends Fragment {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_trip_details, container, false);
 
-        listView = (ExpandableListView) mView.findViewById(R.id.trip_details_list);
-        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id)
-            {
-                String trip_code = ((TextView) view.findViewById(R.id.element_trip_code)).getText().toString();
-                String element_id = ((TextView) view.findViewById(R.id.element_id)).getText().toString();
-                AnnotatedTripElement annotatedElement = TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.valueOf(element_id));
-                TripElement element = annotatedElement.tripElement;
+        listView = mView.findViewById(R.id.trip_details_list);
+        listView.setOnChildClickListener((ExpandableListView parent, View view, int groupPosition, int childPosition, long id) -> {
+            String trip_code = ((TextView) view.findViewById(R.id.element_trip_code)).getText().toString();
+            String element_id = ((TextView) view.findViewById(R.id.element_id)).getText().toString();
+            AnnotatedTripElement annotatedElement = TripList.getSharedList().tripByCode(trip_code).trip.elementById(Integer.parseInt(element_id));
+            TripElement element = annotatedElement.tripElement;
 
-                // Reset modification flag when user views data
-                if (annotatedElement.modified != ChangeState.UNCHANGED) {
-                    annotatedElement.modified = ChangeState.UNCHANGED;
-                    TripList.getSharedList().saveToArchive();
-                    updateListView();
-                }
-
-                //Intent i;
-                Intent i2 = element.getActivityIntent(TripElement.ActivityType.REGULAR);
-
-                // Pass trip id and element id to details view
-                i2.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);
-                i2.putExtra(Constants.IntentExtra.ELEMENT_ID, element_id);
-
-                startActivity(i2);
-                return true;
+            // Reset modification flag when user views data
+            if (annotatedElement.modified != ChangeState.UNCHANGED) {
+                annotatedElement.modified = ChangeState.UNCHANGED;
+                TripList.getSharedList().saveToArchive();
+                updateListView();
             }
+
+            //Intent i;
+            Intent i2 = element.getActivityIntent(TripElement.ActivityType.REGULAR);
+
+            // Pass trip id and element id to details view
+            i2.putExtra(Constants.IntentExtra.TRIP_CODE, trip_code);
+            i2.putExtra(Constants.IntentExtra.ELEMENT_ID, element_id);
+
+            startActivity(i2);
+            return true;
         });
 
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_details_list_container);
-        swipeLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        //Log.i("TripDetailsActivity", "onRefresh called from SwipeRefreshLayout");
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        loadTripDetails(true);
-                    }
-                }
-        );
+        SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_details_list_container);
+        swipeLayout.setOnRefreshListener( () -> loadTripDetails(true) );
 
         if (annotatedTrip == null) {
             Log.e(LOG_TAG, "Invalid trip!");
         } else if (annotatedTrip.trip.elementCount() == 0) {
-            // Check if Internet present
             cd = new ConnectionDetector(SHiTApplication.getContext());
             if (!cd.isConnectedToInternet()) {
-                // Internet Connection is not present
                 alert.showAlertDialogue(getActivity(), getResources().getString(R.string.dlgtitle_network_connection_error),
                         getString(R.string.msg_connect_to_network), false);
-                // stop executing code by return
             } else {
                 loadTripDetails(false);
             }
@@ -183,37 +168,19 @@ public class TripDetailsFragment extends Fragment {
         return mView;
     }
 
-    /*
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-    */
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
-    @Override
-    public void onDetach() {
-        mListener = null;
-        super.onDetach();
-    }
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(tripDetailsUpdateHandler);
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(tripsUpdateHandler);
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(commErrorHandler);
-
+        Activity a = requireActivity();
+        LocalBroadcastManager.getInstance(a).unregisterReceiver(tripDetailsUpdateHandler);
+        LocalBroadcastManager.getInstance(a).unregisterReceiver(tripsUpdateHandler);
+        LocalBroadcastManager.getInstance(a).unregisterReceiver(commErrorHandler);
         super.onDestroy();
     }
 
@@ -254,29 +221,11 @@ public class TripDetailsFragment extends Fragment {
         }
     }
 
-    /*
-    private class HandleNotification extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Constants.Notification.TRIP_DETAILS_LOADED)) {
-                serverCallComplete();
-            } else if (intent.getAction().equals(Constants.Notification.TRIPS_LOADED)) {
-                annotatedTrip = TripList.getSharedList().tripByCode(sTripCode);
-                serverCallComplete();
-            } else if (intent.getAction().equals(Constants.Notification.COMMUNICATION_FAILED)) {
-                serverCallFailed();
-            }
-        }
-    }
-    */
 
     private void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
-            pDialog = new ProgressDialog( getActivity()  /*no.shitt.myshit.ui.TripDetailsFragment.this*/);
-            pDialog.setMessage(getString(R.string.msg_loading_trip_details));
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
+            SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_details_list_container);
+            swipeLayout.setRefreshing(true);
         }
 
         annotatedTrip.trip.loadDetails();
@@ -288,14 +237,11 @@ public class TripDetailsFragment extends Fragment {
                 // Probably reloaded entire trip list, but details for this trip weren't included
                 annotatedTrip.trip.loadDetails();
             } else {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        if (listView != null) {
-                            TripElementListAdapter adapter = new TripElementListAdapter(SHiTApplication.getContext() /*no.shitt.myshit.ui.TripDetailsFragment.this*/, annotatedTrip);
-                            //setListAdapter(adapter);
-                            listView.setAdapter(adapter);
-                            adapter.applyDefaultCollapse(listView);
-                        }
+                getActivity().runOnUiThread( () -> {
+                    if (listView != null) {
+                        TripElementListAdapter adapter = new TripElementListAdapter(SHiTApplication.getContext() /*no.shitt.myshit.ui.TripDetailsFragment.this*/, annotatedTrip);
+                        listView.setAdapter(adapter);
+                        adapter.applyDefaultCollapse(listView);
                     }
                 });
             }
@@ -307,15 +253,10 @@ public class TripDetailsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //Log.d("TripDetailsActivity", "onResume Starting, action = " + getIntent().getAction() + ", Selector = " + getIntent().getSelector());
-        // Or maybe not...
-        //TripList.getSharedList().getFromServer();
-        // Hide keyboard
 
-        //View view = getActivity().getCurrentFocus();
-        View view = getView().getRootView();
+        View view = requireView().getRootView();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager)requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
         } else {
             Log.d("TripDetailsFragment", "Unable to close keyboard");
@@ -325,25 +266,15 @@ public class TripDetailsFragment extends Fragment {
     }
 
     public void serverCallComplete() {
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_details_list_container);
+        SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_details_list_container);
         swipeLayout.setRefreshing(false);
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-        //Log.d("TripDetailsActivity", "Server call succeeded");
-        TripList.getSharedList().saveToArchive();
 
+        TripList.getSharedList().saveToArchive();
         updateListView();
     }
 
     public void serverCallFailed() {
-        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.trip_details_list_container);
+        SwipeRefreshLayout swipeLayout = mView.findViewById(R.id.trip_details_list_container);
         swipeLayout.setRefreshing(false);
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-        //Log.d("TripDetailsActivity", "Server REST call failed.");
     }
 }

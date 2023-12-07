@@ -1,7 +1,7 @@
 package no.shitt.myshit.helper;
 
 import android.accounts.AuthenticatorException;
-import android.os.AsyncTask;
+//import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -21,10 +21,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import no.shitt.myshit.Constants;
 
-public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
+public class ServerAPI /*extends AsyncTask<ServerAPI.Params, String, String>*/ {
+    private final static String LOG_TAG = ServerAPI.class.getSimpleName();
+
     // Interface constants
     public enum Method {
         PUT    ("PUT"),
@@ -37,21 +41,39 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
         }
     }
 
-    public final static String URL_USER_VERIFY  = "https://www.shitt.no/mySHiT/user";
-    public final static String URL_TRIP_INFO    = "https://www.shitt.no/mySHiT/trip";
-    public final static String URL_BASE         = "https://www.shitt.no/mySHiT";
+    public final static String URL_USER_VERIFY  = "https://www.shitt.no/mySHiT/v2/user";
+    public final static String URL_TRIP_INFO    = "https://www.shitt.no/mySHiT/v2/trip";
+    public final static String URL_BASE         = "https://www.shitt.no/mySHiT/v2";
+
+    public final static int    VERSION_CURRENT  = 2;
 
     public final static String RESOURCE_TRIP    = "trip";
     public final static String RESOURCE_CHAT    = "thread";
 
     public final static String VERB_MSG_READ    = "read";
 
-    public final static String PARAM_USER_NAME        = "userName";
-    public final static String PARAM_PASSWORD         = "password";
-    public final static String PARAM_DETAILS_TYPE     = "details";
-    //public final static String PARAM_PLATFORM         = "platform";
-    public final static String PARAM_LANGUAGE         = "language";
-    public final static String PARAM_LAST_MESSAGE_ID  = "lastMessageId";
+    public static class Param {
+        public final static String USER_NAME        = "userName";
+        public final static String PASSWORD         = "password";
+        public final static String LANGUAGE         = "language";
+        public final static String LAST_MESSAGE_ID  = "lastMessageId";
+    }
+
+    public static class ResultItem {
+        public static final String API_VERSION       = "apiVersion";
+        public static final String COUNT             = "count";
+        public static final String RESULTS_V1        = "results";
+        public static final String TRIP_LIST         = "trips";
+        public static final String CONTENT           = "content";
+        public static final String USER              = "user";
+        public static final String MESSAGE           = "message";
+        public static final String TIMESTAMP         = "timestamp";
+    }
+
+    public static class ResultItemValue {
+        public final static String CONTENT_LIST      = "list";
+        //public final static String CONTENT_DETAILS  = "details";
+    }
 
     // Instance properties
     private final Listener listener;
@@ -68,8 +90,9 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
         this.listener = listener;
     }
 
-    @Override
-    protected String doInBackground(Params... params) {
+//    @Override
+//    protected String doInBackground(Params... params) {
+    public /*String*/ void execute(Params... params) {
         StringBuilder urlBuilder = new StringBuilder(params[0].baseUrl);
 
         // Build URL
@@ -88,12 +111,11 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
             urlBuilder.append("/");
             urlBuilder.append(params[0].verbArgument);
         }
-        //Log.d("ServerAPI", "Base URL = " + urlBuilder.toString());
 
         try {
             if (params[0].parameters != null) {
                 boolean firstParam = true;
-                for (Map.Entry<String,String> entry : params[0].parameters.entrySet()) {
+                for (Map.Entry<String, String> entry : params[0].parameters.entrySet()) {
                     urlBuilder.append(firstParam ? "?" : "&");
                     urlBuilder.append(entry.getKey());
                     urlBuilder.append("=");
@@ -102,79 +124,76 @@ public class ServerAPI extends AsyncTask<ServerAPI.Params, String, String> {
                 }
 
             }
-        }
-        catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedEncodingException uee) {
             throw new RuntimeException(uee.getMessage());
         }
 
         String urlString = urlBuilder.toString();
-        String resultToDisplay;
 
         // Invoke REST API
-        InputStream in;
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute( () -> {
+            InputStream in;
+            HttpURLConnection urlConnection = null;
+            try {
+                URL url = new URL(urlString);
+                Log.i(LOG_TAG, "Connecting to " + urlString + " using " + method.rawValue);
 
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(urlString);
-            Log.i("ServerAPI", "Connecting to " + urlString + " using " + method.rawValue);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(method == Method.POST || method == Method.PUT);
+                urlConnection.setConnectTimeout(15000);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setRequestMethod(method.rawValue);
 
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput( method == Method.POST || method == Method.PUT);
-            urlConnection.setConnectTimeout(15000);
-            urlConnection.setReadTimeout(10000);
-            urlConnection.setRequestMethod(method.rawValue);
+                if ((method == Method.POST || method == Method.PUT) && params[0].getPayload() != null) {
+                    OutputStream out = urlConnection.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(
+                            new OutputStreamWriter(out, StandardCharsets.UTF_8));
+                    writer.write(params[0].getPayload().toString());
+                    writer.flush();
+                    writer.close();
+                    out.close();
+                }
 
-            if ( (method == Method.POST || method == Method.PUT) && params[0].getPayload() != null ) {
-                OutputStream out = urlConnection.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(out, StandardCharsets.UTF_8));
-                writer.write(params[0].getPayload().toString());
-                writer.flush();
-                writer.close();
-                out.close();
+                // getResponseCode() connects to server - all settings and data must go before this
+                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new AuthenticatorException();
+                }
+                in = new BufferedInputStream(urlConnection.getInputStream());
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.ISO_8859_1), 8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                    sb.append("\n");
+                }
+                reader.close();
+                in.close();
+
+                //resultToDisplay = sb.toString();
+                if (sb.length() == 0) {
+                    throw new IOException("Empty response, expected JSON");
+                }
+                try {
+                    response = new JSONObject(sb.toString());
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "Invalid response for '" + urlString + "': " + sb);
+                    throw e;
+                }
+//                if (response != null) {
+                    listener.onRemoteCallComplete(response);
+//                }
+            } catch (Exception e) {
+                listener.onRemoteCallFailed(e);
+                //return e.getMessage();
+            } finally {
+                if (urlConnection != null) urlConnection.disconnect();
             }
-
-            // getResponseCode() connects to server - all settings and data must go before this
-            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                throw new AuthenticatorException();
-            }
-            in = new BufferedInputStream(urlConnection.getInputStream());
-
-            //Log.d("Server API", "Result retrieved");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.ISO_8859_1), 8);
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append("\n");
-            }
-            reader.close();
-            in.close();
-
-            resultToDisplay = sb.toString();
-            if (sb.length() == 0) {
-                throw new IOException("Empty response, expected JSON");
-            }
-            //Log.d("Server API JSON Data", resultToDisplay);
-            response = new JSONObject(sb.toString());
-        } catch (Exception e) {
-            //Log.e("Buffer Error", "Error converting result " + e.getMessage());
-            listener.onRemoteCallFailed(e);
-            return e.getMessage();
-        } finally {
-            if (urlConnection != null) urlConnection.disconnect();
-        }
-
-        return resultToDisplay;
+        } ) ;
     }
 
-    protected void onPostExecute(String result) {
-        //Log.d("ServerAPI", "Calling listener");
-        if (response != null) {
-            listener.onRemoteCallComplete(response);
-        }
-    }
 
     public static class Params {
         private final String baseUrl;

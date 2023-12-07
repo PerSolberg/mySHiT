@@ -11,6 +11,7 @@
         android:layout_width="45dp"
         android:layout_height="30dp"
         android:paddingStart="3dp"
+        android:paddingEnd="3dp"
         android:paddingTop="10dp"
         android:paddingBottom="2sp"
         android:textColor="@color/colorPrimaryDark"

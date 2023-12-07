@@ -3,7 +3,8 @@ package no.shitt.myshit.helper;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
-import android.net.NetworkInfo;
+import android.net.NetworkCapabilities;
+//import android.net.NetworkInfo;
 
 public class ConnectionDetector {
 
@@ -21,14 +22,9 @@ public class ConnectionDetector {
         ConnectivityManager connectivityMgr = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityMgr != null)
         {
-            Network[] networks = connectivityMgr.getAllNetworks();
-            for (Network n : networks) {
-                NetworkInfo networkInfo = connectivityMgr.getNetworkInfo(n);
-                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
-                    return true;
-                }
-            }
-
+            Network activeNetwork = connectivityMgr.getActiveNetwork();
+            NetworkCapabilities activeNetCaps = connectivityMgr.getNetworkCapabilities(activeNetwork);
+            return activeNetCaps != null && activeNetCaps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&  activeNetCaps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
         }
         return false;
     }

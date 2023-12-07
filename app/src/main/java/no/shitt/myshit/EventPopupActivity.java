@@ -1,8 +1,6 @@
 package no.shitt.myshit;
 
-
 import android.os.Bundle;
-//import android.util.Log;
 import android.view.MenuItem;
 
 
@@ -13,7 +11,6 @@ import android.view.MenuItem;
 public class EventPopupActivity extends EventActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.d("EventPopup", "Launching Event as pop-up");
         super.onCreate(savedInstanceState);
         cancelAlert();
     }

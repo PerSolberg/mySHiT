@@ -2,7 +2,7 @@ package no.shitt.myshit.model;
 
 import android.content.Intent;
 import android.database.DataSetObservable;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -10,10 +10,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +43,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
     private static final Map<Integer,Double> retryDelays;
 
     static {
-        retryDelays = new TreeMap<>();
+        retryDelays = new TreeMap<>(Comparator.reverseOrder());
         retryDelays.put(1, 5.0);
         retryDelays.put(10, 30.0);
         retryDelays.put(20, 300.0);
@@ -49,21 +51,16 @@ public class ChatThread extends DataSetObservable implements JSONable {
     }
 
     public enum RefreshMode {
-        FULL("F"),
-        INCREMENTAL("I");
-
-        private final String rawValue;
-        RefreshMode(String rawValue) {
-            this.rawValue = rawValue;
-        }
+        FULL,
+        INCREMENTAL;
     }
 
     private class LastSeenInfo {
-        //private final String LOG_TAG = LastSeenInfo.class.getSimpleName();
         private final Map<String,ArrayList<LastSeenUser>> lastSeen;
 
         LastSeenInfo(JSONObject elementData) {
             lastSeen = new HashMap<>();
+            //noinspection ConstantValue
             if (elementData == null || elementData.keys() == null) {
                 return;
             }
@@ -72,7 +69,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
                 String msgId = msgIdList.next();
                 ArrayList<LastSeenUser> userInfoList = new ArrayList<>();
                 JSONArray jsonUserInfoList = elementData.optJSONArray(msgId);
-                for (int i = 0; i < jsonUserInfoList.length(); i++) {
+                for (int i = 0; i < Objects.requireNonNull(jsonUserInfoList).length(); i++) {
                     LastSeenUser userInfo = new LastSeenUser(jsonUserInfoList.optJSONObject(i));
                     if (userInfo.userId != User.sharedUser.getId()) {
                         userInfoList.add(userInfo);
@@ -91,7 +88,6 @@ public class ChatThread extends DataSetObservable implements JSONable {
             final String userName;
 
             LastSeenUser(JSONObject elementData) {
-                //Log.d("ChatThread.LastSeenInfo", "Decoding");
                 userId = elementData.optInt("id");
                 userName = elementData.optString("name");
             }
@@ -138,19 +134,18 @@ public class ChatThread extends DataSetObservable implements JSONable {
     }
 
     private Double retryDelay() {
-        if (retryCount == 0) {
-            return 0.0;
-        } else {
-            Double delayFound = 0.0;
-            for (Integer lowerBound: retryDelays.keySet()) {
-                if (lowerBound <= retryCount && retryDelays.get(lowerBound) > delayFound) {
-                    delayFound = retryDelays.get(lowerBound);
+        if (retryCount > 0) {
+            for (Map.Entry<Integer, Double> entry : retryDelays.entrySet()) {
+                if (entry.getKey() <= retryCount) {
+                    Log.d(LOG_TAG, "Retrying: count = " + retryCount + ", delay = " + entry.getValue());
+                    return entry.getValue();
                 }
             }
-            return delayFound;
         }
+        return 0.0;
     }
 
+    @SuppressWarnings("unused")
     int unreadCount() {
         int count = 0;
 
@@ -295,7 +290,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
 
 
     public JSONObject toJSON() throws JSONException {
-        JSONObject jo = new JSONObject(); // super.toJSON();
+        JSONObject jo = new JSONObject();
 
         jo.putOpt(Constants.JSON.CHATTHREAD_TRIP_ID, tripId);
         jo.putOpt(Constants.JSON.CHATTHREAD_LAST_DISPLAYED_ID, (lastDisplayedId == null ? null : lastDisplayedId.toJSON()));
@@ -359,14 +354,6 @@ public class ChatThread extends DataSetObservable implements JSONable {
         return unsavedMessages;
     }
 
-    /*
-    void reset() {
-        rwl.writeLock().lock();
-        messages = unsavedMessages();
-        rwl.writeLock().unlock();
-    }
-    */
-
     // Response handler
     private class SaveResponseHandler implements ServerAPI.Listener {
         public void onRemoteCallComplete(JSONObject response) {
@@ -377,12 +364,13 @@ public class ChatThread extends DataSetObservable implements JSONable {
         public void onRemoteCallFailed() {
             retryCount += 1;
 
-            mNetworkThreadPool.schedule(new SaveRunnable(), retryDelay().longValue(), TimeUnit.SECONDS);
+            mNetworkThreadPool.schedule(ChatThread.this::performSave, retryDelay().longValue(), TimeUnit.SECONDS);
         }
 
         public void onRemoteCallFailed(Exception e) {
             retryCount += 1;
-            mNetworkThreadPool.schedule(new SaveRunnable(), retryDelay().longValue(), TimeUnit.SECONDS);
+
+            mNetworkThreadPool.schedule(ChatThread.this::performSave, retryDelay().longValue(), TimeUnit.SECONDS);
         }
     }
 
@@ -435,7 +423,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
     }
 
     private void save() {
-        mNetworkThreadPool.execute(new SaveRunnable());
+        mNetworkThreadPool.execute(this::performSave);
     }
 
 
@@ -478,7 +466,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
                 lastSeenByUserServer = response.optInt(Constants.JSON.CHATTHREAD_LAST_SEEN_BY_ME);
                 lastSeenByOthers = new LastSeenInfo(response.optJSONObject(Constants.JSON.CHATTHREAD_LAST_SEEN_OTHERS));
                 JSONArray jsonMessages = response.optJSONArray(Constants.JSON.CHATTHREAD_MESSAGES);
-                if (jsonMessages.length() > 0) {
+                if (jsonMessages != null && jsonMessages.length() > 0) {
                     int srvMessageVersion = response.optInt(Constants.JSON.CHATTHREAD_MSG_VERSION);
                     if (mode == RefreshMode.INCREMENTAL) {
                         if (srvMessageVersion > messageVersion) {
@@ -508,7 +496,7 @@ public class ChatThread extends DataSetObservable implements JSONable {
                 Intent intent = new Intent(Constants.Notification.CHAT_UPDATED);
                 LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
             } else {
-                Log.e("ChatThread.Load", "Incorrect response: " + response.toString());
+                Log.e("ChatThread.Load", "Incorrect response: " + response);
             }
         }
 
@@ -525,12 +513,12 @@ public class ChatThread extends DataSetObservable implements JSONable {
 
     public void refresh(RefreshMode mode) {
         ServerAPI.Params params = new ServerAPI.Params(ServerAPI.URL_BASE, ServerAPI.RESOURCE_CHAT, Integer.toString(tripId), null, null);
-        params.addParameter(ServerAPI.PARAM_USER_NAME, User.sharedUser.getUserName());
-        params.addParameter(ServerAPI.PARAM_PASSWORD, User.sharedUser.getPassword());
-        params.addParameter(ServerAPI.PARAM_LANGUAGE, Locale.getDefault().getLanguage());
+        params.addParameter(ServerAPI.Param.USER_NAME, User.sharedUser.getUserName());
+        params.addParameter(ServerAPI.Param.PASSWORD, User.sharedUser.getPassword());
+        params.addParameter(ServerAPI.Param.LANGUAGE, Locale.getDefault().getLanguage());
 
         if (messageVersion != ChatMessage.ID_NONE && mode == RefreshMode.INCREMENTAL) {
-            params.addParameter(ServerAPI.PARAM_LAST_MESSAGE_ID, Integer.toString(messageVersion));
+            params.addParameter(ServerAPI.Param.LAST_MESSAGE_ID, Integer.toString(messageVersion));
         }
 
         new ServerAPI(new LoadChatResponseHandler(mode)).execute(params);
@@ -538,27 +526,19 @@ public class ChatThread extends DataSetObservable implements JSONable {
 
     public void updateReadStatus(JSONObject jsonLastSeenByUsers, int lastSeenVersion) {
         // TODO: Perform in background
-        rwl.writeLock().lock();
-
         if (lastSeenVersion <= this.lastSeenVersion) {
-            rwl.writeLock().unlock();
             return;
         }
 
+        rwl.writeLock().lock();
         lastSeenByOthers = new LastSeenInfo(jsonLastSeenByUsers);
-        Log.d(LOG_TAG, "Updated last seen by me: " + lastSeenByUserServer + ", other users: " + lastSeenByOthers.toString());
+        Log.d(LOG_TAG, "Updated last seen by me: " + lastSeenByUserServer + ", other users: " + lastSeenByOthers);
         rwl.writeLock().unlock();
         notifyChanged();
         Intent intent = new Intent(Constants.Notification.CHAT_UPDATED);
         LocalBroadcastManager.getInstance(SHiTApplication.getContext()).sendBroadcast(intent);
     }
 
-    private class SaveRunnable implements Runnable {
-        @Override
-        public void run() {
-            performSave();
-        }
-    }
 
     private class ReadRunnable implements Runnable {
         final ChatMessage messageToRead;

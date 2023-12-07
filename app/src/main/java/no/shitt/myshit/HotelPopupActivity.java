@@ -1,7 +1,6 @@
 package no.shitt.myshit;
 
 import android.os.Bundle;
-//import android.util.Log;
 import android.view.MenuItem;
 
 /**
@@ -11,7 +10,6 @@ import android.view.MenuItem;
 public class HotelPopupActivity extends HotelActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //Log.d("HotelPopup", "Launching Hotel as pop-up");
         super.onCreate(savedInstanceState);
 
         cancelAlert();

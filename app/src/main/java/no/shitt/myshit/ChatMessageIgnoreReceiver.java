@@ -4,15 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import android.support.v4.app.NotificationManagerCompat;
-//import android.util.Log;
+import androidx.core.app.NotificationManagerCompat;
 
 /**
  * Created by Per Solberg on 2018-02-01.
  */
 
 public class ChatMessageIgnoreReceiver extends BroadcastReceiver {
-    //private static final String LOG_TAG = ChatMessageIgnoreReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -21,8 +19,6 @@ public class ChatMessageIgnoreReceiver extends BroadcastReceiver {
             int messageId = intent.getIntExtra(Constants.IntentExtra.MESSAGE_ID, -1);
 
             if (tripId != -1 && messageId != -1) {
-                //Log.d(LOG_TAG, "Ignoring message for TripId " + tripId);
-
                 // Update the notification to stop the progress spinner.
                 NotificationManagerCompat notificationManager =
                         NotificationManagerCompat.from(context);

@@ -1,40 +1,35 @@
 package no.shitt.myshit;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-//import android.util.Log;
-//import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceFragmentCompat;
 
 import no.shitt.myshit.model.TripList;
 
-public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Context ctx = getApplicationContext();
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager()
+                .beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
-        PreferenceManager.getDefaultSharedPreferences(ctx).registerOnSharedPreferenceChangeListener(this);
     }
+
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
         TripList.getSharedList().refreshNotifications();
     }
 
-    public static class SettingsFragment extends PreferenceFragment
+    public static class SettingsFragment extends PreferenceFragmentCompat
     {
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferences, rootKey);
         }
     }
 }

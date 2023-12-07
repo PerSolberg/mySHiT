@@ -2,9 +2,11 @@ package no.shitt.myshit;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
+import com.google.android.material.tabs.TabLayout;
 import android.util.Log;
 import android.view.MenuItem;
+
+import java.util.Objects;
 
 import no.shitt.myshit.adapters.TripPagerAdapter;
 
@@ -13,9 +15,10 @@ import no.shitt.myshit.adapters.TripPagerAdapter;
  */
 
 public class TripDetailsPopupActivity extends TripDetailsActivity {
+    private static final String LOG_TAG = TripDetailsPopupActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.d("TripDetailsPopup", "Launching TripDetails as pop-up");
         super.onCreate(savedInstanceState);
         cancelAlert();
 
@@ -26,16 +29,16 @@ public class TripDetailsPopupActivity extends TripDetailsActivity {
         String intentAction = i.getAction();
         if (intentAction != null) {
             if (intentAction.equals(Constants.PushNotificationActions.CHATMSG_CLICK)) {
-                Bundle extras = i.getExtras();
-                String changeType = extras.getString(Constants.PushNotificationKeys.CHANGE_TYPE);
+                Bundle extras = Objects.requireNonNull( i.getExtras() );
+                String changeType = Objects.requireNonNull( extras.getString(Constants.PushNotificationKeys.CHANGE_TYPE) );
                 if (changeType.equals(Constants.PushNotificationData.TYPE_CHAT_MESSAGE)) {
-                    TabLayout tabLayout = (TabLayout) findViewById(R.id.trip_details_tabbar);
+                    TabLayout tabLayout = findViewById(R.id.trip_details_tabbar);
                     TabLayout.Tab tab = tabLayout.getTabAt(TripPagerAdapter.TAB_MESSAGES);
-                    tab.select();
+                    Objects.requireNonNull(tab).select();
                 }
             }
         } else {
-            Log.e("TripDetailsPopup", "Could not get intent action");
+            Log.e(LOG_TAG, "Could not get intent action");
         }
     }
 

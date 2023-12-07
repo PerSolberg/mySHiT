@@ -15,4 +15,15 @@ public class StringUtil {
             sb.append(str);
         }
     }
+
+    public static void appendWithTrailingSeparator(StringBuilder sb, String str, String sep, boolean appendBlank) {
+        if (str == null || str.isEmpty()) {
+            if (appendBlank) {
+                sb.append(sep);
+            }
+        } else {
+            sb.append(str);
+            sb.append(sep);
+        }
+    }
 }

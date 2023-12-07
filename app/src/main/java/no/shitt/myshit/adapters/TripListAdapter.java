@@ -1,9 +1,10 @@
 package no.shitt.myshit.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+//import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,21 +57,23 @@ public class TripListAdapter extends BaseExpandableListAdapter {
     }
 
     // public View getView(int position, View convertView, ViewGroup parent)
+    @SuppressLint("SetTextI18n")
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         TripViewHolder holder;
 
         LayoutInflater mInflater = (LayoutInflater)
                 context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_item_trip, null);
+//            convertView = mInflater.inflate(R.layout.list_item_trip, null);
+            convertView = mInflater.inflate(R.layout.list_item_trip, parent, false);
             holder = new TripViewHolder();
-            holder.txtId = (TextView) convertView.findViewById(R.id.trip_id);
-            holder.txtCode = (TextView) convertView.findViewById(R.id.trip_code);
-            holder.imageView = (ImageView) convertView.findViewById(R.id.trip_icon);
-            holder.overlayView = (ImageView) convertView.findViewById(R.id.trip_icon_overlay);
-            holder.txtName = (TextView) convertView.findViewById(R.id.trip_name);
-            holder.txtInfo = (TextView) convertView.findViewById(R.id.trip_info);
-            holder.txtDesc = (TextView) convertView.findViewById(R.id.trip_description);
+            holder.txtId = convertView.findViewById(R.id.trip_id);
+            holder.txtCode = convertView.findViewById(R.id.trip_code);
+            holder.imageView = convertView.findViewById(R.id.trip_icon);
+            holder.overlayView = convertView.findViewById(R.id.trip_icon_overlay);
+            holder.txtName = convertView.findViewById(R.id.trip_name);
+            holder.txtInfo = convertView.findViewById(R.id.trip_info);
+            holder.txtDesc = convertView.findViewById(R.id.trip_description);
             convertView.setTag(holder);
         }
         else {
@@ -82,7 +85,7 @@ public class TripListAdapter extends BaseExpandableListAdapter {
         if (rowItem != null) {
             holder.txtId.setText(Integer.toString(rowItem.trip.id));
             holder.txtCode.setText(rowItem.trip.code);
-            holder.imageView.setImageResource(rowItem.trip.getIconId());
+            holder.imageView.setImageIcon(rowItem.trip.getIcon());
             holder.txtName.setText(rowItem.trip.name);
             holder.txtInfo.setText(rowItem.trip.getDateInfo());
             holder.txtDesc.setText(rowItem.trip.tripDescription);
@@ -109,10 +112,10 @@ public class TripListAdapter extends BaseExpandableListAdapter {
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_group_trip, null);
+            convertView = mInflater.inflate(R.layout.list_group_trip, parent, false);
             holder = new GroupViewHolder();
-            holder.txtTitle   = (TextView) convertView.findViewById(R.id.trip_group_title);
-            holder.imageView  = (ImageView) convertView.findViewById(R.id.trip_group_icon);
+            holder.txtTitle   = convertView.findViewById(R.id.trip_group_title);
+            holder.imageView  = convertView.findViewById(R.id.trip_group_icon);
             convertView.setTag(holder);
         }
         else {
@@ -126,7 +129,7 @@ public class TripListAdapter extends BaseExpandableListAdapter {
             section.expanded = isExpanded;
             holder.txtTitle.setText(section.title);
         }
-        //Log.d("TripListAdapter", "section = " + section + ", title = " + section.title);
+
         if (isExpanded) {
             holder.imageView.setImageResource(R.mipmap.icon_group_expanded);
         } else {
@@ -220,7 +223,9 @@ public class TripListAdapter extends BaseExpandableListAdapter {
         int     currentSectionTitleId;
         Context ctx = SHiTApplication.getContext();
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences sharedPref = ctx.getSharedPreferences(
+                ctx.getPackageName() + "_preferences", Context.MODE_PRIVATE);
         String prefUpcoming = sharedPref.getString("pref_upcoming", "");
 
         for (int i = TripList.getSharedList().tripCount() - 1; i >= 0; i--) {

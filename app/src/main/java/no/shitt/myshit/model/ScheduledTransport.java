@@ -62,11 +62,10 @@ public class ScheduledTransport extends GenericTransport {
     }
 
 
+    //
     // MARK: Methods
+    //
     public void setNotification() {
-        // First delete any existing notifications for this trip element (either one or two)
-        //cancelNotifications();
-
         // Set notification(s) (if we have a start date)
         if (getTense() == Tense.FUTURE) {
             int leadTimeDepartureMinutes = SHiTApplication.getPreferenceInt(Constants.Setting.ALERT_LEAD_TIME_DEPARTURE, LEAD_TIME_MISSING);

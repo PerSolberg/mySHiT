@@ -3,17 +3,19 @@ package no.shitt.myshit;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentResolver;
+//import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
-import android.media.RingtoneManager;
-import android.net.Uri;
+//import android.media.RingtoneManager;
+//import android.net.Uri;
 import android.app.RemoteInput;
-import android.os.Build;
+//import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -24,6 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.ChatThread;
@@ -43,23 +46,22 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         // If the application is in the foreground handle both data and notification messages here.
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
-        Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
-        Log.d(LOG_TAG, "Data: " + remoteMessage.getData());
+        Log.d(LOG_TAG, "From: " + remoteMessage.getFrom() + ", Data: " + remoteMessage.getData());
 
         Map<String,String> ntfData = remoteMessage.getData();
 
         if (ntfData.size() > 0) {
             boolean chatMessage = Constants.PushNotificationData.TYPE_CHAT_MESSAGE.equals(ntfData.get(Constants.PushNotificationKeys.CHANGE_TYPE));
             boolean insert = Constants.PushNotificationData.OP_INSERT.equals(ntfData.get(Constants.PushNotificationKeys.CHANGE_OPERATION));
-            int tripId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.TRIP_ID));
+            int tripId = Integer.parseInt(Objects.requireNonNull(ntfData.get(Constants.PushNotificationKeys.TRIP_ID)));
             if (chatMessage) {
                 AnnotatedTrip aTrip = TripList.getSharedList().tripById(tripId);
                 if (aTrip != null && aTrip.trip.chatThread != null) {
                     if (insert) {
                         aTrip.trip.chatThread.refresh(ChatThread.RefreshMode.INCREMENTAL);
 
-                        int fromUserId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.FROM_USER_ID));
-                        int messageId = Integer.parseInt(ntfData.get(Constants.PushNotificationKeys.MESSAGE_ID));
+                        int fromUserId = Integer.parseInt(Objects.requireNonNull(ntfData.get(Constants.PushNotificationKeys.FROM_USER_ID)));
+                        int messageId = Integer.parseInt(Objects.requireNonNull(ntfData.get(Constants.PushNotificationKeys.MESSAGE_ID)));
                         if (fromUserId != User.sharedUser.getId()) {
                             Context ctx = SHiTApplication.getContext();
                             Object[] locArgsArray = getLocArgs(remoteMessage);
@@ -68,27 +70,41 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                         }
                     } else {
                         String strLastSeenInfo = ntfData.get(Constants.PushNotificationKeys.LAST_SEEN_INFO);
-                        Log.d(LOG_TAG, "Last Seen Info = " + strLastSeenInfo);
-                        try {
-                            JSONObject lastSeenInfo = new JSONObject(strLastSeenInfo);
-                            int lastSeenVersion = lastSeenInfo.optInt(Constants.JSON.CHATTHREAD_LAST_SEEN_VERSION);
-                            JSONObject lastSeenByUsers = lastSeenInfo.optJSONObject(Constants.JSON.CHATTHREAD_LAST_SEEN_OTHERS);
-                            if (lastSeenByUsers != null) {
-                                aTrip.trip.chatThread.updateReadStatus(lastSeenByUsers, lastSeenVersion);
-                            } else {
-                                Log.e(LOG_TAG, "Missing read status for users");
+//                        Log.d(LOG_TAG, "Last Seen Info = " + strLastSeenInfo);
+                        if (strLastSeenInfo != null) {
+                            try {
+                                JSONObject lastSeenInfo = new JSONObject(strLastSeenInfo);
+                                int lastSeenVersion = lastSeenInfo.optInt(Constants.JSON.CHATTHREAD_LAST_SEEN_VERSION);
+                                JSONObject lastSeenByUsers = lastSeenInfo.optJSONObject(Constants.JSON.CHATTHREAD_LAST_SEEN_OTHERS);
+                                if (lastSeenByUsers != null) {
+                                    aTrip.trip.chatThread.updateReadStatus(lastSeenByUsers, lastSeenVersion);
+                                } else {
+                                    Log.e(LOG_TAG, "Missing read status for users");
+                                }
+                            } catch (JSONException je) {
+                                Log.e(LOG_TAG, "Unable to parse JSON for last seen info");
                             }
-                        } catch (JSONException je) {
-                            Log.e(LOG_TAG, "Unable to parse JSON for last seen info");
                         }
                     }
                 }
             } else {
-                Log.d(LOG_TAG, "Received notification for trip update");
+//                Log.d(LOG_TAG, "Received notification for trip update");
                 sendNotification(tripId, remoteMessage);
-                TripList.getSharedList().getFromServer();
+                AnnotatedTrip at = TripList.getSharedList().tripById(tripId);
+                if ( at == null) {
+                    TripList.getSharedList().getFromServer();
+                } else {
+                    at.trip.loadDetails();
+                }
             }
         }
+    }
+
+
+    @Override
+    public void onNewToken(@NonNull String s) {
+        super.onNewToken(s);
+        Log.d(LOG_TAG, "Firebase token changed: " + s);
     }
 
 
@@ -109,7 +125,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         if (titleLocKey != null) {
             int locKeyId = SHiTApplication.getStringResourceIdByName(titleLocKey);
             Object[] locArgs = getTitleLocArgs(remoteMessage);
-            //Object[] locArgs = remoteMessage.getNotification().getTitleLocalizationArgs();
             messageTitle = ctx.getString(locKeyId, locArgs);
         }
 
@@ -121,26 +136,19 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         }
         intent.putExtra(Constants.PushNotificationKeys.TRIP_ID, String.valueOf(tripId));
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Notification.Builder notificationBuilder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder = new Notification.Builder(this, Constants.NotificationChannel.UPDATE);
-        } else {
-            notificationBuilder = new Notification.Builder(this);
-        }
+        notificationBuilder = new Notification.Builder(this, Constants.NotificationChannel.UPDATE);
         notificationBuilder
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(largeIcon)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
-                .setPriority(Notification.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
@@ -156,13 +164,12 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         // Intent for clicking the notification
         Intent intent = new Intent(this, TripDetailsPopupActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(Constants.PushNotificationActions.CHATMSG_CLICK);
         intent.putExtra(Constants.PushNotificationKeys.TRIP_ID, String.valueOf(tripId));
         intent.putExtra(Constants.PushNotificationKeys.CHANGE_TYPE, Constants.PushNotificationData.TYPE_CHAT_MESSAGE);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         Icon smallIcon = Icon.createWithResource(ctx, R.mipmap.icon_chat);
@@ -195,19 +202,15 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                         //.addRemoteInput(remoteInput)
                         .build();
 
-        Uri chatSoundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + ctx.getPackageName()+"/"+R.raw.chat_new_message);
+        //Uri chatSoundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + ctx.getPackageName()+"/"+R.raw.chat_new_message);
         Notification.Builder notificationBuilder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder = new Notification.Builder(this, Constants.NotificationChannel.CHAT);
-        } else {
-            notificationBuilder = new Notification.Builder(this);
-        }
+        notificationBuilder = new Notification.Builder(this, Constants.NotificationChannel.CHAT);
         notificationBuilder
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(largeIcon)
                 .setContentText(messageBody)
                 .setAutoCancel(true)
-                .setSound(chatSoundUri)
+                //.setSound(chatSoundUri)
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .addAction(replyAction)
                 .addAction(ignoreAction)

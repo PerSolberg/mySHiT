@@ -1,5 +1,7 @@
 package no.shitt.myshit;
 
+//import static android.view.View.VISIBLE;
+
 import no.shitt.myshit.adapters.TripPagerAdapter;
 import no.shitt.myshit.model.AnnotatedTrip;
 import no.shitt.myshit.model.TripList;
@@ -8,32 +10,36 @@ import no.shitt.myshit.ui.ChatThreadFragment;
 import no.shitt.myshit.ui.TripDetailsFragment;
 
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager2.widget.ViewPager2;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+
+import java.util.Objects;
 
 public class TripDetailsActivity extends AppCompatActivity
         implements TripDetailsFragment.OnFragmentInteractionListener
                  , ChatThreadFragment.OnFragmentInteractionListener
 {
+    private static final String LOG_TAG = TripDetailsActivity.class.getSimpleName();
     private AnnotatedTrip annotatedTrip;
 
     String trip_code;
+
+    private static final int[] tabTitles = new int[]{R.string.trip_page_itinerary, R.string.trip_page_messages};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,77 +69,54 @@ public class TripDetailsActivity extends AppCompatActivity
             annotatedTrip = TripList.getSharedList().tripByCode(trip_code);
         } else {
             Bundle extras = i.getExtras();
-            String extTripId = extras.getString(Constants.PushNotificationKeys.TRIP_ID);
-            int tripId = Integer.parseInt(extTripId);
+            String extTripId = Objects.requireNonNull(extras).getString(Constants.PushNotificationKeys.TRIP_ID);
+            int tripId = Integer.parseInt(Objects.requireNonNull(extTripId));
             annotatedTrip = TripList.getSharedList().tripById(tripId);
             trip_code = annotatedTrip.trip.code;
         }
 
         // Get the ViewPager and set its PagerAdapter so that it can display items
-        ViewPager viewPager = (ViewPager) findViewById(R.id.trip_content);
-        viewPager.setAdapter(new TripPagerAdapter(getSupportFragmentManager(),
-                TripDetailsActivity.this, annotatedTrip.trip.id, trip_code));
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                View view = getCurrentFocus(); //getView().getRootView();
-                if (view != null) {
-                    Log.d("TripDetailsActivity", "Closing keyboard");
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                } else {
-                    Log.d("TripDetailsActivity", "Unable to close keyboard");
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        TripPagerAdapter  tpa = new TripPagerAdapter(this, annotatedTrip.trip.id, trip_code);
+        ViewPager2 viewPager = findViewById(R.id.trip_content);
+        viewPager.setAdapter(tpa);
+        TabLayout tabs = findViewById(R.id.trip_details_tabbar);
+        TabLayoutMediator tlm =  new TabLayoutMediator(tabs, viewPager,
+                (tab, position) -> tab.setText(SHiTApplication.getContext().getString(tabTitles[position]))
+        );
+        tlm.attach();
 
         // Set up toolbar and enable Up button
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.trip_details_toolbar);
+        Toolbar myToolbar = findViewById(R.id.trip_details_toolbar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setTitle(annotatedTrip.trip.name);
-
-        // Give the TabLayout the ViewPager
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.trip_details_tabbar);
-        tabLayout.setupWithViewPager(viewPager);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setTitle(annotatedTrip.trip.name);
+        } else {
+            Log.e(LOG_TAG, "Cannot find action bar");
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
-                return true;
-
-            case R.id.action_refresh:
-                SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.trip_details_list_container);
-                swipeLayout.setRefreshing(true);
-                loadTripDetails(true);
-                return true;
-
-
-            case R.id.action_logout:
-                TripList.getSharedList().clear();
-                User.sharedUser.logout();
-                finish();
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
+            return true;
+        } else if (item.getItemId() == R.id.action_refresh) {
+            SwipeRefreshLayout swipeLayout = findViewById(R.id.trip_details_list_container);
+            swipeLayout.setRefreshing(true);
+            loadTripDetails(true);
+            return true;
+        } else if (item.getItemId() == R.id.action_logout) {
+            TripList.getSharedList().clear();
+            User.sharedUser.logout();
+            finish();
+            return true;
+        } else {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            return super.onOptionsItemSelected(item);
         }
     }
 
@@ -160,11 +143,19 @@ public class TripDetailsActivity extends AppCompatActivity
 
     protected void loadTripDetails(boolean refresh) {
         if ( ! refresh ) {
-            ProgressDialog pDialog = new ProgressDialog(/*TripDetailsActivity.*/this);
-            pDialog.setMessage("Loading trip details ...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
+            ViewPager2 viewPager = findViewById(R.id.trip_content);
+            int currentTab = viewPager.getCurrentItem();
+            SwipeRefreshLayout swipeLayout = null;
+            if ( currentTab == 0 ) {
+                swipeLayout = findViewById(R.id.trip_details_list_container);
+            } else if ( currentTab == 1 ) {
+                swipeLayout = findViewById(R.id.trip_chat_container);
+            } else {
+                Log.e(LOG_TAG, "Invalid tab: " + currentTab);
+            }
+            if (swipeLayout != null) {
+                swipeLayout.setRefreshing(true);
+            }
         }
 
         annotatedTrip.trip.loadDetails();

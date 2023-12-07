@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +25,10 @@ public class ReferenceListAdapter extends BaseAdapter {
     private final List<Map<String,String>> referenceList;
 
 
-    public ReferenceListAdapter(Context context, List<Map<String,String>> referenceList) {
+    public ReferenceListAdapter(Context context, Set<Map<String,String>> referenceSet) {
         this.context = context;
-        this.referenceList = referenceList;
+        this.referenceList = new ArrayList<>();
+        this.referenceList.addAll(referenceSet);
     }
 
     /*private view holder class*/
@@ -39,17 +42,17 @@ public class ReferenceListAdapter extends BaseAdapter {
 
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_item_reference, null);
+            convertView = mInflater.inflate(R.layout.list_item_reference, parent, false);
             holder = new ViewHolder();
-            holder.txtRefLabel  = (TextView) convertView.findViewById(R.id.ref_type);
-            holder.txtRefNo     = (TextView) convertView.findViewById(R.id.ref_no);
+            holder.txtRefLabel  = convertView.findViewById(R.id.ref_type);
+            holder.txtRefNo     = convertView.findViewById(R.id.ref_no);
             convertView.setTag(holder);
         }
         else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Map<String, String> reference = (Map<String, String>) getItem(position);
+        Map<String, String> reference = getItem(position);
 
         String refNo = reference.get(TripElement.REFTAG_REF_NO);
         String url = reference.get(TripElement.REFTAG_LOOKUP_URL);
@@ -64,9 +67,8 @@ public class ReferenceListAdapter extends BaseAdapter {
             displayRefNo.append(refNo);
         }
 
-
         holder.txtRefLabel.setText(reference.get(TripElement.REFTAG_TYPE));
-        holder.txtRefNo.setText(Html.fromHtml(displayRefNo.toString()));
+        holder.txtRefNo.setText(Html.fromHtml(displayRefNo.toString(), Html.FROM_HTML_MODE_LEGACY));
         holder.txtRefNo.setMovementMethod(LinkMovementMethod.getInstance());
 
         return convertView;
@@ -78,7 +80,7 @@ public class ReferenceListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public Map<String,String> getItem(int position) {
         return referenceList.get(position);
     }
 

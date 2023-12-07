@@ -17,8 +17,8 @@ import no.shitt.myshit.model.TripList;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")
-                || intent.getAction().equals("android.intent.action.QUICKBOOT_POWERON"))
+        if ( "android.intent.action.BOOT_COMPLETED".equals( intent.getAction() )
+                || "android.intent.action.QUICKBOOT_POWERON".equals( intent.getAction() ) )
         {
             TripList.getSharedList().loadFromArchive();
         }

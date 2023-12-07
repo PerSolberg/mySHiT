@@ -1,4 +1,7 @@
 package no.shitt.myshit.beans;
+/*
+
+import androidx.annotation.NonNull;
 
 class TripElementItem {
     private int trip_id;
@@ -61,7 +64,8 @@ class TripElementItem {
         this.desc = desc;
     }
     @Override
+    @NonNull
     public String toString() {
         return name + "\n" + desc;
     }
-}
+}*/

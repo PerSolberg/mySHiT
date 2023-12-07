@@ -1,13 +1,13 @@
 package no.shitt.myshit.model;
 
 import android.content.Intent;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import no.shitt.myshit.Constants;
@@ -16,8 +16,9 @@ import no.shitt.myshit.FlightPopupActivity;
 import no.shitt.myshit.SHiTApplication;
 
 public class Flight extends ScheduledTransport {
+    private final static String LOG_TAG = Flight.class.getSimpleName();
     // MARK: Properties
-    public final String airlineCode;
+    public String airlineCode;
 
     @Override
     public String getTitle() {
@@ -65,25 +66,24 @@ public class Flight extends ScheduledTransport {
     Flight(int tripId, String tripCode, JSONObject elementData) {
         super(tripId, tripCode, elementData);
         airlineCode = elementData.isNull(Constants.JSON.ELEM_COMPANY_CODE) ? null : elementData.optString(Constants.JSON.ELEM_COMPANY_CODE);
-        //setNotification();
     }
 
+
+    //
     // MARK: Methods
+    //
     @Override
-    public boolean isEqual(Object otherObject) {
-        if (this.getClass() != otherObject.getClass()) {
-            return false;
-        }
-        try {
-            Flight otherFlight = (Flight) otherObject;
-//            if (!StringUtil.equal(this.airlineCode, otherFlight.airlineCode))      { return false; }
-            if (!Objects.equals(this.airlineCode, otherFlight.airlineCode))      { return false; }
+    boolean update(JSONObject elementData) {
+        changed = super.update(elementData);
 
-            return super.isEqual(otherObject);
-        } catch (Exception e) {
-            return false;
+        airlineCode = updateField(airlineCode, elementData, Constants.JSON.ELEM_COMPANY_CODE);
+
+        if (changed && ( this.getClass() == Flight.class) ) {
+            setNotification();
         }
+        return changed;
     }
+
 
     @Override
     public Intent getActivityIntent(ActivityType activityType) {

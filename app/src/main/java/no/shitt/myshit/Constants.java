@@ -21,6 +21,8 @@ public class Constants {
         public static final String UPDATE    = "UPDATE";
     }
 
+    public static final long[] NOTIFICATION_VIBRATION_PATTERN = new long[] { 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50 };
+
     public class NotificationTag {
         public static final String CHAT           = "Chat";
         public static final String TRIP           = "Trip";
@@ -108,10 +110,6 @@ public class Constants {
         public static final String TITLE                = "title";
         public static final String TRIP_CODE            = "trip_code";
         public static final String TRIP_ID              = "trip_id";
-//        public static final String KEY_TRIP_CODE  = "tripCode";
-//        public static final String KEY_ELEMENT_ID = "tripElement";
-//        public static final String KEY_TITLE      = "title";
-//        public static final String KEY_MESSAGE    = "msg";
     }
 
     public class UpcomingPreference {
@@ -123,9 +121,10 @@ public class Constants {
     }
 
     public class JSON {
-        public static final String QUERY_COUNT             = "count";
-        public static final String QUERY_DETAILS           = "details";
-        public static final String QUERY_RESULTS           = "results";
+        public static final String SRVTS_FORMATTED         = "formatted";
+        public static final String SRVTS_EPOCH             = "epoch";
+        public static final String SRVTS_EPOCH_SEC         = "sec";
+        public static final String SRVTS_EPOCH_MICROSEC    = "microsec";
 
         public static final String ANNTRIP_TRIP            = "trip";
         public static final String ANNTRIP_MODIFIED        = "modified";
@@ -135,7 +134,9 @@ public class Constants {
         public static final String TRIP_ID                 = "id";
         public static final String TRIP_ITINERARY_ID       = "itineraryId";
         public static final String TRIP_START_DATE         = "startDate";
+        public static final String TRIP_START_TIMEZONE     = "startTimezone";
         public static final String TRIP_END_DATE           = "endDate";
+        public static final String TRIP_END_TIMEZONE       = "endTimezone";
         public static final String TRIP_DESCRIPTION        = "description";
         public static final String TRIP_CODE               = "code";
         public static final String TRIP_NAME               = "name";
@@ -182,6 +183,7 @@ public class Constants {
         public static final String ELEM_HOTEL_CITY          = "city";
         public static final String ELEM_HOTEL_PHONE         = "phone";
         public static final String ELEM_HOTEL_TRANSFER_INFO = "transferInfo";
+        public static final String ELEM_HOTEL_TIMEZONE      = "timezone";
 
         public static final String ELEM_EVENT_VENUE_NAME       = "venueName";
         public static final String ELEM_EVENT_START_TIME       = "startTime";
@@ -193,7 +195,7 @@ public class Constants {
         public static final String ELEM_EVENT_VENUE_PHONE      = "venuePhone";
         public static final String ELEM_EVENT_ACCESS_INFO      = "accessInfo";
 
-        public static final String CHAT_MESSAGES               = "messages";
+        //public static final String CHAT_MESSAGES               = "messages";
 
         public static final String CHATMSG_ID                  = "id";
         public static final String CHATMSG_TRIP_ID             = "tripId";
